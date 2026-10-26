@@ -1,0 +1,469 @@
+{
+  "_note": "Hybrid tones (005). Three tiers D/M/L, each a dabs field on one ground colour. Transition XY: tier X texture as base, tier Y full texture clipped by blotch_mask side=top so Y's mass reaches the top edge (neighbour above). Non-directional; the renderer rotates for the other sides. ref_size 100: mark length 0.2 = 20 units.",
+  "ref_size": 100,
+  "palette": {
+    "indigo": "#2b3262",
+    "slate": "#56647a",
+    "rust": "#9a4f2e",
+    "olive": "#8a8c4c",
+    "ochre": "#b8902f",
+    "sand": "#d9c79c",
+    "cream": "#ece3c8",
+    "pale_blue": "#b7d3e4"
+  },
+  "classes": {
+    "D": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "M": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "L": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "DM": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.45,
+              "side": "top",
+              "inset": 0.08,
+              "count": 3
+            }
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "DL": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.45,
+              "side": "top",
+              "inset": 0.08,
+              "count": 3
+            }
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "MD": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.45,
+              "side": "top",
+              "inset": 0.08,
+              "count": 3
+            }
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "ML": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.45,
+              "side": "top",
+              "inset": 0.08,
+              "count": 3
+            }
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "LD": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.45,
+              "side": "top",
+              "inset": 0.08,
+              "count": 3
+            }
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "LM": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.45,
+              "side": "top",
+              "inset": 0.08,
+              "count": 3
+            }
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    }
+  }
+}
