@@ -25,8 +25,8 @@ Conventions
 
 Public API
 ----------
-stipple, dabs, mosaic, hatch_multi, scatter_shapes, blotch, blotch_mask, motif,
-compose, cell_svg
+stipple, dabs, mosaic, hatch_multi, scatter_shapes, blotch, blotch_mask, march_mask,
+motif, compose, cell_svg
 """
 
 from __future__ import annotations
@@ -44,6 +44,7 @@ __all__ = [
     "scatter_shapes",
     "blotch",
     "blotch_mask",
+    "march_mask",
     "motif",
     "MOTIF_KINDS",
     "compose",
@@ -584,6 +585,161 @@ def blotch_mask(seed: int, size: float, palette: Sequence[str], *,
         for _, _, pts in _blotch_polys(rng, size, coverage, side, count, inset,
                                        roughness, spread))
     return f'<clipPath id="{cid}">{paths}</clipPath>', cid
+
+
+# ------------------------------------------------------------- march_mask
+
+_MARCH_PATTERNS = ("straight", "corner", "corner_in", "cap", "dot")
+_MARCH_DIP = 0.76           # cap: the deepest point of the dip, as a fraction of size
+_MARCH_DOT_RADIUS = 0.275   # dot: nominal radius as a fraction of size (diameter 55%)
+_MARCH_MAX_WOBBLE = 0.2     # above this a diagonal path can leave the cell
+
+
+def _march_noise(rng: random.Random, n: int, size: float, roughness: float,
+                 wobble: float) -> list[float]:
+    """Offsets for n path points: two sine frequencies (1.5 and 4.5 cycles along the
+    path) with per-vertex jitter, scaled by ``roughness`` and by an envelope that is
+    zero at both ends. Every offset lies within ``wobble * size * roughness``."""
+    p0 = rng.uniform(0.0, 2.0 * math.pi)
+    p1 = rng.uniform(0.0, 2.0 * math.pi)
+    amp = wobble * size * roughness
+    out = []
+    for i in range(n):
+        t = i / (n - 1)
+        low = math.sin(2.0 * math.pi * 1.5 * t + p0)
+        high = 0.7 * math.sin(2.0 * math.pi * 4.5 * t + p1) + 0.3 * rng.uniform(-1.0, 1.0)
+        out.append(amp * math.sin(math.pi * t) * (0.7 * low + 0.3 * high))
+    out[0] = out[-1] = 0.0
+    return out
+
+
+def _march_path(rng: random.Random, n: int, size: float, pattern: str,
+                roughness: float, wobble: float) -> list[tuple[float, float]]:
+    """n points of a ragged boundary, from its first edge midpoint to its last.
+
+    straight and cap run from the left midpoint to the right one; their offset is
+    vertical. cap also bends down to ``_MARCH_DIP * size`` at its middle. corner and
+    corner_in run diagonally, from the left midpoint to the bottom or top midpoint,
+    and their offset is along the normal. Both endpoints are exact."""
+    d = _march_noise(rng, n, size, roughness, wobble)
+    pts: list[tuple[float, float]] = []
+    if pattern in ("straight", "cap"):
+        start, end = (0.0, size / 2.0), (size, size / 2.0)
+        for i in range(n):
+            t = i / (n - 1)
+            y = size / 2.0
+            if pattern == "cap":
+                y += (_MARCH_DIP - 0.5) * size * math.sin(math.pi * t) ** 0.6
+            pts.append((t * size, y + d[i]))
+    else:
+        start = (0.0, size / 2.0)
+        end = (size / 2.0, size) if pattern == "corner" else (size / 2.0, 0.0)
+        dx, dy = end[0] - start[0], end[1] - start[1]
+        length = math.hypot(dx, dy)
+        nx, ny = -dy / length, dx / length
+        for i in range(n):
+            t = i / (n - 1)
+            x = start[0] + t * dx + d[i] * nx
+            y = start[1] + t * dy + d[i] * ny
+            pts.append((x, y))
+    pts[0], pts[-1] = start, end
+    return pts
+
+
+def _march_blob(rng: random.Random, n: int, size: float, roughness: float,
+                inset: float) -> list[tuple[float, float]]:
+    """A ragged blob of diameter ``_MARCH_DOT_RADIUS * 2 * size``, centred near the
+    cell centre and at least ``inset * size`` from every edge. A blob that cannot fit
+    that margin is scaled down to fit."""
+    step = 2.0 * math.pi / n
+    p0 = rng.uniform(0.0, 2.0 * math.pi)
+    p1 = rng.uniform(0.0, 2.0 * math.pi)
+    cx = size * (0.5 + rng.uniform(-0.04, 0.04))
+    cy = size * (0.5 + rng.uniform(-0.04, 0.04))
+    r0 = size * _MARCH_DOT_RADIUS
+    rel = []
+    for i in range(n):
+        a = i * step + roughness * 0.3 * step * rng.uniform(-1.0, 1.0)
+        low = math.sin(2.0 * a + p0)
+        high = 0.7 * math.sin(5.0 * a + p1) + 0.3 * rng.uniform(-1.0, 1.0)
+        r = r0 * (1.0 + roughness * (0.25 * low + 0.12 * high))
+        rel.append((r * math.cos(a), r * math.sin(a)))
+    reach = max(math.hypot(x, y) for x, y in rel)
+    room = size * (0.5 - inset)
+    if reach > room:
+        f = room / reach
+        rel = [(x * f, y * f) for x, y in rel]
+        reach = room
+    lo, hi = size * inset + reach, size * (1.0 - inset) - reach
+    cx = min(max(cx, lo), hi)
+    cy = min(max(cy, lo), hi)
+    return [(cx + x, cy + y) for x, y in rel]
+
+
+def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
+               pattern: str = "straight", roughness: float = 0.5, wobble: float = 0.12,
+               inset: float = 0.0, **_) -> tuple[str, str]:
+    """Clip path for one tile of a marching-squares set: ``(clip_svg, clip_id)``.
+
+    The mass is the dark material; the rest of the cell is the base. Each edge pattern
+    crosses a cell edge only at that edge's midpoint, so two adjacent transition cells
+    join continuously whichever patterns they use. Put ``clip_svg`` in a ``<defs>``
+    and reference it with ``clip-path="url(#clip_id)"``. Rotate the tile about its
+    centre to turn a pattern; the four 90-degree turns are exact.
+
+    pattern:
+        "straight": the path runs from the left midpoint to the right one. The mass
+            is everything above it: the whole top edge, and the left and right edges
+            from their midpoints up.
+        "corner": the path runs from the left midpoint to the bottom midpoint. The
+            mass is everything except the bottom-left corner region, so the base
+            keeps only that corner.
+        "corner_in": the mass is only the top-left corner region, cut off by a path
+            from the left midpoint to the top midpoint. Use it for a convex corner of
+            a mass (the complement of "corner").
+        "cap": the same endpoints and mass as "straight", but the path dips down to
+            about 76% of the cell height at its middle. The mass is a tongue hanging
+            from the top edge. "straight" has no dip, and its path stays near the
+            middle line.
+        "dot": an isolated ragged blob of diameter about 55% of size, with no contact
+            with any edge. It is centred near the middle.
+
+    roughness: 0-1, the share of the ragged offset. At 0 the path is a straight line
+        between its pinned points (for "dot", a regular polygon).
+    wobble: 0-0.2, the maximum vertical (or normal) offset of an edge path, as a
+        fraction of size, reached at roughness 1. Ignored by "dot". Above 0.2 a
+        diagonal path could leave the cell, so the value is capped.
+    inset: 0-0.5, the clear margin kept from every edge. Used only by "dot", which does
+        not touch an edge. The edge patterns must reach their midpoints, so they ignore
+        it. The value is still checked.
+
+    Output is deterministic for a given seed. Each edge path has 12 to 20 points,
+    endpoints included. A "dot" has the same count.
+    """
+    params = _key_args(locals())
+    params.pop("_", None)
+    if pattern not in _MARCH_PATTERNS:
+        raise ValueError(f"pattern must be one of {_MARCH_PATTERNS}, not {pattern!r}")
+    if not 0.0 <= roughness <= 1.0:
+        raise ValueError("roughness must be in [0, 1]")
+    if not 0.0 <= wobble <= _MARCH_MAX_WOBBLE:
+        raise ValueError(f"wobble must be in [0, {_MARCH_MAX_WOBBLE:g}]")
+    if not 0.0 <= inset < 0.5:
+        raise ValueError("inset must be in [0, 0.5)")
+    rng = random.Random(seed)
+    n = rng.randint(12, 20)
+    if pattern == "dot":
+        pts = _march_blob(rng, n, size, roughness, inset)
+    else:
+        pts = _march_path(rng, n, size, pattern, roughness, wobble)
+        pts += {
+            "straight": [(size, 0.0), (0.0, 0.0)],
+            "cap": [(size, 0.0), (0.0, 0.0)],
+            "corner": [(size, size), (size, 0.0), (0.0, 0.0)],
+            "corner_in": [(0.0, 0.0)],
+        }[pattern]
+    cid = _clip_id("march_mask", seed, size, palette or (), params)
+    return f'<clipPath id="{cid}"><polygon points="{_points(pts)}"/></clipPath>', cid
 
 
 MOTIF_KINDS = ("disc", "ring", "silhouette_bird", "leaf", "fish", "boat",

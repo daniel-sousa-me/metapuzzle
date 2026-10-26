@@ -23,7 +23,8 @@ Spec format (see ``data/sample_classes.json``)::
 * ``palette`` entries are names from the top-level palette or raw ``#rgb``/``#rrggbb``.
 * ``background`` defaults to true for the first layer and false for the others.
 * ``mask`` is optional. ``{"primitive": "blotch_mask", "params": {...}}`` clips the
-  whole layer to a blotch-shaped region: the layer is drawn normally, then wrapped in
+  whole layer to a blotch-shaped region (``"march_mask"`` is the marching-squares
+  alternative, with edge-midpoint crossings): the layer is drawn normally, then wrapped in
   ``<g clip-path>``. A transition is a full-cell base layer plus a second full-cell
   layer with a ``mask``, so both sides are textured and the boundary is ragged.
 * A class may define named masks under ``"masks"``, and several layers may reference
@@ -81,6 +82,7 @@ PRIMITIVES = {
 # Mask primitives return (clip_svg, clip_id) instead of a painted fragment.
 MASK_PRIMITIVES = {
     "blotch_mask": tx.blotch_mask,
+    "march_mask": tx.march_mask,
 }
 ROTATIONS = (0, 90, 180, 270)
 DEFAULT_REF_SIZE = 100.0

@@ -488,3 +488,161 @@ def test_roughness_and_spread_reject_bad_arguments():
         tx.blotch(1, 100.0, PALETTE, side="top", spread=0.5)           # roughness 0
     with pytest.raises(ValueError, match="spread applies only"):
         tx.blotch(1, 100.0, PALETTE, roughness=0.6, spread=0.5)        # no side
+
+
+# ------------------------------------------------------------------ march_mask
+
+MARCH_EDGE = ("straight", "corner", "corner_in", "cap")
+MARCH_ENDS = {                       # pinned path endpoints (size 100)
+    "straight": ((0.0, 50.0), (100.0, 50.0)),
+    "cap": ((0.0, 50.0), (100.0, 50.0)),
+    "corner": ((0.0, 50.0), (50.0, 100.0)),
+    "corner_in": ((0.0, 50.0), (50.0, 0.0)),
+}
+MARCH_TAIL = {                       # mass-polygon corners after the path
+    "straight": [(100.0, 0.0), (0.0, 0.0)],
+    "cap": [(100.0, 0.0), (0.0, 0.0)],
+    "corner": [(100.0, 100.0), (100.0, 0.0), (0.0, 0.0)],
+    "corner_in": [(0.0, 0.0)],
+}
+
+
+def _march_pts(clip: str) -> list[tuple[float, float]]:
+    m = re.search(r'<polygon points="([^"]+)"', clip)
+    assert m, clip[:200]
+    return [tuple(map(float, p.split(","))) for p in m.group(1).split()]
+
+
+@pytest.mark.parametrize("roughness", [0.0, 0.5, 1.0])
+@pytest.mark.parametrize("pattern", MARCH_EDGE)
+def test_march_path_is_pinned_at_mid_edges(pattern, roughness):
+    # The boundary enters and leaves at the exact edge midpoints, and nowhere else touches
+    # an edge: that is what lets neighbouring transition cells join.
+    for seed in range(10):
+        clip, _ = tx.march_mask(seed, 100.0, None, pattern=pattern, roughness=roughness)
+        pts = _march_pts(clip)
+        k = len(MARCH_TAIL[pattern])
+        path = pts[:-k]
+        assert pts[-k:] == MARCH_TAIL[pattern], (pattern, seed)
+        assert (path[0], path[-1]) == MARCH_ENDS[pattern], (pattern, seed)
+        assert 12 <= len(path) <= 20, (pattern, seed)
+        for x, y in path[1:-1]:
+            assert 0.0 < x < 100.0 and 0.0 < y < 100.0, (pattern, seed, x, y)
+
+
+def test_march_wobble_is_capped_so_paths_stay_inside():
+    for pattern in MARCH_EDGE:
+        for seed in range(20):
+            clip, _ = tx.march_mask(seed, 100.0, None, pattern=pattern, roughness=1.0,
+                                    wobble=0.2)
+            for x, y in _march_pts(clip)[1:-4]:
+                assert 0.0 < x < 100.0 and 0.0 < y < 100.0, (pattern, seed)
+    with pytest.raises(ValueError, match="wobble must be in"):
+        tx.march_mask(1, 100.0, None, wobble=0.3)
+
+
+def test_march_roughness_zero_is_straight_between_the_pinned_points():
+    clip, _ = tx.march_mask(4, 100.0, None, pattern="straight", roughness=0.0)
+    assert all(y == 50.0 for _, y in _march_pts(clip)[:-2])
+    clip, _ = tx.march_mask(4, 100.0, None, pattern="corner", roughness=0.0)
+    path = _march_pts(clip)[:-3]
+    # collinear with (0, 50) and (50, 100): the cross product of each point's offset is zero
+    for x, y in path:
+        assert abs((x - 0.0) * 50.0 - (y - 50.0) * 50.0) < 1e-6
+
+
+def test_march_mass_is_on_the_documented_side():
+    for seed in range(6):
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="straight"))
+        assert all(grid[0][x] for x in range(100))              # whole top edge is mass
+        assert not any(grid[99][x] for x in range(100))         # bottom edge is base
+        assert grid[10][50] and not grid[90][50]
+
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="corner"))
+        assert grid[0][0] and grid[0][99] and grid[99][99]      # top and right are mass
+        assert not grid[99][0]                                   # bottom-left is base
+
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="corner_in"))
+        assert grid[0][0] and not grid[0][99] and not grid[99][0] and not grid[99][99]
+
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="cap"))
+        assert all(grid[0][x] for x in range(100))              # still touches the top
+        assert grid[60][50] and not grid[90][50]                # the tongue reaches down
+        assert not grid[95][1] and not grid[95][98]             # sides are base low down
+
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="dot"))
+        assert grid[50][50] and not grid[0][0] and not grid[99][99]
+
+
+def test_march_cap_dips_deeper_than_straight():
+    for seed in range(8):
+        cap = _march_pts(tx.march_mask(seed, 100.0, None, pattern="cap")[0])[:-2]
+        straight = _march_pts(tx.march_mask(seed, 100.0, None, pattern="straight")[0])[:-2]
+        assert max(y for _, y in cap) >= 70.0, seed          # about 70-80% of the height
+        assert max(y for _, y in straight) <= 50.0 + 0.12 * 100 * 0.5 + 1e-6, seed
+
+
+def test_march_dot_never_touches_the_edge():
+    for seed in range(40):
+        clip, cid = tx.march_mask(seed, 100.0, None, pattern="dot", roughness=1.0)
+        for x, y in _march_pts(clip):
+            assert 8.0 <= x <= 92.0 and 8.0 <= y <= 92.0, (seed, x, y)
+    for seed in range(4):
+        clip, cid = tx.march_mask(seed, 100.0, None, pattern="dot", roughness=1.0)
+        assert _mask_margin_hits(clip, cid, EDGES) == 0, seed
+
+
+def test_march_dot_inset_keeps_the_blob_inside_the_margin():
+    for seed in range(20):
+        clip, _ = tx.march_mask(seed, 100.0, None, pattern="dot", inset=0.3)
+        for x, y in _march_pts(clip):
+            assert 30.0 - 1e-6 <= x <= 70.0 + 1e-6 and 30.0 - 1e-6 <= y <= 70.0 + 1e-6, seed
+
+
+def test_march_dot_diameter_is_about_half_the_cell():
+    xs = [x for x, _ in _march_pts(tx.march_mask(3, 100.0, None, pattern="dot", roughness=0.0)[0])]
+    assert 50.0 <= max(xs) - min(xs) <= 60.0
+
+
+@pytest.mark.parametrize("pattern", tx._MARCH_PATTERNS)
+def test_march_is_deterministic_and_seed_dependent(pattern):
+    a = tx.march_mask(7, 100.0, None, pattern=pattern)
+    assert tx.march_mask(7, 100.0, None, pattern=pattern) == a
+    assert tx.march_mask(8, 100.0, None, pattern=pattern) != a
+    # the palette is not read; it only enters the clip id
+    body = lambda clip: clip[clip.index('<polygon'):]
+    assert body(tx.march_mask(7, 100.0, PALETTE, pattern=pattern)[0]) == body(a[0])
+
+
+def test_march_mask_is_registered_for_class_specs_and_exported():
+    assert classes.MASK_PRIMITIVES["march_mask"] is tx.march_mask
+    assert "march_mask" in tx.__all__
+
+
+def test_march_mask_rejects_bad_arguments():
+    with pytest.raises(ValueError, match="pattern must be one of"):
+        tx.march_mask(1, 100.0, None, pattern="spiral")
+    with pytest.raises(ValueError, match="roughness must be in"):
+        tx.march_mask(1, 100.0, None, roughness=1.5)
+    with pytest.raises(ValueError, match="inset must be in"):
+        tx.march_mask(1, 100.0, None, inset=0.5)
+
+
+def test_march_mask_extra_keywords_are_ignored_and_not_keyed():
+    a = tx.march_mask(2, 100.0, None, pattern="corner")
+    assert tx.march_mask(2, 100.0, None, pattern="corner", unused=1) == a
+
+
+def test_march_mask_class_spec_layer_renders():
+    spec = classes.ClassSpec.from_dict({
+        "palette": {"paper": "#e8dcc4", "ink": "#2f4f4f"},
+        "classes": {"edge": {"layers": [
+            {"primitive": "stipple", "palette": ["paper", "ink"]},
+            {"primitive": "stipple", "palette": ["ink", "paper"],
+             "mask": {"primitive": "march_mask", "params": {"pattern": "corner"}}},
+        ]}},
+    })
+    spec.validate()
+    frag = spec.drawer()("p1", "edge", 3, 64.0)
+    assert 'clipPath id="clip-march_mask-' in frag
+    ET.fromstring(tx.cell_svg(frag, 64.0))
