@@ -4,7 +4,16 @@ import pytest
 
 from metapuzzle.cli import main
 from metapuzzle.scene import ClassMap, load_scenes
-from metapuzzle.scene_metrics import WINDOW_SIZES, largest_blob, report, same_position_overlap, transferable_blob, window_reuse
+from metapuzzle.scene_metrics import (
+    SCENE_GATES,
+    WINDOW_SIZES,
+    largest_blob,
+    report,
+    same_position_overlap,
+    scene_gates,
+    transferable_blob,
+    window_reuse,
+)
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "docs" / "design" / "scenes-8x10.txt"
 
@@ -132,7 +141,83 @@ def test_example_scene_file():
 
 
 def test_cli_scene_metrics(capsys):
-    assert main(["scene-metrics", str(EXAMPLE)]) == 0
+    assert main(["scene-metrics", str(EXAMPLE)]) == 3  # scene gates fail
     out = capsys.readouterr().out
     assert "A-B: same position" in out and "A-C:" in out and "B-C:" in out
     assert "transferable blob" in out
+    assert out.splitlines()[-1].startswith("scene gates: FAIL (A-B same-position 66.2% ≥ 25%; ")
+
+
+def test_cli_scene_metrics_exit_zero_when_gates_pass(tmp_path, capsys):
+    path = tmp_path / "pass.txt"
+    path.write_text("\n\n".join("\n".join(" ".join(row) for row in m) for m in (PASS_A, PASS_B, PASS_C)) + "\n")
+    assert main(["scene-metrics", str(path)]) == 0
+    assert capsys.readouterr().out.splitlines()[-1] == "scene gates: PASS"
+
+
+# Hand-built 10x10 class maps. Each failing pair trips exactly one scene gate.
+N = 10
+
+
+def _map(f):
+    return [["abcdef"[f(x, y)] for x in range(N)] for y in range(N)]
+
+
+PASS_A = _map(lambda x, y: (x * x + 3 * y + x * y) % 6)
+PASS_B = _map(lambda x, y: (x * 5 + y * y * 2 + 1) % 6)
+PASS_C = _map(lambda x, y: (x * y) % 6)
+# B keeps 30% of A's cells in place and relabels the rest: same-position 30%, almost no 2x2 reuse.
+SAME_B = [[PASS_A[y][x] if (x * 7 + y * 3) % 10 < 3 else "abcdef"[("abcdef".index(PASS_A[y][x]) + 1) % 6]
+           for x in range(N)] for y in range(N)]
+# A checkerboard and the same checkerboard shifted one column: every 2x2 window reappears, no cell matches.
+CHECK_A = _map(lambda x, y: (x + y) % 2)
+CHECK_B = _map(lambda x, y: (x + 1 + y) % 2)
+
+
+def _with_block(f, x0, y0):
+    """Background from f (classes a-d) with a 4x3 block of class f at (x0, y0)."""
+    g = [["abcd"[f(x, y)] for x in range(N)] for y in range(N)]
+    for y in range(y0, y0 + 3):
+        for x in range(x0, x0 + 4):
+            g[y][x] = "f"
+    return g
+
+
+# A 4x3 block of class f in both maps, at different places: a 12-cell transferable blob.
+BLOB_A = _with_block(lambda x, y: (x * 5 + y * y * 2 + 1) % 4, 0, 0)
+BLOB_B = _with_block(lambda x, y: (x * 3 + y * 7 + 2) % 4, 5, 6)
+
+
+def test_hand_built_maps_pass_every_scene_gate():
+    assert scene_gates([PASS_A, PASS_B, PASS_C]) == (True, [])
+    assert report([PASS_A, PASS_B, PASS_C])["gates"] == {"ok": True, "failures": []}
+
+
+@pytest.mark.parametrize(
+    "a, b, failure",
+    [
+        (PASS_A, SAME_B, "A-B same-position 30.0% ≥ 25%"),
+        (CHECK_A, CHECK_B, "A-B 2x2 window reuse 100.0% ≥ 30%"),
+        (BLOB_A, BLOB_B, "A-B transferable blob 12.0% ≥ 10% of cells"),
+    ],
+)
+def test_each_scene_gate_fails_alone(a, b, failure):
+    assert scene_gates([a, b], names=("A", "B")) == (False, [failure])
+    rep = report([a, b], names=("A", "B"))
+    assert rep["gates"] == {"ok": False, "failures": [failure]}
+    assert rep["text"].splitlines()[-1] == f"scene gates: FAIL ({failure})"
+
+
+def test_gate_limits_are_a_tunable_dict(monkeypatch):
+    assert SCENE_GATES == {"same_position_below": 0.25, "window_2x2_plain_below": 0.30, "transferable_below": 0.10}
+    assert scene_gates([PASS_A, SAME_B], names=("A", "B"))[0] is False
+    monkeypatch.setitem(SCENE_GATES, "same_position_below", 0.35)
+    assert scene_gates([PASS_A, SAME_B], names=("A", "B")) == (True, [])
+
+
+def test_example_scene_file_fails_every_pair():
+    ok, failures = scene_gates(load_scenes([EXAMPLE]))
+    assert not ok and len(failures) == 9  # three gates on each of the three pairs
+    assert "A-B same-position 66.2% ≥ 25%" in failures
+    assert "A-C 2x2 window reuse 57.1% ≥ 30%" in failures
+    assert "B-C transferable blob 27.5% ≥ 10% of cells" in failures

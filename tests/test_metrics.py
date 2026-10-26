@@ -1,15 +1,19 @@
+import pytest
+
 from metapuzzle.board import square_board
 from metapuzzle.metrics import (
+    PIECE_GATES,
     components,
     corner_order,
     familiarity,
     format_report,
+    piece_gates,
     report,
     shared_adjacencies,
     shared_fraction,
     transferable_clusters,
 )
-from metapuzzle.optimize import Solution
+from metapuzzle.optimize import Solution, solve
 from metapuzzle.pieces import make_inventory
 
 
@@ -85,3 +89,53 @@ def test_report_dict_and_text():
     assert rep["total_shared"] == 7 + 4 + 4
     assert rep["pairs"]["AB"]["largest_component"] == 6
     assert "AB: shared=7" in rep["text"] and rep["text"] == format_report(rep)
+
+
+BIG = square_board(10, 8, "standard")  # 80 pieces, 142 adjacencies
+
+
+def _stride(k):
+    return {p: ((p * k) % 80, 0) for p in range(80)}
+
+
+def _chain():
+    """Pieces 0-3 keep slots 0-3 (a row of four); the others are scattered by a stride."""
+    pl = {p: (p, 0) for p in range(4)}
+    for i, p in enumerate(range(4, 80)):
+        pl[p] = (4 + (3 * i) % 76, 0)
+    return pl
+
+
+def _solution(placements):
+    return Solution([BIG, BIG, BIG], make_inventory(BIG), placements, None, {})
+
+
+def test_piece_gates_pass_on_solver_output():
+    sol = solve([BIG, BIG, BIG], make_inventory(BIG), None, seed=0)
+    assert piece_gates(sol) == (True, [])
+    assert report(sol)["text"].splitlines()[-1] == "piece gates: PASS"
+
+
+def test_piece_gates_fail_on_a_shared_cluster_of_four_or_more():
+    ident = {p: (p, 0) for p in range(80)}
+    sol = _solution([ident, _stride(3), _chain()])
+    # 4 shared adjacencies (2.8% < 5%) form one run of five pieces: only the cluster gate fails
+    assert piece_gates(sol) == (False, ["AC largest shared cluster 5 pieces ≥ 4"])
+    rep = report(sol)
+    assert rep["gates"] == {"ok": False, "failures": ["AC largest shared cluster 5 pieces ≥ 4"]}
+    assert rep["text"].splitlines()[-1] == "piece gates: FAIL (AC largest shared cluster 5 pieces ≥ 4)"
+
+
+def test_piece_gates_fail_on_shared_fraction():
+    ident = {p: (p, 0) for p in range(80)}
+    ok, failures = piece_gates(_solution([ident, ident, _stride(3)]))
+    assert not ok
+    assert "AB shared 100.0% ≥ 5%" in failures
+
+
+def test_piece_gate_limits_are_a_tunable_dict(monkeypatch):
+    assert PIECE_GATES == {"shared_fraction_below": 0.05, "largest_cluster_below": 4}
+    ident = {p: (p, 0) for p in range(80)}
+    sol = _solution([ident, _stride(3), _chain()])
+    monkeypatch.setitem(PIECE_GATES, "largest_cluster_below", 6)
+    assert piece_gates(sol) == (True, [])

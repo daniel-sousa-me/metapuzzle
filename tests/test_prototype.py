@@ -58,6 +58,14 @@ def test_run_prototype_writes_outputs_and_valid_solution(tmp_path, scenes):
     assert set(res["shared"]) == {"AB", "AC", "BC"}
     summary = (out / "summary.md").read_text()
     assert "| AB |" in summary and "- valid: yes" in summary and "solution.json" in summary
+    piece_line, scene_line = res["gate_lines"]
+    assert piece_line.startswith("piece gates: ") and scene_line.startswith("scene gates: ")
+    assert "## Gates" in summary and f"- {piece_line}" in summary and f"- {scene_line}" in summary
+    assert (out / "scene-metrics.txt").read_text().splitlines()[-1] == scene_line
+    assert set(res["gates"]) == {"piece", "scene", "failures"}
+    assert (piece_line == "piece gates: PASS") == res["gates"]["piece"]
+    assert (scene_line == "scene gates: PASS") == res["gates"]["scene"]
+    assert all(f.startswith(("piece: ", "scene: ")) for f in res["gates"]["failures"])
     with Image.open(out / "triptych.png") as im:
         assert im.height <= 600 and im.width > 3 * 4 * 48
 
@@ -82,7 +90,8 @@ def test_cli_prototype(tmp_path, scenes, capsys):
     args = ["prototype", "--scenes", str(scenes), "--classes", str(SAMPLE_SPEC_PATH), "--out", str(out),
             "--sizes", "4x5,4x5,4x5", "--iters", "3000", "--cell", "24"]
     assert main(args) == 0
-    assert "valid=True" in capsys.readouterr().out
+    text = capsys.readouterr().out
+    assert "valid=True" in text and "piece gates: " in text and "scene gates: " in text
     assert (out / "triptych.png").is_file() and (out / "summary.md").is_file()
     assert validate_solution(Solution.load(out / "solution.json")) == []
     assert main(["prototype", "--scenes", str(scenes), "--classes", str(SAMPLE_SPEC_PATH),

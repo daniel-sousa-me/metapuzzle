@@ -12,6 +12,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from typing import Iterator, Mapping, Sequence
 
+from .metrics import gate_line
 from .scene import ClassMap
 
 Grid = Sequence[Sequence[str]]
@@ -20,6 +21,18 @@ Pattern = tuple[tuple[str, ...], ...]
 
 WINDOW_SIZES = ((1, 2), (2, 1), (2, 2), (3, 3))
 DEFAULT_NAMES = ("A", "B", "C")
+
+# Scene-level pass/fail gates, checked per pair (A-B, A-C, B-C). A gate passes when its value is
+# strictly below the limit. A value that cannot be evaluated (a 2x2 window in a map narrower than
+# 2 cells, or same-position overlap of maps with different shapes) is not a failure.
+#   same_position_below:      same-class cells at the same (row, col), fraction of A's cells
+#   window_2x2_plain_below:   fraction of A's 2x2 windows (no rotation) found anywhere in B
+#   transferable_below:       transferable blob (cells) as a fraction of A's cells
+SCENE_GATES = {
+    "same_position_below": 0.25,
+    "window_2x2_plain_below": 0.30,
+    "transferable_below": 0.10,
+}
 
 
 def _grid(m: ClassMap | Grid) -> list[list[str]]:
@@ -189,8 +202,8 @@ def _sorted_counts(c: Mapping[str, int]) -> dict[str, int]:
     return dict(sorted(c.items(), key=lambda kv: (-kv[1], kv[0])))
 
 
-def report(maps: Sequence[ClassMap | Grid], names: Sequence[str] = DEFAULT_NAMES) -> dict:
-    """Pairwise carry-over metrics, class histograms and largest blobs; key 'text' is a summary."""
+def _analyse(maps: Sequence[ClassMap | Grid], names: Sequence[str]) -> dict:
+    """Histograms, blobs and pairwise metrics (no gates, no text)."""
     if len(names) != len(maps):
         raise ValueError(f"{len(maps)} maps but {len(names)} names")
     if len(maps) < 2:
@@ -208,6 +221,46 @@ def report(maps: Sequence[ClassMap | Grid], names: Sequence[str] = DEFAULT_NAMES
         for j in range(i + 1, len(grids)):
             key = f"{names[i]}-{names[j]}"
             rep["pairs"][key] = _pair_metrics(grids[i], grids[j], (names[i], names[j]))
+    return rep
+
+
+def _limit(x: float) -> str:
+    return f"{100 * x:g}%"
+
+
+def _gate_failures(pairs: Mapping[str, dict]) -> list[str]:
+    """One string per failing gate item, e.g. 'A-B same-position 66.2% ≥ 25%'."""
+    g = SCENE_GATES
+    out = []
+    for key, p in pairs.items():
+        if p["same_position"] is not None and p["same_position"][1] >= g["same_position_below"]:
+            out.append(f"{key} same-position {100 * p['same_position'][1]:.1f}% ≥ {_limit(g['same_position_below'])}")
+        w = p["window_reuse"]["2x2"]
+        if w is not None and w["plain"] >= g["window_2x2_plain_below"]:
+            out.append(f"{key} 2x2 window reuse {100 * w['plain']:.1f}% ≥ {_limit(g['window_2x2_plain_below'])}")
+        if p["transferable_fraction"] >= g["transferable_below"]:
+            out.append(
+                f"{key} transferable blob {100 * p['transferable_fraction']:.1f}% ≥ "
+                f"{_limit(g['transferable_below'])} of cells"
+            )
+    return out
+
+
+def scene_gates(maps: Sequence[ClassMap | Grid], names: Sequence[str] = DEFAULT_NAMES) -> tuple[bool, list[str]]:
+    """(ok, failures) of the scene gates; failures are the items listed in the report's gate line."""
+    failures = _gate_failures(_analyse(maps, names)["pairs"])
+    return not failures, failures
+
+
+def report(maps: Sequence[ClassMap | Grid], names: Sequence[str] = DEFAULT_NAMES) -> dict:
+    """Pairwise carry-over metrics, class histograms, largest blobs and scene gates.
+
+    Keys: 'pairs', 'histograms', 'largest_blobs', 'shapes', 'names', 'gates' ({'ok', 'failures'})
+    and 'text', a readable summary whose last line is the scene gate line.
+    """
+    rep = _analyse(maps, names)
+    failures = _gate_failures(rep["pairs"])
+    rep["gates"] = {"ok": not failures, "failures": failures}
     rep["text"] = format_scene_report(rep)
     return rep
 
@@ -217,7 +270,7 @@ def _pct(x: float | None) -> str:
 
 
 def format_scene_report(rep: dict) -> str:
-    """Readable summary of a report() dict."""
+    """Readable summary of a report() dict, ending with the scene gate line."""
     lines = ["maps (cols x rows): " + ", ".join(f"{n} {c}x{r}" for n, (c, r) in rep["shapes"].items())]
     lines.append("class histograms:")
     for n, h in rep["histograms"].items():
@@ -242,4 +295,5 @@ def format_scene_report(rep: dict) -> str:
             f"    transferable blob: {p['transferable_blob']} cells "
             f"({100 * p['transferable_fraction']:.1f}% of {first})"
         )
+    lines.append(gate_line("scene", _gate_failures(rep["pairs"])))
     return "\n".join(lines)

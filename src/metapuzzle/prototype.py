@@ -6,7 +6,6 @@ triptychs and a summary into one output directory. `metapuzzle prototype` wraps 
 """
 from __future__ import annotations
 
-import dataclasses
 from pathlib import Path
 from typing import Sequence
 
@@ -14,7 +13,8 @@ from PIL import Image
 
 from .board import ROTATION_DEGREES, square_board
 from .classes import ClassSpec, load_class_spec
-from .metrics import PAIR_NAMES, report
+from . import scene_metrics
+from .metrics import PAIR_NAMES, gate_line, report
 from .optimize import solve, validate_solution
 from .pieces import Piece, rotations_for_piece
 from .render import render_all, render_solution_png, render_solution_svg
@@ -74,15 +74,6 @@ def _check_cells_fit(maps, boards, pieces: list[Piece]) -> None:
                 )
 
 
-def _scene_metrics_text(maps) -> str | None:
-    """Scene-level report from `scene_metrics`, or None when that module is not present."""
-    try:
-        from . import scene_metrics
-    except ImportError:
-        return None
-    return scene_metrics.report(maps)["text"]
-
-
 def _triptych(paths: Sequence[Path], dest: Path) -> Path:
     """Side by side, each image at most TRIPTYCH_MAX_HEIGHT tall, TRIPTYCH_GAP apart, white."""
     images = []
@@ -104,8 +95,8 @@ def _triptych(paths: Sequence[Path], dest: Path) -> Path:
 
 
 def _summary_md(
-    *, params: dict, rep: dict, errs: list[str], scene_text: str | None,
-    missing_classes: list[str], files: list[str],
+    *, params: dict, rep: dict, errs: list[str], scene_text: str,
+    gate_lines: list[str], missing_classes: list[str], files: list[str],
 ) -> str:
     rows = dict(params)
     rows["valid"] = "yes" if not errs else f"no ({len(errs)} violation(s))"
@@ -131,10 +122,9 @@ def _summary_md(
         )
     lines += ["", f"Total shared: {rep['total_shared']}; cluster penalty: {rep['cluster_penalty']}; "
               f"rotated pieces per solution: {rep['rotated_pieces']}", "", "## Scene-level metrics", ""]
-    if scene_text is None:
-        lines.append("Not available: `metapuzzle.scene_metrics` is not present in this build.")
-    else:
-        lines += ["```text", scene_text, "```"]
+    lines += ["```text", scene_text, "```"]
+    lines += ["", "## Gates", ""]
+    lines += [f"- {g}" for g in gate_lines]
     lines += ["", "## Files", ""]
     lines += [f"- `{f}`" for f in files]
     lines.append("- `summary.md` (this file)")
@@ -163,6 +153,8 @@ def run_prototype(
 
     Returns a dict with `valid`, `violations`, `shared` (per pair), `files` (name -> path) and
     `out_dir`. Invalid solutions still write their outputs and return `valid: False`.
+    `gates` is {"piece": ok, "scene": ok, "failures": [...]} (failures prefixed "piece: " or
+    "scene: "); `gate_lines` are the two printed gate lines. Gate failures do not change `valid`.
     """
     maps = load_scenes(scenes_path)
     map_sizes = [(m.cols, m.rows) for m in maps]
@@ -173,8 +165,8 @@ def run_prototype(
     boards = [square_board(c, r, border, rotation) for c, r in map_sizes]
     spec = load_class_spec(classes_path)
 
-    base = pieces_from_scenes(boards, maps)
-    pieces = [dataclasses.replace(p, allowed_rotations=_allowed_rotations(spec, p.cls, rotation)) for p in base]
+    class_rotations = {cls: _allowed_rotations(spec, cls, rotation) for cls in maps[0].histogram()}
+    pieces = pieces_from_scenes(boards, maps, allowed_rotations=class_rotations)
     _check_cells_fit(maps, boards, pieces)
     missing_classes = sorted(set(maps[0].histogram()) - set(spec.classes))
 
@@ -193,10 +185,10 @@ def run_prototype(
     files["metrics.txt"] = out / "metrics.txt"
     files["metrics.txt"].write_text(rep["text"] + "\n" + validity + "\n", encoding="utf-8")
 
-    scene_text = _scene_metrics_text(maps)
-    if scene_text is not None:
-        files["scene-metrics.txt"] = out / "scene-metrics.txt"
-        files["scene-metrics.txt"].write_text(scene_text + "\n", encoding="utf-8")
+    scene_rep = scene_metrics.report(maps)
+    scene_text = scene_rep["text"]
+    files["scene-metrics.txt"] = out / "scene-metrics.txt"
+    files["scene-metrics.txt"].write_text(scene_text + "\n", encoding="utf-8")
 
     drawer = spec.drawer()
     rendered = render_all(sol, drawer, out, "solution", cell_size=cell, grid=grid, labels=labels)
@@ -227,10 +219,17 @@ def run_prototype(
         "grid": grid,
         "labels": labels,
     }
+    piece_failures, scene_failures = rep["gates"]["failures"], scene_rep["gates"]["failures"]
+    gate_lines = [gate_line("piece", piece_failures), gate_line("scene", scene_failures)]
+    gates = {
+        "piece": rep["gates"]["ok"],
+        "scene": scene_rep["gates"]["ok"],
+        "failures": [f"piece: {f}" for f in piece_failures] + [f"scene: {f}" for f in scene_failures],
+    }
     listed = [str(p.relative_to(out)) for p in files.values()]
     files["summary.md"] = out / "summary.md"
     files["summary.md"].write_text(
-        _summary_md(params=params, rep=rep, errs=errs, scene_text=scene_text,
+        _summary_md(params=params, rep=rep, errs=errs, scene_text=scene_text, gate_lines=gate_lines,
                     missing_classes=missing_classes, files=sorted(listed)),
         encoding="utf-8",
     )
@@ -242,4 +241,6 @@ def run_prototype(
         "violations": errs,
         "shared": {n: rep["pairs"][n]["shared"] for n in PAIR_NAMES},
         "files": {name: str(p) for name, p in files.items()},
+        "gates": gates,
+        "gate_lines": gate_lines,
     }

@@ -10,6 +10,7 @@ from .board import square_board
 from .metrics import report
 from .optimize import Solution, solve, validate_solution
 from . import scene_metrics
+from .scene_metrics import SCENE_GATES
 from .pieces import make_inventory
 from .scene import SceneError, load_scenes, pieces_from_scenes
 
@@ -55,9 +56,22 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--grid", choices=["none", "faint", "strong"], default="none", help="cell outlines")
     g.add_argument("--labels", action="store_true", help="print piece ids in the cells")
     g.add_argument("--classes", metavar="SPEC.json", help="draw pieces from a class spec instead of flat colours")
-    sm = sub.add_parser("scene-metrics", help="class carry-over metrics between the three class maps")
+    sm = sub.add_parser(
+        "scene-metrics",
+        help="class carry-over metrics and scene gates between the three class maps",
+        epilog=(
+            "exit status: 0 when every scene gate passes, 3 when a scene gate fails, 1 on an input error. "
+            f"Gates per pair: same-position overlap < {100 * SCENE_GATES['same_position_below']:g}% of cells, "
+            f"2x2 window reuse (no rotation) < {100 * SCENE_GATES['window_2x2_plain_below']:g}%, "
+            f"transferable blob < {100 * SCENE_GATES['transferable_below']:g}% of cells."
+        ),
+    )
     sm.add_argument("scenes", metavar="SCENES.txt", help="scene file with three class maps (text or JSON)")
-    pt = sub.add_parser("prototype", help="end to end: solve, metrics, renders, triptych and summary into a directory")
+    pt = sub.add_parser(
+        "prototype",
+        help="end to end: solve, metrics, renders, triptych and summary into a directory",
+        epilog="prints the piece and scene gate lines; exit status 0 when valid, 2 when not (gates do not change it)",
+    )
     pt.add_argument("--scenes", required=True, metavar="FILE", help="three class maps (text or JSON)")
     pt.add_argument("--classes", required=True, metavar="SPEC.json", help="class spec: drawing and per-class rotations")
     pt.add_argument("--out", required=True, metavar="DIR", help="output directory")
@@ -132,8 +146,9 @@ def _cmd_render(a: argparse.Namespace) -> int:
 
 
 def _cmd_scene_metrics(a: argparse.Namespace) -> int:
-    print(scene_metrics.report(load_scenes(a.scenes))["text"])
-    return 0
+    rep = scene_metrics.report(load_scenes(a.scenes))
+    print(rep["text"])
+    return 0 if rep["gates"]["ok"] else 3
 
 
 def _cmd_prototype(a: argparse.Namespace) -> int:
@@ -148,6 +163,8 @@ def _cmd_prototype(a: argparse.Namespace) -> int:
         f"sizes={res['params']['sizes']} shared AB/AC/BC={s['AB']}/{s['AC']}/{s['BC']} "
         f"valid={res['valid']} wrote {len(res['files'])} files to {res['out_dir']}"
     )
+    for line in res["gate_lines"]:
+        print(line)
     return 0 if res["valid"] else 2
 
 

@@ -15,7 +15,7 @@ def test_solve_report_round_trip(tmp_path, capsys):
     capsys.readouterr()
     assert main(["report", str(out)]) == 0
     text = capsys.readouterr().out
-    assert "AB: shared=0" in text and "validity: OK" in text
+    assert "AB: shared=0" in text and "validity: OK" in text and "piece gates: PASS" in text.splitlines()
     assert main(["report", str(out), "--json"]) == 0
     rep = json.loads(capsys.readouterr().out)
     assert rep["total_shared"] == 0

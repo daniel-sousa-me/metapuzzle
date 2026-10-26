@@ -15,6 +15,36 @@ Placement = Mapping[int, tuple[int, int]]
 PAIR_NAMES = ("AB", "AC", "BC")
 PAIR_INDEX = ((0, 1), (0, 2), (1, 2))
 
+# Piece-level pass/fail gates, checked per pair. A gate passes when its value is strictly below
+# the limit. "shared_fraction_below" is the shared fraction of adjacencies; "largest_cluster_below"
+# is the piece count of the largest connected group of shared adjacencies.
+PIECE_GATES = {"shared_fraction_below": 0.05, "largest_cluster_below": 4}
+
+
+def gate_line(name: str, failures: list[str]) -> str:
+    """Final gate line of a text report: 'piece gates: PASS' or 'piece gates: FAIL (item; item)'."""
+    if not failures:
+        return f"{name} gates: PASS"
+    return f"{name} gates: FAIL ({'; '.join(failures)})"
+
+
+def _piece_failures(pairs: Mapping[str, dict]) -> list[str]:
+    frac_lim = PIECE_GATES["shared_fraction_below"]
+    clus_lim = PIECE_GATES["largest_cluster_below"]
+    out = []
+    for name, v in pairs.items():
+        if v["fraction"] >= frac_lim:
+            out.append(f"{name} shared {100 * v['fraction']:.1f}% ≥ {100 * frac_lim:g}%")
+        if v["largest_component"] >= clus_lim:
+            out.append(f"{name} largest shared cluster {v['largest_component']} pieces ≥ {clus_lim}")
+    return out
+
+
+def piece_gates(solution) -> tuple[bool, list[str]]:
+    """(ok, failures) of the piece gates for a solution; failures name the pair and the value."""
+    failures = _piece_failures(report(solution)["pairs"])
+    return not failures, failures
+
 
 def piece_edges(placement: Placement, board: Board) -> set[tuple[int, int]]:
     """Unordered neighbor pairs (p<q) of pieces in one solution."""
@@ -132,6 +162,8 @@ def report(solution) -> dict:
         rep["corner_orders"] = [list(corner_order(p, b)) for p, b in zip(pl, boards)]
     except KeyError:
         rep["corner_orders"] = None
+    failures = _piece_failures(pairs_rep)
+    rep["gates"] = {"ok": not failures, "failures": failures}
     rep["text"] = format_report(rep)
     return rep
 
@@ -155,4 +187,5 @@ def format_report(rep: dict) -> str:
     m = rep.get("meta", {})
     if m:
         lines.append("meta: " + ", ".join(f"{k}={v}" for k, v in m.items() if k != "shared"))
+    lines.append(gate_line("piece", _piece_failures(rep["pairs"])))
     return "\n".join(lines)
