@@ -1,0 +1,35 @@
+# A  "Valley River" (day, frontal). Sky owns SK; river and banks are thin lines.
+SK SK S/ SN SN S/@90 SK SK
+SK SK SN SN SN SN SK S/
+SK SK SK SK SK SK SU SK
+F/ F/@90 F/ HD HD F/@90 F/ F/@90
+FO FO FO DP DP FO FO FO
+ME|FO ME|FO FO FO DP FO ME|FO ME|FO
+ME|FO ME|FO FO DP DP|MO FO ME|FO ME|FO
+ME|FO ME|FO FO DP|MO FO ME|FO RU ME|FO
+FO FO DP DP FO ME|FO PH ME|FO
+DP DP DP FO FO ME|FO RU ME|FO
+
+# B  "Moonlit Lake" (night, frontal, values inverted). Night sky owns DP, forest owns FO.
+DP DP DP DP DP DP DP DP|FO
+DP|FO DP|FO DP MO DP|FO DP|FO DP|FO DP|FO
+FO FO|DP FO FO FO FO|DP FO FO
+FO FO FO FO FO FO FO FO
+ME|FO ME|FO ME|FO RU ME|FO ME|FO ME|FO ME|FO
+FO RU PH ME|FO ME|FO FO FO ME|FO
+F/@270 HD@180 HD@180 F/@180 F/@270 F/@180 F/@270 F/@180
+SK SN SK SK SN SK SU SK
+SK SK S/ SK SK SN SN SK
+SN SK SK S/ SK SK SN S/
+
+# C  "Coast from the Air" (aerial, diagonal). Surf stripes, coast, river delta, strip fields.
+SU SK SN SK SK SN SK F/
+SK S/ SK SK S/ SK F/ FO
+SN SK SK SN SK F/ FO ME|FO
+SN SK S/ SK F/ FO ME|FO ME|FO
+SK SN F/ HD FO ME|FO ME|FO ME|FO
+F/ HD FO DP FO ME|FO RU ME|FO
+FO DP FO DP DP|MO FO PH ME|FO
+FO DP FO FO DP DP|MO FO RU
+ME|FO FO ME|FO ME|FO FO DP DP FO
+ME|FO ME|FO ME|FO ME|FO ME|FO FO DP DP

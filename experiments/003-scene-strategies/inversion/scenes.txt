@@ -1,0 +1,39 @@
+# Candidate 'inversion' (experiment 003). Quarter-rotation mode, tray border, 8x10 x3.
+# A Valley River (day, frontal) / B Moonlit Lake (night, inverted) / C Coast from the Air (aerial, diagonal).
+# New classes: MO = gold disc on deep_field host. Filled from intent.txt by ../fill.py --rot --iters 15000 --seed 2.
+# A
+SK SK S/ SN SN S/@90 SK SK
+SK SK SN SN SN SN SK S/
+SK SK SK SK SK SK SU SK
+F/ F/@90 F/ HD HD F/@90 F/ F/@90
+FO FO FO DP DP FO FO FO
+FO ME FO FO DP FO ME FO
+ME ME FO DP DP FO ME FO
+ME FO FO MO FO FO RU FO
+FO FO DP DP FO ME PH FO
+DP DP DP FO FO ME RU FO
+
+# B
+DP DP DP DP DP DP DP FO
+FO FO DP MO DP FO FO DP
+FO FO FO FO FO FO FO FO
+FO FO FO FO FO FO FO FO
+ME ME ME RU ME ME ME ME
+FO RU PH FO FO FO FO ME
+F/@270 HD@180 HD@180 F/@180 F/@270 F/@180 F/@270 F/@180
+SK SN SK SK SN SK SU SK
+SK SK S/ SK SK SN SN SK
+SN SK SK S/ SK SK SN S/
+
+# C
+SU SK SN SK SK SN SK F/
+SK S/ SK SK S/ SK F/ FO
+SN SK SK SN SK F/ FO ME
+SN SK S/ SK F/ FO FO FO
+SK SN F/ HD FO ME ME ME
+F/ HD FO DP FO FO RU FO
+FO DP FO DP MO FO PH FO
+FO DP FO FO DP DP FO RU
+ME FO ME FO FO DP DP FO
+FO FO FO ME ME FO DP DP
+

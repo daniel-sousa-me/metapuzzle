@@ -1,0 +1,35 @@
+# Candidate 'frames' (experiment 003). No rotation, tray border, 96 pieces: A 8x12, B 16x6, C 12x8.
+# A Lone Tree on the Hillside / B Cove and Sail / C Snow Peak above the Alp. Every scene has 8 sky-bearing columns.
+# New class: HF = horizon_foliage (sky over foliage, straight). Filled from intent.txt by ../fill.py --iters 20000 --seed 3.
+# A
+SN SK SK SK SK S/ SU SK
+HF HF F\ SK SN SN SK SK
+FO FO FO F\ SK F/ F\ SK
+FO FO FO FO HD FO FO HB
+FO FO DP DP DP DP FO FO
+ME FO DP DP DP DP FO ME
+ME FO DP DP DP DP RU ME
+ME ME FO DP DP FO PH ME
+ME ME FO DP DP FO RU ME
+ME ME FO DP FO ME ME ME
+ME ME FO DP FO ME ME ME
+ME FO DP DP FO ME ME ME
+
+# B
+ME ME ME ME ME ME ME ME F\ SK SK SK SK SK SU SK
+ME ME RU ME ME ME ME ME FO F\ SN S/ SN SK SK SK
+ME ME PH ME ME FO ME FO FO FO F\ SN SK F/ HF HF
+FO FO RU FO FO FO FO FO DP FO FO HB HD FO FO FO
+FO DP DP DP DP DP DP FO FO DP FO DP DP FO FO ME
+DP DP DP DP DP DP DP DP FO FO DP DP FO ME ME ME
+
+# C
+ME ME ME ME F\ SN SK SN SK SN SK SK
+ME ME ME ME ME F\ SK SK SK SK SU SK
+ME ME ME ME FO FO F\ S/ SK F/ HF HF
+ME ME ME FO FO DP FO HD HB FO FO FO
+ME ME FO DP FO DP DP DP RU DP DP FO
+ME FO DP DP DP DP FO DP PH DP FO FO
+FO ME FO FO FO DP DP DP RU FO FO ME
+FO FO DP DP DP DP FO FO FO ME ME ME
+

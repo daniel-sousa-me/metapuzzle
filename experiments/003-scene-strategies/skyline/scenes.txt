@@ -1,0 +1,39 @@
+# Candidate 'skyline' (experiment 003): control. No rotation, 8x10 x3, tray border (side multisets differ).
+# A Bay between Hills / B Wooded Gorge / C Mountain Peak. Only the skyline shape and the dark-region layout vary.
+# Filled from intent.txt by ../fill.py --iters 15000 --seed 2. No new classes.
+# A
+SK SK SK SN SN SK SK SK
+SK SK SN SN SN SK SU SK
+SK F/ F\ SK SK F/ F\ SK
+F/ FO FO HD HD FO FO F\
+DP FO DP DP DP DP FO FO
+DP DP FO DP FO DP DP FO
+FO FO ME FO ME FO FO ME
+FO ME FO ME RU ME ME ME
+FO FO ME FO PH FO FO FO
+FO ME FO ME RU ME ME ME
+
+# B
+SK SK SK SK SK SN SK SK
+F\ SN SK SK SU SK SN F/
+FO F\ SN SK SK SK F/ FO
+FO FO F\ SN SK F/ FO FO
+ME FO FO HD HD FO FO ME
+ME ME FO DP DP FO ME FO
+ME ME FO DP FO DP FO FO
+ME RU DP DP FO DP FO ME
+ME PH DP FO DP FO ME FO
+ME RU FO FO DP FO ME ME
+
+# C
+SN SK SK SK SK SK SU SK
+SK SK SK F/ F\ SK SK SN
+SK SK F/ DP DP F\ SK SN
+SN F/ DP DP DP DP F\ SN
+HD FO DP DP DP DP FO HD
+FO FO FO FO FO FO FO FO
+FO FO FO FO FO FO ME FO
+ME ME ME FO FO RU FO FO
+ME ME FO ME FO PH ME ME
+ME FO ME ME ME RU FO ME
+
