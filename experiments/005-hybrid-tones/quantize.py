@@ -33,7 +33,12 @@ Steps (see README.md for the results):
    histogram (class + side) is reported for information; it is not forced equal.
 5. Output: scenes.txt (3 maps, 20 cols x 25 rows), quantized/*.npy (tier arrays),
    quantized-preview.png.
+
+Optional argument: the output suffix (for example "-v2"). It selects targets/<name><suffix>.npy as
+input and writes scenes<suffix>.txt, quantized<suffix>/, quantized-preview<suffix>.png. Without it,
+the files are the v1 names above.
 """
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -281,8 +286,8 @@ def preview(tones: dict, tiers: dict, choices: dict, opts: dict, path: Path) -> 
     canvas.save(path)
 
 
-def main() -> None:
-    tones = {n: np.load(TARGETS / f"{n}.npy") for n in NAMES}
+def main(suffix: str = "") -> None:
+    tones = {n: np.load(TARGETS / f"{n}{suffix}.npy") for n in NAMES}
     raw = {n: np.bincount(tier_of(tones[n]).ravel(), minlength=3) for n in NAMES}
     print("1. tier counts by fixed thresholds (D / M / L):")
     for n in NAMES:
@@ -349,17 +354,17 @@ def main() -> None:
 
     maps = {n: [[token(int(tiers[n][r, c]), opts[n][r][c], choices[n][r][c]) for c in range(COLS)] for r in range(ROWS)]
             for n in NAMES}
-    (HERE / "quantized").mkdir(exist_ok=True)
+    (HERE / f"quantized{suffix}").mkdir(exist_ok=True)
     for n in NAMES:
-        np.save(HERE / "quantized" / f"{n}.npy", tiers[n])
-    write_scenes(maps, HERE / "scenes.txt",
+        np.save(HERE / f"quantized{suffix}" / f"{n}.npy", tiers[n])
+    write_scenes(maps, HERE / f"scenes{suffix}.txt",
                  "# Hybrid tones, experiment 005. Three 20x25 class maps (cols x rows).\n"
                  "# A = cat, B = sailboat, C = tree. Classes: D dark, M mid, L light (plain);\n"
                  "# XY = own tier X with neighbour tier Y across the side set by @rotation (clockwise;\n"
                  "# canonical side = T, so @0 = neighbour at top, @90 right, @180 bottom, @270 left).")
-    preview(tones, tiers, choices, opts, HERE / "quantized-preview.png")
-    print("wrote scenes.txt, quantized/*.npy, quantized-preview.png")
+    preview(tones, tiers, choices, opts, HERE / f"quantized-preview{suffix}.png")
+    print(f"wrote scenes{suffix}.txt, quantized{suffix}/*.npy, quantized-preview{suffix}.png")
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else "")

@@ -11,8 +11,12 @@ Each cell becomes a role:
 
 Writes roles.txt (three grids, scene layout) and roles-spec.json (no target_counts: the solver
 finds a common histogram).
+
+Optional argument: the output suffix (for example "-v2"). It reads scenes<suffix>.txt and writes
+roles<suffix>.txt and roles-spec<suffix>.json. Without it, the files are the v1 names above.
 """
 import json
+import sys
 from pathlib import Path
 
 from metapuzzle.scene import load_scenes
@@ -42,8 +46,8 @@ def spec_roles() -> dict:
     return roles
 
 
-def main() -> None:
-    maps = load_scenes(HERE / "scenes.txt")
+def main(suffix: str = "") -> None:
+    maps = load_scenes(HERE / f"scenes{suffix}.txt")
     roles = spec_roles()
     spec = {
         "_note": "Step 2: frame cells take their plain tier only (scene rule: no suffix on the frame). "
@@ -51,7 +55,7 @@ def main() -> None:
                  "interior edge roles take only their transition class.",
         "roles": roles,
     }
-    (HERE / "roles-spec.json").write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
+    (HERE / f"roles-spec{suffix}.json").write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
 
     lines = ["# Step 2 role maps, experiment 005. A = cat, B = sailboat, C = tree.",
              "# Roles: x_frame frame cells (plain tier); x_int interior plain tier cells; x_edge_y interior",
@@ -77,12 +81,12 @@ def main() -> None:
                     row.append(f"{role_of(cls)}@{rot}")
             lines.append(" ".join(row))
         lines.append("")
-    (HERE / "roles.txt").write_text("\n".join(lines), encoding="utf-8")
+    (HERE / f"roles{suffix}.txt").write_text("\n".join(lines), encoding="utf-8")
 
     for name in "ABC":
         print(f"map {name}: interior transition cells {interior_tr[name]}")
-    print(f"wrote {HERE / 'roles.txt'} and {HERE / 'roles-spec.json'} ({len(roles)} roles)")
+    print(f"wrote {HERE / f'roles{suffix}.txt'} and {HERE / f'roles-spec{suffix}.json'} ({len(roles)} roles)")
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else "")

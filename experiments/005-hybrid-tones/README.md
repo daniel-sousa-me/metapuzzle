@@ -71,3 +71,21 @@ Light cells (45% of each map) dominate same-position overlap. Proposal: count ma
 - Rougher, edge-spanning transition masks: `run-quarter-v2`.
 - Subject fixes (bigger cat head and ears; mid-tone sail): `scenes-v2`.
 - Frame-cell transitions in the engine.
+
+
+## Step 2b: subject fixes
+
+Suffix `-v2` on `make_targets.py`, `quantize.py` (report to `quantize-report-v2.txt`) and `make_roles.py`; then `roles-to-scenes roles-v2.txt --spec roles-spec-v2.json --out scenes-v2.txt --rotation quarter --restarts 8`. v1 files are unchanged.
+
+- Sail is mid tone; horizon row 19.6. Tree unchanged. Cat head radius 3.4 cells, taller ears.
+- Tiers before equalization (D/M/L): cat 76/122/302, sailboat 76/123/301, tree 76/124/300. After: 76/123/301 each.
+- Histogram: D 14, DM 42, DL 20; M 60, MD 37, ML 26; L 230, LD 30, LM 41.
+- Scene metrics (gates still fail): same position excl. L A-B/A-C/B-C 28.9/26.1/24.6%; 2x2 reuse plain/rotated A-B 0.71/0.82, A-C 0.78/0.87, B-C 0.77/0.93; transferable blob 32.0/34.8/27.0%.
+
+## Step 4: minimal, localized surplus
+
+**Solve.** `make_roles_v3.py` rebuilds the codes from `roles.txt`, because `scenes.txt` now holds the solver output (texture transitions included). `target_counts` per code is the max over the three images of its boundary cells: DM 23, DL 31, MD 19, ML 22, LD 33, LM 33. Plain tiers take the rest (D 22, M 83, L 234). Each image adds 27 / 38 / 33 surplus pieces, down from 49 to 60 texture.
+
+**Localized.** Interior plain cells next to a same-tier transition are `near` (own tier plus its transitions, weights 1/3/3). Others are `far` (plain only). All surplus lands in `near`; `roles-to-scenes --restarts 8` solves in 13 s.
+
+**Result.** Histogram identical across maps. Scene gates still fail, and same-position overlap is higher (excl. L 48 / 41 / 43%). Every surplus piece touches another transition.

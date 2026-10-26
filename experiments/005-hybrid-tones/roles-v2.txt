@@ -1,0 +1,84 @@
+# Step 2 role maps, experiment 005. A = cat, B = sailboat, C = tree.
+# Roles: x_frame frame cells (plain tier); x_int interior plain tier cells; x_edge_y interior
+# transition cells (own x, neighbour y), with @deg = orientation carried into the scene token.
+
+# A
+l_frame m_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_edge_m@0 l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_edge_m@180 l_edge_m@180 l_int l_int l_int l_edge_m@180 l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_l@270 m_edge_d@180 l_edge_m@270 l_int l_edge_m@90 m_edge_d@180 l_edge_m@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_m@0 l_edge_d@270 l_int l_edge_d@90 d_edge_m@0 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_m@90 m_edge_d@270 l_edge_m@270 m_edge_d@90 d_edge_m@270 m_edge_d@270 l_edge_m@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_m@270 d_edge_m@0 l_edge_d@270 d_edge_l@270 d_edge_m@90 m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_d@90 d_edge_l@270 d_int d_edge_m@90 m_edge_l@0 d_edge_m@270 d_int d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_d@90 d_edge_l@270 d_int d_int d_edge_m@0 d_int d_int d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_l@270 d_edge_m@270 d_int d_int d_int d_int d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_m@270 d_int d_int d_int d_int d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_l@270 d_edge_m@270 d_int d_int d_int d_int d_edge_l@90 l_edge_d@270 l_edge_m@180 l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_int d_int d_int d_int d_edge_m@90 m_edge_d@270 m_edge_d@180 l_edge_m@180 l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_edge_m@90 m_edge_l@180 d_edge_m@270 d_int d_int d_int d_edge_m@90 m_edge_d@90 d_edge_m@0 m_edge_d@270 l_edge_m@270 l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_int d_int d_int d_edge_l@90 l_edge_d@270 m_edge_d@0 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_int d_int d_int d_edge_l@90 l_edge_d@270 m_edge_l@270 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_edge_m@90 m_edge_l@270 d_edge_m@270 d_int d_int d_edge_l@90 l_edge_d@180 m_edge_d@180 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_frame
+l_frame l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_d@90 d_edge_l@270 d_int d_edge_m@180 d_edge_m@180 d_edge_l@0 d_edge_m@0 m_edge_l@90 l_edge_m@270 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_frame
+d_frame m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_d@0 d_edge_m@180 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_int m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_int m_edge_d@0 m_int m_int m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
+
+# B
+l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_int l_edge_m@180 l_edge_m@180 l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_m@90 m_edge_l@0 m_edge_l@0 l_edge_m@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_l@0 l_edge_m@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_int m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_int m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_int m_int m_edge_l@90 l_edge_m@270 l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_int m_int m_edge_l@90 l_edge_m@270 l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_int m_int m_int m_edge_l@90 l_edge_m@270 l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_int m_int m_int m_edge_l@90 l_edge_m@270 l_int l_int l_frame
+l_frame l_int l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_d@90 d_edge_l@270 d_edge_m@90 m_edge_d@270 m_int m_int m_int m_edge_l@90 l_edge_m@270 l_edge_m@180 l_int l_frame
+l_frame l_edge_m@90 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_d@180 m_edge_d@180 m_edge_d@180 d_edge_m@270 d_edge_m@90 m_edge_d@180 m_edge_d@180 m_edge_d@180 m_edge_d@180 m_edge_d@180 m_edge_d@180 m_edge_d@180 l_edge_m@270 l_frame
+m_frame l_edge_d@90 d_edge_l@270 d_edge_m@0 d_edge_m@0 d_edge_m@0 d_edge_m@0 d_edge_m@0 d_edge_m@0 d_int d_int d_edge_m@0 d_edge_m@0 d_edge_m@0 d_edge_m@0 d_edge_m@0 d_edge_m@0 d_edge_l@90 l_edge_d@270 l_frame
+d_frame m_edge_l@0 m_edge_d@90 d_edge_m@270 d_int d_int d_int d_int d_int d_int d_int d_int d_int d_int d_int d_int d_int d_edge_m@90 m_edge_l@0 m_frame
+m_frame m_int m_edge_d@90 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 m_edge_d@270 m_int m_frame
+m_frame m_int m_int m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_int m_int m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
+
+# C
+l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_int l_edge_m@180 l_edge_m@180 l_int l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_edge_m@180 l_edge_d@180 m_edge_d@180 m_edge_d@180 l_edge_d@180 l_edge_m@180 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_l@0 d_edge_m@0 d_edge_m@0 d_edge_l@0 m_edge_d@180 l_edge_m@180 l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_m@0 d_int d_int d_int d_int d_edge_m@0 m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_int d_int d_int d_int d_int d_int d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_m@270 d_int d_int d_int d_int d_int d_int d_edge_m@90 m_edge_d@270 l_edge_m@270 l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_edge_m@90 m_edge_d@90 d_edge_m@270 d_int d_int d_int d_int d_int d_int d_edge_m@90 m_edge_d@270 l_edge_m@270 l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_int d_int d_int d_int d_int d_int d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_edge_m@90 m_edge_l@270 d_edge_m@180 d_int d_int d_int d_int d_edge_m@90 m_edge_l@90 l_edge_m@270 l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_edge_m@0 m_edge_l@180 d_edge_m@180 d_int d_int d_edge_m@180 m_edge_l@180 l_edge_m@0 l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_edge_m@0 m_edge_d@0 d_edge_m@270 d_edge_m@90 m_edge_d@0 l_edge_m@0 l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_int l_int l_int l_int l_int l_int l_int l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_int l_int l_int l_int l_int l_int l_int l_frame
+l_frame l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_frame
+l_frame m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 d_edge_l@0 d_int d_edge_m@90 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_int m_int m_int m_int m_int m_int m_int m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_int m_int m_int m_int m_int m_int m_int m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame d_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
