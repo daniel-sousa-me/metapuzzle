@@ -1,6 +1,6 @@
 # Prototype gallery
 
-Visual index of the `experiments/` runs that produced a `triptych.png`. Figures come from each run's `summary.md` and the experiment README. Distinctiveness and grid scores come from the latest `blind-test-*.md` in the folder. A dash means not recorded. Folders 001, 003, 005 and 007 have no triptych and are not listed. 003, 005 and 007 also have no README.
+Visual index of the `experiments/` runs that produced a `triptych.png`. Figures come from each run's `summary.md` and the experiment README. Distinctiveness and grid scores come from the latest `blind-test-*.md` in the folder. A dash means not recorded. Folders 001, 003 and 007 have no triptych and are not listed. 003 also has no README.
 
 ## At a glance
 
@@ -11,11 +11,15 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 002 | run-quarter | 8x10 | quarter | 4 / 5 / 4 | PASS | FAIL | 2/5 | 3 / 4 / 3 |
 | 004 | run-none | 20x25 | none | 0 / 1 / 0 | PASS | FAIL | - | - |
 | 004 | run-quarter | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 5 / 5 / 5 |
+| 005 | run-quarter (carry-forward) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 4 / 4 / 3 |
 | 006 | run-none | 8x10 | none | 7 / 2 / 4 | PASS | PASS | - | - |
 | 006 | run-quarter | 8x10 | quarter | 1 / 0 / 0 | PASS | PASS | - | - |
+| 008 | run-quarter | 20x24 / 30x16 / 40x12 | quarter | 0 / 0 / 0 | PASS (invalid) | FAIL | not evaluated; runs invalid | not evaluated; runs invalid |
+| 008 | run-flat | 20x24 / 30x16 / 40x12 | none | 0 / 0 / 0 | PASS (invalid) | FAIL | not evaluated; runs invalid | not evaluated; runs invalid |
 
 - Shared counts are piece-level adjacencies: pieces touching in both solutions of the pair.
-- Blind tests cover one run each: 002 `blind-test-2` and 004 `blind-test-1`, both on run-quarter.
+- Blind tests cover one run each: 002 `blind-test-2`, 004 `blind-test-1` and 005 `blind-test-1`, all on run-quarter.
+- 008 runs are invalid (see its section), so their piece and scene gates are indicative only.
 - \* 002 run-none's `summary.md` has no Gates section. Its gate values come from the round 2 table in `experiments/002-direction-a/README.md`.
 
 ## 002: Direction A, first end-to-end render
@@ -67,6 +71,21 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 - Piece shared: AB 0, AC 0, BC 0.
 - Piece gates: PASS. Scene gates: FAIL, with the same failures as run-none.
 
+## 005: Hybrid tone-field
+
+**Goal:** three-tier tone maps (dark / mid / light) of a cat, a sailboat and a tree at 20x25, with one piece histogram shared by all three and every tier boundary inside a transition piece.
+
+**Carry-forward grammar:** this run is the current carry-forward grammar; `docs/DECISIONS.md` (last two entries) keeps the hybrid tone-field and treats its scene-level gates as difficulty indicators, not hard gates.
+
+**Latest blind test** (`blind-test-1.md`, run-quarter): distinctiveness 4/5, grid A 4, B 4, C 3. The tree is recognised (canopy and trunk 4/5). The cat and sailboat are not named. **Grid visibility** (`grid-visibility-1.md`): C 2/5, A 3/5; B not scored.
+
+### run-quarter
+
+![005 run-quarter triptych](../experiments/005-hybrid-tones/run-quarter/triptych.png)
+
+- Piece shared: AB 0 (0.00%), AC 0, BC 0. No clusters.
+- Piece gates: PASS. Scene gates: FAIL. Same-position excluding the dominant light class 34.1 / 30.7 / 33.0% (limit 25%), 2x2 reuse 71.1 / 75.2 / 73.0% (limit 30%), transferable blob 31.2 / 31.0 / 25.6% (limit 10%) for A-B / A-C / B-C.
+
 ## 006: Direction B (Garden Terrazzo)
 
 **Goal:** no README.md in this folder. `NOTES.md` describes the Direction B class spec: 14 non-directional classes with four rotations, built from `docs/design/alt-b/02-piece-classes.md`.
@@ -86,3 +105,23 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 
 - Piece shared: AB 1 (0.70%), AC 0, BC 0.
 - Piece gates: PASS. Scene gates: PASS.
+
+## 008: Mixed frames
+
+**Goal:** can three images with different aspect ratios share one 480-piece set? A is a tree at 20x24 (portrait), B a sailboat at 30x16 (landscape), C a panorama at 40x12.
+
+**Validity:** neither variant gives a valid solution. `run-quarter` has 3 mating violations (one per map) after 300k iterations. `run-flat` adds 64 extra flat pieces and has 41 violations. Piece and scene numbers below are indicative only. **Blind test and grid visibility:** not evaluated; runs invalid.
+
+### run-quarter
+
+![008 run-quarter triptych](../experiments/008-mixed-frames/run-quarter/triptych.png)
+
+- Piece shared: AB 0, AC 0, BC 0. Same-position overlap is n/a (shapes differ).
+- Piece gates: PASS (invalid run). Scene gates: FAIL. 2x2 window reuse plain/rotated A-B 0.61/0.84, A-C 0.72/0.83, B-C 0.74/0.81 (limit 30%).
+
+### run-flat
+
+![008 run-flat triptych](../experiments/008-mixed-frames/run-flat/triptych.png)
+
+- Piece shared: AB 0, AC 0, BC 0. Rotation none.
+- Piece gates: PASS (invalid run). Scene gates: FAIL, with the same 2x2 reuse failures as run-quarter.
