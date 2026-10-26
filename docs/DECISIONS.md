@@ -16,3 +16,7 @@ The owner asked that unconventional piece shapes (which permit more rotations, e
 ## Working method
 
 Think broadly during experiments, then make explicit narrowing decisions and record them here, so scope converges on a workable result.
+
+## 2026-10-26 — Square lattice is the base (owner clarification)
+
+The base tiling is a square lattice; hexagonal or triangular tilings are not pursued. "Unconventional shapes" means individual piece cuts that deviate from a square (e.g. curving toward a triangle) while still occupying one lattice cell. For now the prototypes use plain squares; shape deviation within the lattice is a later-stage experiment to revisit once the visual grammar is validated.
