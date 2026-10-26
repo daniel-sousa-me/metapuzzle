@@ -1,7 +1,9 @@
 """Role maps: author each scene as a grid of roles and let a solver pick the concrete classes.
 
 A roles file has the scene file layout (three grids, blank line between them, '#' comments),
-with role names as tokens. A roles spec (JSON) lists, per role, the classes it may take and
+with role names as tokens. A token may carry an orientation suffix (``dark_edge_m@90``); the suffix
+is copied unchanged to that cell's scene token (``DM@90``) in every map, and plain roles emit none.
+Suffixes need rotation "quarter" and interior cells (``validate_scenes`` checks both). A roles spec (JSON) lists, per role, the classes it may take and
 optional preference weights, plus optional ``fixed`` counts (a required total per class) and
 ``target_counts`` (the whole histogram). Without target_counts the solver chooses a histogram
 that all three maps can realise.
@@ -37,7 +39,7 @@ from pathlib import Path
 from typing import Mapping, Sequence
 
 from .board import Board, square_board
-from .scene import ClassMap, SceneError, load_scenes, validate_scenes
+from .scene import ClassMap, SceneError, load_scenes, parse_token, validate_scenes
 
 NAMES = ("A", "B", "C")
 ROTATIONS = ("none", "quarter")
@@ -153,11 +155,20 @@ def write_scene_file(maps: Sequence[ClassMap], path) -> None:
     Path(path).write_text("\n".join(blocks), encoding="utf-8")
 
 
-def _grids(role_maps) -> list[list[list[str]]]:
+def _grids(role_maps) -> tuple[list[list[list[str]]], list[list[list[int]]]]:
+    """Role names and orientation (degrees, 0 = none) per cell, for each of the three maps."""
     maps = list(role_maps)
     if len(maps) != 3:
         raise SceneError(f"expected 3 role maps, got {len(maps)}")
-    grids = [[list(r) for r in (m.cls if isinstance(m, ClassMap) else m)] for m in maps]
+    grids, rots = [], []
+    for m in maps:
+        if isinstance(m, ClassMap):
+            grids.append([list(r) for r in m.cls])
+            rots.append([list(r) for r in m.rot])
+        else:
+            parsed = [[parse_token(t) for t in r] for r in m]
+            grids.append([[c for c, _ in r] for r in parsed])
+            rots.append([[o for _, o in r] for r in parsed])
     for k, g in enumerate(grids):
         if not g or not g[0] or len({len(r) for r in g}) != 1:
             raise SceneError(f"role map {NAMES[k]} is empty or has rows of different lengths")
@@ -167,7 +178,7 @@ def _grids(role_maps) -> list[list[list[str]]]:
             raise SceneError(
                 f"role map {NAMES[k]} is {len(g[0])}x{len(g)} (cols x rows) but map A is {shape[1]}x{shape[0]}"
             )
-    return grids
+    return grids, rots
 
 
 # ---------------------------------------------------------------- counting
@@ -512,7 +523,7 @@ def assign_classes(
     if rotation not in ROTATIONS:
         raise ValueError(f"rotation must be one of {ROTATIONS}")
     spec = roles_spec if isinstance(roles_spec, RolesSpec) else parse_roles_spec(roles_spec)
-    grids = _grids(role_maps)
+    grids, rot_grids = _grids(role_maps)
     rows, cols = len(grids[0]), len(grids[0][0])
     board = square_board(cols, rows, "standard", rotation)
     T = board.n_slots
@@ -548,9 +559,13 @@ def assign_classes(
     if best is None:
         raise first_error
     cls = best[1]
+    flat_rot = [[r for line in g for r in line] for g in rot_grids]
     maps = [
-        ClassMap([row[y * cols:(y + 1) * cols] for y in range(rows)], [[0] * cols for _ in range(rows)])
-        for row in cls
+        ClassMap(
+            [row[y * cols:(y + 1) * cols] for y in range(rows)],
+            [rot[y * cols:(y + 1) * cols] for y in range(rows)],
+        )
+        for row, rot in zip(cls, flat_rot)
     ]
     validate_scenes([board] * 3, maps)  # self-check against the scene rules
     return maps

@@ -153,3 +153,14 @@ def test_cli_infeasible_exits_1(tmp_path, capsys):
     code = main(["roles-to-scenes", str(roles), "--spec", str(spec), "--out", str(tmp_path / "x.txt")])
     assert code == 1
     assert "no common histogram" in capsys.readouterr().err
+
+
+def test_role_suffix_passes_through_to_scene_token():
+    # Centre is interior on a 3x3 board; its role token carries @90, plain roles carry none.
+    spec = {"roles": {"ring": {"classes": ["D"]}, "edge_m": {"classes": ["MD"]}}}
+    grid = "ring ring ring\nring edge_m@90 ring\nring ring ring"
+    maps = assign_classes(roles_maps(grid, grid, grid), spec, rotation="quarter", seed=0)
+    for m in maps:
+        assert m.cls[1][1] == "MD" and m.rot[1][1] == 90
+        assert m.tokens()[1][1] == "MD@90"
+        assert m.tokens()[0][0] == "D" and m.rot[0][0] == 0

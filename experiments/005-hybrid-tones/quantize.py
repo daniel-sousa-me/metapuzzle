@@ -9,8 +9,14 @@ Steps (see README.md for the results):
    cells with the lowest tone (both next to 0.35); M->L takes the M cells with the highest tone,
    L->M the L cells with the lowest tone (both next to 0.65). D/L are fixed first, so M absorbs
    the rest and ends at its target.
-3. Codes: a plain cell (no 4-neighbour in another tier) keeps its tier code D, M or L. A
-   transition cell is coded <own><neighbour>@<side>, side = direction of the neighbour with the
+2b. Frame (board edge and corner cells). The strict border rule compares the class histograms of
+   the edge pool and of the corner pool across the three maps, so their tier composition must be
+   common. Each pool gets the rounded mean composition of the three images; cells cross one tier
+   threshold at a time, the one closest to it first. The interior takes the rest, so the global
+   tier counts stay exact.
+3. Codes: a plain cell (no 4-neighbour in another tier) keeps its tier code D, M or L. Frame cells
+   are always plain: a scene cannot carry an orientation suffix on the frame, so a frame transition
+   is coded as its tier and the cut is counted. A transition cell is coded <own><neighbour>@<side>, side = direction of the neighbour with the
    different tier (T = N, R = E, B = S, L = W). If two or more sides differ, the side with the
    largest tone difference wins (ties: N, E, S, W order); the count of such cells is reported.
 4. Equalization of the transition codes. The histogram is taken on rotation-equivalent classes
@@ -40,6 +46,12 @@ NAMES = ["cat", "sailboat", "tree"]
 ROWS, COLS = 25, 20
 CELLS = ROWS * COLS
 DARK_MAX, LIGHT_MIN = 0.35, 0.65
+FRAME = np.zeros((ROWS, COLS), bool)
+FRAME[0, :] = FRAME[-1, :] = FRAME[:, 0] = FRAME[:, -1] = True
+CORNER = np.zeros((ROWS, COLS), bool)
+CORNER[0, 0] = CORNER[0, -1] = CORNER[-1, 0] = CORNER[-1, -1] = True
+EDGE = FRAME & ~CORNER
+INNER = ~FRAME
 TIER_SYM = "DML"
 CLASSES = ["D", "M", "L", "DM", "DL", "MD", "ML", "LD", "LM"]
 OWN_GROUPS = {0: [0, 3, 4], 1: [1, 5, 6], 2: [2, 7, 8]}  # class indices by own tier
@@ -69,7 +81,30 @@ def _move(tiers: np.ndarray, tone: np.ndarray, src: int, dst: int, n: int, highe
     flat_t[order[:n]] = dst
 
 
-def equalize_tiers(tones: dict) -> tuple[dict, dict, np.ndarray]:
+def _hist(tiers: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    return np.array([int(((tiers == k) & mask).sum()) for k in range(3)])
+
+
+def _set_counts(tiers: np.ndarray, tone: np.ndarray, mask: np.ndarray, want: np.ndarray) -> list:
+    """Move cells inside mask one tier step at a time until the mask holds the wanted counts.
+    Each step takes the cell closest to the threshold it crosses. Returns (r, c, from, to) per move."""
+    assert _hist(tiers, mask).sum() == want.sum(), "mask size and target differ"
+    flat_t, flat_tone, flat_m = tiers.reshape(-1), tone.reshape(-1), mask.reshape(-1)
+    moves = []
+    while True:
+        diff = _hist(tiers, mask) - want
+        if not diff.any():
+            return moves
+        src, dst = int(np.argmax(diff)), int(np.argmin(diff))
+        step = src + (1 if dst > src else -1)
+        cand = np.flatnonzero(flat_m & (flat_t == src))
+        order = cand[np.argsort(-flat_tone[cand] if step > src else flat_tone[cand], kind="stable")]
+        p = int(order[0])
+        flat_t[p] = step
+        moves.append((p // COLS, p % COLS, src, step))
+
+
+def equalize_tiers(tones: dict) -> tuple[dict, dict, np.ndarray, dict]:
     tiers = {n: tier_of(tones[n]) for n in NAMES}
     counts = np.array([np.bincount(tiers[n].ravel(), minlength=3) for n in NAMES])
     target = largest_remainder(counts.mean(axis=0) / CELLS, CELLS)
@@ -92,8 +127,22 @@ def equalize_tiers(tones: dict) -> tuple[dict, dict, np.ndarray]:
             _move(t, tone, 1, 2, -l, highest=True)
         after = np.bincount(t.ravel(), minlength=3)
         assert (after == target).all(), (n, after, target)
+    # Frame and corner composition: common target (rounded mean), interior takes the rest.
+    edge_t = np.array([_hist(tiers[n], EDGE) for n in NAMES])
+    corner_t = np.array([_hist(tiers[n], CORNER) for n in NAMES])
+    edge_target = largest_remainder(edge_t.mean(axis=0) / EDGE.sum(), int(EDGE.sum()))
+    corner_target = largest_remainder(corner_t.mean(axis=0) / CORNER.sum(), int(CORNER.sum()))
+    inner_target = target - edge_target - corner_target
+    assert (inner_target >= 0).all(), inner_target
+    shifts = {}
+    for n in NAMES:
+        t, tone = tiers[n], tones[n]
+        shifts[n] = (_set_counts(t, tone, CORNER, corner_target)
+                     + _set_counts(t, tone, EDGE, edge_target)
+                     + _set_counts(t, tone, INNER, inner_target))
+        assert (_hist(t, np.ones_like(INNER)) == target).all(), n
         moves[n] = int((t != tier_of(tone)).sum())
-    return tiers, moves, target
+    return tiers, moves, target, shifts
 
 
 def options(tiers: np.ndarray, tone: np.ndarray, r: int, c: int) -> list:
@@ -107,7 +156,8 @@ def options(tiers: np.ndarray, tone: np.ndarray, r: int, c: int) -> list:
 
 
 def build_options(tiers, tone) -> list:
-    return [[options(tiers, tone, r, c) for c in range(COLS)] for r in range(ROWS)]
+    """Frame cells get no options: they are always plain."""
+    return [[[] if FRAME[r, c] else options(tiers, tone, r, c) for c in range(COLS)] for r in range(ROWS)]
 
 
 def default_choice(opts) -> list:
@@ -238,10 +288,20 @@ def main() -> None:
     for n in NAMES:
         print(f"   {n:9s} {raw[n][0]:3d} / {raw[n][1]:3d} / {raw[n][2]:3d}")
 
-    tiers, moves, target = equalize_tiers(tones)
+    tiers, moves, target, shifts = equalize_tiers(tones)
     print(f"2. equalized tier target (D / M / L): {target[0]} / {target[1]} / {target[2]}")
     for n in NAMES:
         print(f"   {n:9s} cells moved across a threshold: {moves[n]}")
+    print("2b. frame and corner shifts, cell (row,col) from -> to, closest to threshold first:")
+    for n in NAMES:
+        desc = ", ".join(f"({r},{c}) {TIER_SYM[a]}->{TIER_SYM[b]}" for r, c, a, b in shifts[n])
+        print(f"   {n:9s} {len(shifts[n])} cells: {desc or '-'}")
+    for n in NAMES:
+        print(f"   {n:9s} frame D/M/L {_hist(tiers[n], FRAME).tolist()}  corner D/M/L {_hist(tiers[n], CORNER).tolist()}")
+    frame_cuts = {n: sum(1 for r in range(ROWS) for c in range(COLS) if FRAME[r, c] and options(tiers[n], tones[n], r, c))
+                  for n in NAMES}
+    print("2c. frame boundaries on cuts (frame cells with a different-tier neighbour, now plain): "
+          + ", ".join(f"{n} {frame_cuts[n]}" for n in NAMES))
 
     opts, choices, mixed, trans = {}, {}, {}, {}
     for n in NAMES:
