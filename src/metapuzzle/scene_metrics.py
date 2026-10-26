@@ -10,7 +10,7 @@ to match the board and scene file names.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
-from typing import Iterator, Mapping, Sequence
+from typing import Collection, Iterator, Mapping, Sequence
 
 from .metrics import gate_line
 from .scene import ClassMap
@@ -22,14 +22,23 @@ Pattern = tuple[tuple[str, ...], ...]
 WINDOW_SIZES = ((1, 2), (2, 1), (2, 2), (3, 3))
 DEFAULT_NAMES = ("A", "B", "C")
 
+# A pair's dominant class (most cells across both maps) is excluded from the same-position gate
+# when it covers more than this share of the cells. Strictly more: exactly 40% does not trigger.
+DOMINANT_SHARE = 0.40
+
 # Scene-level pass/fail gates, checked per pair (A-B, A-C, B-C). A gate passes when its value is
 # strictly below the limit. A value that cannot be evaluated (a 2x2 window in a map narrower than
-# 2 cells, or same-position overlap of maps with different shapes) is not a failure.
-#   same_position_below:      same-class cells at the same (row, col), fraction of A's cells
+# 2 cells, or an overlap of maps with different shapes or with no cells left) is not a failure.
+#   same_position_below:      same-class cells at the same (row, col), fraction of A's cells.
+#                             Where the pair's dominant class covers more than DOMINANT_SHARE of
+#                             the cells, the value is same_position_overlap excluding that class.
+#   weighted_overlap_below:   weighted_overlap, i.e. the mean over A's classes of the fraction of
+#                             each class's cells that stay in place
 #   window_2x2_plain_below:   fraction of A's 2x2 windows (no rotation) found anywhere in B
 #   transferable_below:       transferable blob (cells) as a fraction of A's cells
 SCENE_GATES = {
     "same_position_below": 0.25,
+    "weighted_overlap_below": 0.25,
     "window_2x2_plain_below": 0.30,
     "transferable_below": 0.10,
 }
@@ -56,14 +65,49 @@ def _rot90(p: Pattern) -> Pattern:
     return tuple(zip(*p[::-1]))
 
 
-def same_position_overlap(map_a: ClassMap | Grid, map_b: ClassMap | Grid) -> tuple[int, float] | None:
-    """(count, fraction) of cells with the same class at the same (row, col); None if shapes differ."""
+def same_position_overlap(
+    map_a: ClassMap | Grid, map_b: ClassMap | Grid, exclude: Collection[str] | None = None
+) -> tuple[int, float] | None:
+    """(count, fraction) of cells with the same class at the same (row, col).
+
+    None if the shapes differ, or if no cells remain after ``exclude``. Cells whose class is in
+    ``exclude`` in either map are skipped; the fraction is over the cells that remain.
+    """
     a, b = _grid(map_a), _grid(map_b)
     if _shape(a) != _shape(b):
         return None
-    rows, cols = _shape(a)
-    n = sum(x == y for ra, rb in zip(a, b) for x, y in zip(ra, rb))
-    return n, n / (rows * cols)
+    skip = set(exclude or ())
+    kept = [(x, y) for ra, rb in zip(a, b) for x, y in zip(ra, rb) if x not in skip and y not in skip]
+    if not kept:
+        return None
+    n = sum(x == y for x, y in kept)
+    return n, n / len(kept)
+
+
+def weighted_overlap(map_a: ClassMap | Grid, map_b: ClassMap | Grid) -> float | None:
+    """Same-position overlap where a matching cell of class c weighs 1 / share_A(c).
+
+    Normalised by the total weight of A's cells, so a map compared with itself gives 1.0. Every
+    class carries the same total weight (its cells times 1 / share), so the value equals the mean
+    over A's classes of the fraction of that class's cells that stay in place. A common class
+    therefore counts no more than a rare one. None if the shapes differ.
+    """
+    a, b = _grid(map_a), _grid(map_b)
+    if _shape(a) != _shape(b):
+        return None
+    total = Counter(x for ra in a for x in ra)
+    matched = Counter(x for ra, rb in zip(a, b) for x, y in zip(ra, rb) if x == y)
+    # The weighted ratio with each class's weight cancelled out: the mean over classes of
+    # matching cells / cells. Written this way, identical maps give exactly 1.0.
+    return sum(matched[c] / n for c, n in total.items()) / len(total)
+
+
+def dominant_class(map_a: ClassMap | Grid, map_b: ClassMap | Grid) -> tuple[str, float]:
+    """(class, share): the most frequent class over the cells of both maps, ties broken by name."""
+    a, b = _grid(map_a), _grid(map_b)
+    counts = Counter(x for g in (a, b) for row in g for x in row)
+    cls, n = min(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    return cls, n / sum(counts.values())
 
 
 def window_reuse(map_a: ClassMap | Grid, map_b: ClassMap | Grid, h: int, w: int, allow_rotation: bool = False) -> float:
@@ -189,9 +233,13 @@ def _pair_metrics(ga: Grid, gb: Grid, names: tuple[str, str]) -> dict:
         else:
             win[f"{h}x{w}"] = None
     tb = transferable_blob(ga, gb)
+    dom_cls, dom_share = dominant_class(ga, gb)
     return {
         "names": names,
         "same_position": same,
+        "dominant": {"class": dom_cls, "share": dom_share},
+        "same_position_excl_dominant": same_position_overlap(ga, gb, exclude={dom_cls}),
+        "weighted_overlap": weighted_overlap(ga, gb),
         "window_reuse": win,
         "transferable_blob": tb,
         "transferable_fraction": tb / (rows_a * cols_a),
@@ -228,13 +276,28 @@ def _limit(x: float) -> str:
     return f"{100 * x:g}%"
 
 
+def _gated_same_position(p: dict) -> tuple[str | None, tuple[int, float] | None]:
+    """(excluded class or None, value) of the same-position gate for one pair.
+
+    The dominant class is excluded when it covers more than DOMINANT_SHARE of the pair's cells.
+    """
+    if p["dominant"]["share"] > DOMINANT_SHARE:
+        return p["dominant"]["class"], p["same_position_excl_dominant"]
+    return None, p["same_position"]
+
+
 def _gate_failures(pairs: Mapping[str, dict]) -> list[str]:
     """One string per failing gate item, e.g. 'A-B same-position 66.2% ≥ 25%'."""
     g = SCENE_GATES
     out = []
     for key, p in pairs.items():
-        if p["same_position"] is not None and p["same_position"][1] >= g["same_position_below"]:
-            out.append(f"{key} same-position {100 * p['same_position'][1]:.1f}% ≥ {_limit(g['same_position_below'])}")
+        dom, same = _gated_same_position(p)
+        if same is not None and same[1] >= g["same_position_below"]:
+            label = "same-position" if dom is None else f"same-position excl. {dom}"
+            out.append(f"{key} {label} {100 * same[1]:.1f}% ≥ {_limit(g['same_position_below'])}")
+        ws = p["weighted_overlap"]
+        if ws is not None and ws >= g["weighted_overlap_below"]:
+            out.append(f"{key} weighted overlap {100 * ws:.1f}% ≥ {_limit(g['weighted_overlap_below'])}")
         w = p["window_reuse"]["2x2"]
         if w is not None and w["plain"] >= g["window_2x2_plain_below"]:
             out.append(f"{key} 2x2 window reuse {100 * w['plain']:.1f}% ≥ {_limit(g['window_2x2_plain_below'])}")
@@ -247,7 +310,12 @@ def _gate_failures(pairs: Mapping[str, dict]) -> list[str]:
 
 
 def scene_gates(maps: Sequence[ClassMap | Grid], names: Sequence[str] = DEFAULT_NAMES) -> tuple[bool, list[str]]:
-    """(ok, failures) of the scene gates; failures are the items listed in the report's gate line."""
+    """(ok, failures) of the scene gates; failures are the items listed in the report's gate line.
+
+    Same-position gate rule: per pair, the pair's dominant class (most cells across both maps) is
+    excluded when it covers more than DOMINANT_SHARE (40%) of the cells, and the gate reads the
+    excluded value; otherwise it reads the plain same-position overlap.
+    """
     failures = _gate_failures(_analyse(maps, names)["pairs"])
     return not failures, failures
 
@@ -270,7 +338,12 @@ def _pct(x: float | None) -> str:
 
 
 def format_scene_report(rep: dict) -> str:
-    """Readable summary of a report() dict, ending with the scene gate line."""
+    """Readable summary of a report() dict, ending with the scene gate line.
+
+    Per pair: plain same-position, same-position excluding the pair's dominant class (marked
+    as gated when the dominant class covers more than 40% of cells, in which case the gate reads
+    that line), and the weighted overlap.
+    """
     lines = ["maps (cols x rows): " + ", ".join(f"{n} {c}x{r}" for n, (c, r) in rep["shapes"].items())]
     lines.append("class histograms:")
     for n, h in rep["histograms"].items():
@@ -278,6 +351,10 @@ def format_scene_report(rep: dict) -> str:
     lines.append("largest same-class blob per class:")
     for n, h in rep["largest_blobs"].items():
         lines.append(f"  {n}: " + " ".join(f"{k}={v}" for k, v in h.items()))
+    lines.append(
+        f"same-position gate: where the pair's dominant class covers more than {100 * DOMINANT_SHARE:g}% "
+        "of the cells, the gate reads same position excl. that class; otherwise the plain line"
+    )
     lines.append("pairs (window reuse shown as plain/rotated, window = rows x cols):")
     for key, p in rep["pairs"].items():
         if p["same_position"] is None:
@@ -286,6 +363,21 @@ def format_scene_report(rep: dict) -> str:
             cnt, frac = p["same_position"]
             same = f"same position {cnt} ({100 * frac:.1f}%)"
         lines.append(f"  {key}: {same}")
+        dom = p["dominant"]
+        gated = "gated" if dom["share"] > DOMINANT_SHARE else "not gated"
+        excl = p["same_position_excl_dominant"]
+        if p["same_position"] is None:
+            excl_txt = "n/a (shapes differ)"
+        elif excl is None:
+            excl_txt = "n/a (no cells left)"
+        else:
+            excl_txt = f"{excl[0]} ({100 * excl[1]:.1f}%)"
+        lines.append(
+            f"    same position excl. dominant {dom['class']} "
+            f"(covers {100 * dom['share']:.1f}% of cells, {gated}): {excl_txt}"
+        )
+        ws = p["weighted_overlap"]
+        lines.append("    weighted overlap: " + ("n/a (shapes differ)" if ws is None else f"{100 * ws:.1f}%"))
         wins = "  ".join(
             f"{k} {_pct(v['plain'])}/{_pct(v['rot'])}" if v else f"{k} n/a" for k, v in p["window_reuse"].items()
         )
