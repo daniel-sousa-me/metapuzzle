@@ -395,29 +395,44 @@
           }
         },
         {
-          "primitive": "blotch",
+          "primitive": "dabs",
           "palette": [
-            "sky",
-            "snow"
+            "snow",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow"
           ],
-          "background": false,
+          "background": true,
           "params": {
-            "coverage": 0.35,
-            "side": "right",
-            "color_index": 1
-          }
-        },
-        {
-          "primitive": "blotch",
-          "palette": [
-            "sky",
-            "snow"
-          ],
-          "background": false,
-          "params": {
-            "coverage": 0.35,
-            "side": "right",
-            "color_index": 1
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.35,
+              "side": "right",
+              "count": 3
+            }
           }
         }
       ],
@@ -463,29 +478,44 @@
           }
         },
         {
-          "primitive": "blotch",
+          "primitive": "dabs",
           "palette": [
-            "sky",
-            "snow"
+            "snow",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow"
           ],
-          "background": false,
+          "background": true,
           "params": {
-            "coverage": 0.35,
-            "side": "left",
-            "color_index": 1
-          }
-        },
-        {
-          "primitive": "blotch",
-          "palette": [
-            "sky",
-            "snow"
-          ],
-          "background": false,
-          "params": {
-            "coverage": 0.35,
-            "side": "left",
-            "color_index": 1
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.35,
+              "side": "left",
+              "count": 3
+            }
           }
         }
       ],
@@ -531,29 +561,34 @@
           }
         },
         {
-          "primitive": "blotch",
+          "primitive": "dabs",
           "palette": [
-            "sky",
-            "foliage"
+            "foliage",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_b",
+            "foliage_dab_b",
+            "foliage_dab_b",
+            "foliage_spill_deep",
+            "foliage_spill_deep",
+            "foliage_spill_meadow"
           ],
-          "background": false,
+          "background": true,
           "params": {
-            "coverage": 0.35,
-            "side": "right",
-            "color_index": 1
-          }
-        },
-        {
-          "primitive": "blotch",
-          "palette": [
-            "sky",
-            "foliage"
-          ],
-          "background": false,
-          "params": {
-            "coverage": 0.35,
-            "side": "right",
-            "color_index": 1
+            "count": 39,
+            "length": 0.22,
+            "width": 0.18,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.35,
+              "side": "right",
+              "count": 3
+            }
           }
         }
       ],
@@ -599,29 +634,34 @@
           }
         },
         {
-          "primitive": "blotch",
+          "primitive": "dabs",
           "palette": [
-            "sky",
-            "foliage"
+            "foliage",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_b",
+            "foliage_dab_b",
+            "foliage_dab_b",
+            "foliage_spill_deep",
+            "foliage_spill_deep",
+            "foliage_spill_meadow"
           ],
-          "background": false,
+          "background": true,
           "params": {
-            "coverage": 0.35,
-            "side": "left",
-            "color_index": 1
-          }
-        },
-        {
-          "primitive": "blotch",
-          "palette": [
-            "sky",
-            "foliage"
-          ],
-          "background": false,
-          "params": {
-            "coverage": 0.35,
-            "side": "left",
-            "color_index": 1
+            "count": 39,
+            "length": 0.22,
+            "width": 0.18,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.35,
+              "side": "left",
+              "count": 3
+            }
           }
         }
       ],
@@ -667,29 +707,44 @@
           }
         },
         {
-          "primitive": "blotch",
+          "primitive": "dabs",
           "palette": [
-            "sky",
-            "deep"
+            "deep",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "foliage_spill_deep"
           ],
-          "background": false,
+          "background": true,
           "params": {
-            "coverage": 0.35,
-            "side": "bottom",
-            "color_index": 1
-          }
-        },
-        {
-          "primitive": "blotch",
-          "palette": [
-            "sky",
-            "deep"
-          ],
-          "background": false,
-          "params": {
-            "coverage": 0.35,
-            "side": "bottom",
-            "color_index": 1
+            "count": 36,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.35,
+              "side": "bottom",
+              "count": 3
+            }
           }
         }
       ],
@@ -794,29 +849,44 @@
           }
         },
         {
-          "primitive": "blotch",
+          "primitive": "dabs",
           "palette": [
-            "sky",
-            "deep"
+            "deep",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "foliage_spill_deep"
           ],
-          "background": false,
+          "background": true,
           "params": {
-            "coverage": 0.35,
-            "side": "bottom",
-            "color_index": 1
-          }
-        },
-        {
-          "primitive": "blotch",
-          "palette": [
-            "sky",
-            "deep"
-          ],
-          "background": false,
-          "params": {
-            "coverage": 0.35,
-            "side": "bottom",
-            "color_index": 1
+            "count": 36,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.35,
+              "side": "bottom",
+              "count": 3
+            }
           }
         },
         {
@@ -828,9 +898,13 @@
           ],
           "background": false,
           "params": {
-            "kind": "boat",
+            "kind": "hull",
             "scale": 0.62,
-            "jitter": 0.06
+            "jitter": 0.0,
+            "offset": [
+              0.0,
+              0.09999999999999998
+            ]
           }
         }
       ],
@@ -876,29 +950,44 @@
           }
         },
         {
-          "primitive": "blotch",
+          "primitive": "dabs",
           "palette": [
-            "sky",
-            "deep"
+            "deep",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "foliage_spill_deep"
           ],
-          "background": false,
+          "background": true,
           "params": {
-            "coverage": 0.35,
-            "side": "bottom",
-            "color_index": 1
-          }
-        },
-        {
-          "primitive": "blotch",
-          "palette": [
-            "sky",
-            "deep"
-          ],
-          "background": false,
-          "params": {
-            "coverage": 0.35,
-            "side": "bottom",
-            "color_index": 1
+            "count": 36,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          },
+          "mask": {
+            "primitive": "blotch_mask",
+            "params": {
+              "coverage": 0.35,
+              "side": "bottom",
+              "count": 3
+            }
           }
         },
         {
@@ -910,9 +999,13 @@
           ],
           "background": false,
           "params": {
-            "kind": "drop",
-            "scale": 0.36,
-            "jitter": 0.08
+            "kind": "fleck",
+            "scale": 0.3,
+            "jitter": 0.0,
+            "offset": [
+              0.0,
+              -0.035
+            ]
           }
         }
       ],

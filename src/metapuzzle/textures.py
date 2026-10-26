@@ -11,17 +11,21 @@ Conventions
 * Geometric parameters (radii, lengths, widths, pitch, scale) are fractions of
   ``size``, so the look does not depend on the unit used for ``size``.
 * Count-like parameters (``density``, ``count``) are marks per 100 x 100 units
-  of cell area, scaled by ``(size / 100) ** 2``.
+  of cell area, scaled by ``(size / 100) ** 2``. The class-spec drawer always
+  passes its reference size (100 by default) here, so the artwork does not
+  depend on the size a piece is displayed at.
 * Marks are scattered over a padded area that extends past every edge by at
   least one mark extent. Marks cut by the edge therefore occur at the same
   density as in the interior, which keeps adjacent independent cells free of
   a visible band or seam.
 * Every primitive draws its own full background unless ``background=False``.
   Fragments paint in order, so later fragments cover earlier ones.
+* ``blotch_mask`` is not a painter. It returns a ``<clipPath>`` element and its
+  id, so a caller can clip another fragment to the blotch shape.
 
 Public API
 ----------
-stipple, dabs, mosaic, hatch_multi, scatter_shapes, blotch, motif,
+stipple, dabs, mosaic, hatch_multi, scatter_shapes, blotch, blotch_mask, motif,
 compose, cell_svg
 """
 
@@ -39,6 +43,7 @@ __all__ = [
     "hatch_multi",
     "scatter_shapes",
     "blotch",
+    "blotch_mask",
     "motif",
     "MOTIF_KINDS",
     "compose",
@@ -80,13 +85,18 @@ def _ground(base: str, size: float, background: bool) -> str:
     return f'<rect x="0" y="0" width="{s}" height="{s}" fill="{base}"/>'
 
 
-def _wrap(name: str, seed: int, size: float, palette: Sequence[str],
-          params: dict, body: str) -> str:
-    """Clip ``body`` to the cell. The clip id hashes name, seed and all parameters,
-    so fragments can share one SVG document without id collisions."""
+def _clip_id(name: str, seed: int, size: float, palette: Sequence[str], params: dict) -> str:
+    """Id for a clip path. It hashes name, seed and all parameters, so fragments can
+    share one SVG document without id collisions."""
     key = repr((name, seed, float(size), tuple(palette), tuple(sorted(params.items()))))
     digest = hashlib.sha1(key.encode("utf-8")).hexdigest()[:10]
-    cid = f"clip-{name}-{seed}-{digest}"
+    return f"clip-{name}-{seed}-{digest}"
+
+
+def _wrap(name: str, seed: int, size: float, palette: Sequence[str],
+          params: dict, body: str) -> str:
+    """Clip ``body`` to the cell, with the id from ``_clip_id``."""
+    cid = _clip_id(name, seed, size, palette, params)
     s = _f(size)
     return (
         f'<defs><clipPath id="{cid}"><rect x="0" y="0" width="{s}" height="{s}"/>'
@@ -322,32 +332,20 @@ def scatter_shapes(seed: int, size: float, palette: Sequence[str], *,
     return _wrap("scatter_shapes", seed, size, palette, params, "".join(parts))
 
 
-def blotch(seed: int, size: float, palette: Sequence[str], *,
-           coverage: float = 0.45, side: str | None = None, color_index: int = 1,
-           background: bool = True) -> str:
-    """1-3 large soft, wobbly blotches over the background.
-
-    coverage: 0-1, scales blotch radius (about 0.12 to 0.62 of size).
-    side: None, or "top"/"bottom"/"left"/"right" to bias the blotch centers
-        toward that edge. The cut through the cell is the piece's transition.
-    color_index: palette index of the blotch color (default: palette[1]).
-    Blotches are not padded, so they intentionally meet the edges as a
-    visible boundary. Neighboring cells will differ there unless deliberately
-    matched.
-    """
-    params = _key_args(locals())
+def _check_blotch_args(coverage: float, side: str | None) -> None:
     if not 0.0 <= coverage <= 1.0:
         raise ValueError("coverage must be in [0, 1]")
     if side not in _SIDES:
         raise ValueError(f"side must be one of {_SIDES}")
-    if not 0 <= color_index < len(palette):
-        raise ValueError("color_index is out of range for palette")
-    base = palette[0]
-    color = palette[color_index]
-    rng = random.Random(seed)
+
+
+def _blotch_polys(rng: random.Random, size: float, coverage: float, side: str | None,
+                  count: int | None = None) -> list[tuple[float, float, list[tuple[float, float]]]]:
+    """Wobbly blotches as ``(center_x, center_y, outline)``, 1-3 of them unless
+    ``count`` is given. Draws from ``rng`` in a fixed order, so ``blotch`` output is stable."""
     r_base = size * (0.12 + 0.5 * coverage)
-    parts = [_ground(base, size, background)]
-    for _ in range(rng.randint(1, 3)):
+    polys = []
+    for _ in range(rng.randint(1, 3) if count is None else count):
         r = r_base * rng.uniform(0.7, 1.2)
         if side is None:
             cx, cy = rng.uniform(0.0, size), rng.uniform(0.0, size)
@@ -366,14 +364,65 @@ def blotch(seed: int, size: float, palette: Sequence[str], *,
             a = (k + rng.uniform(-0.15, 0.15)) * 2.0 * math.pi / m
             rr = r * rng.uniform(0.7, 1.15)
             pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
+        polys.append((cx, cy, pts))
+    return polys
+
+
+def blotch(seed: int, size: float, palette: Sequence[str], *,
+           coverage: float = 0.45, side: str | None = None, color_index: int = 1,
+           background: bool = True) -> str:
+    """1-3 large soft, wobbly blotches over the background.
+
+    coverage: 0-1, scales blotch radius (about 0.12 to 0.62 of size).
+    side: None, or "top"/"bottom"/"left"/"right" to bias the blotch centers
+        toward that edge. The cut through the cell is the piece's transition.
+    color_index: palette index of the blotch color (default: palette[1]).
+    Blotches are not padded, so they intentionally meet the edges as a
+    visible boundary. Neighboring cells will differ there unless deliberately
+    matched. To clip another texture to the same shape, use ``blotch_mask``.
+    """
+    params = _key_args(locals())
+    _check_blotch_args(coverage, side)
+    if not 0 <= color_index < len(palette):
+        raise ValueError("color_index is out of range for palette")
+    base = palette[0]
+    color = palette[color_index]
+    rng = random.Random(seed)
+    parts = [_ground(base, size, background)]
+    for cx, cy, pts in _blotch_polys(rng, size, coverage, side):
         halo = [(cx + (px - cx) * 1.18, cy + (py - cy) * 1.18) for px, py in pts]
         parts.append(f'<path d="{_smooth_closed(halo)}" fill="{color}" fill-opacity="0.3"/>')
         parts.append(f'<path d="{_smooth_closed(pts)}" fill="{color}"/>')
     return _wrap("blotch", seed, size, palette, params, "".join(parts))
 
 
+def blotch_mask(seed: int, size: float, palette: Sequence[str], *,
+                coverage: float = 0.45, side: str | None = None,
+                count: int | None = None) -> tuple[str, str]:
+    """Clip path for a blotch-shaped region: ``(clip_svg, clip_id)``.
+
+    ``clip_svg`` is a ``<clipPath id="clip_id">`` element holding only the blotch
+    outlines (no fill, no halo). Put it in a ``<defs>`` and reference it with
+    ``clip-path="url(#clip_id)"``. Parameters have the same meaning as in
+    ``blotch``. ``count`` sets the number of blotches (1-6); by default it is
+    random, 1 to 3, as in ``blotch``.
+
+    ``palette`` is accepted for parity with the painting primitives. A mask has
+    no colour, so the palette is not read.
+    """
+    params = _key_args(locals())
+    _check_blotch_args(coverage, side)
+    if count is not None and not (isinstance(count, int) and 1 <= count <= 6):
+        raise ValueError("count must be an integer in [1, 6], or None")
+    rng = random.Random(seed)
+    cid = _clip_id("blotch_mask", seed, size, palette, params)
+    paths = "".join(f'<path d="{_smooth_closed(pts)}"/>'
+                    for _, _, pts in _blotch_polys(rng, size, coverage, side, count))
+    return f'<clipPath id="{cid}">{paths}</clipPath>', cid
+
+
 MOTIF_KINDS = ("disc", "ring", "silhouette_bird", "leaf", "fish", "boat",
-               "window", "star", "drop")
+               "window", "star", "drop", "hull", "fleck")
 _MOTIF_ROTATIONS = ("none", "any", "flip")
 _MOTIF_MARGIN = 0.08   # minimum gap between a motif and any cell edge, as a fraction of size
 
@@ -409,6 +458,17 @@ def _motif_unit(kind: str, fill: str, ink: str) -> str:
         sail = "M0.06-0.6L0.06 0.1L0.62 0.1Z"
         return (f'<path d="{hull} {sail}" fill="{fill}"/>'
                 f'<line x1="0" y1="-0.6" x2="0" y2="0.12" stroke="{fill}" stroke-width="0.08"/>')
+    if kind == "hull":
+        # Boat hull only: a trapezoid with its waterline (bottom edge) at the origin.
+        return f'<path d="M-0.85-0.35L0.85-0.35L0.5 0L-0.5 0Z" fill="{fill}"/>'
+    if kind == "fleck":
+        # Small soft irregular blob: seven fixed radii, smoothed, slightly translucent.
+        radii = (0.95, 0.62, 0.82, 0.5, 0.9, 0.68, 0.78)
+        pts = []
+        for k, r in enumerate(radii):
+            a = 0.3 + k * 2.0 * math.pi / len(radii)
+            pts.append((r * math.cos(a), r * math.sin(a)))
+        return f'<path d="{_smooth_closed(pts)}" fill="{fill}" fill-opacity="0.92"/>'
     if kind == "window":
         return (f'<rect x="-0.62" y="-0.78" width="1.24" height="1.56" rx="0.14" fill="{fill}"/>'
                 f'<path d="M0-0.78V0.78M-0.62 0H0.62" stroke="{ink}" stroke-width="0.12"/>')
@@ -430,16 +490,22 @@ def _motif_unit(kind: str, fill: str, ink: str) -> str:
 def motif(seed: int, size: float, palette: Sequence[str], background: bool = True,
           kind: str = "disc", scale: float = 0.5, jitter: float = 0.08,
           rotation: str = "none", halo: float = 0.0, color_index: int = 1,
-          halo_color_index: int = 2) -> str:
+          halo_color_index: int = 2, offset: tuple[float, float] = (0.0, 0.0)) -> str:
     """One recognizable shape, centered in the cell with a small seeded jitter.
 
     The shape never comes within ``_MOTIF_MARGIN`` (8%) of a cell edge.
 
     kind: one of MOTIF_KINDS: disc, ring, silhouette_bird, leaf, fish, boat,
-        window, star, drop.
+        window, star, drop, hull, fleck. ``hull`` is a boat hull without mast or
+        sail, with its waterline at the origin, so ``offset`` can seat it on a
+        horizon line. ``fleck`` is a small soft irregular blob.
     scale: diameter of the circle enclosing the shape, as a fraction of size.
         Must satisfy scale / 2 + jitter <= 0.42, so the default fits with jitter.
     jitter: maximum center offset per axis, as a fraction of size.
+    offset: (dx, dy) fractions of size added to the center, before jitter. The
+        center is then clamped so the enclosing circle stays inside the 8%
+        margin: an offset that would push the shape past the margin stops at
+        the margin instead of leaving the cell. The default (0, 0) is a no-op.
     rotation: "none"; "any" (seeded angle); or "flip" (mirror horizontally
         with 50% chance).
     halo: 0 for none. Above 0, 2 or 3 concentric circles of decreasing opacity
@@ -468,14 +534,20 @@ def motif(seed: int, size: float, palette: Sequence[str], background: bool = Tru
     for name, idx in (("color_index", color_index), ("halo_color_index", halo_color_index)):
         if not 0 <= idx < len(palette):
             raise ValueError(f"{name} is out of range for palette")
+    if len(offset) != 2 or not all(math.isfinite(v) for v in offset):
+        raise ValueError("offset must be a pair of finite numbers (dx, dy)")
     base = palette[0]
     color = palette[color_index]
     halo_color = palette[halo_color_index]
 
     rng = random.Random(seed)
-    cx = size * (0.5 + rng.uniform(-jitter, jitter))
-    cy = size * (0.5 + rng.uniform(-jitter, jitter))
     radius = size * scale / 2.0
+    # Keep the enclosing circle inside the margin: the center may only range over
+    # [margin + radius, size - margin - radius]. The validation above makes this non-empty.
+    lo = size * _MOTIF_MARGIN + radius
+    hi = size - lo
+    cx = min(max(size * (0.5 + rng.uniform(-jitter, jitter) + offset[0]), lo), hi)
+    cy = min(max(size * (0.5 + rng.uniform(-jitter, jitter) + offset[1]), lo), hi)
     angle = 0.0
     mirror = False
     if rotation == "any":

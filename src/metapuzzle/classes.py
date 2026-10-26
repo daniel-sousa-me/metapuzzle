@@ -22,9 +22,16 @@ Spec format (see ``data/sample_classes.json``)::
   hatch_multi, scatter_shapes, blotch, motif).
 * ``palette`` entries are names from the top-level palette or raw ``#rgb``/``#rrggbb``.
 * ``background`` defaults to true for the first layer and false for the others.
+* ``mask`` is optional. ``{"primitive": "blotch_mask", "params": {...}}`` clips the
+  whole layer to a blotch-shaped region: the layer is drawn normally, then wrapped in
+  ``<g clip-path>``. A transition is a full-cell base layer plus a second full-cell
+  layer with a ``mask``, so both sides are textured and the boundary is ragged.
 * Layers are drawn in order. Layer ``i`` of a piece with seed ``s`` uses a seed derived
-  from ``(s, i)`` through SHA-256, so layers are independent and the output does not
-  depend on ``PYTHONHASHSEED``.
+  from ``(s, i)`` through SHA-256 (a mask uses ``(s, "i:mask")``), so layers are
+  independent and the output does not depend on ``PYTHONHASHSEED``.
+* Top-level ``ref_size`` (default 100) is the unit the spec is written in. Every piece
+  is drawn at that size and the fragment is scaled to the display size, so the artwork
+  is the same at every render size; only the resolution changes.
 * ``directional`` defaults to false. ``allowed_rotations`` defaults to all four
   rotations, or to ``[0]`` for a directional class.
 * Keys starting with ``_`` are ignored everywhere, so a spec can carry comments.
@@ -66,7 +73,12 @@ PRIMITIVES = {
     "blotch": tx.blotch,
     "motif": tx.motif,
 }
+# Mask primitives return (clip_svg, clip_id) instead of a painted fragment.
+MASK_PRIMITIVES = {
+    "blotch_mask": tx.blotch_mask,
+}
 ROTATIONS = (0, 90, 180, 270)
+DEFAULT_REF_SIZE = 100.0
 SAMPLE_SPEC_PATH = Path(__file__).resolve().parent / "data" / "sample_classes.json"
 
 _RESERVED_PARAMS = frozenset({"seed", "size", "palette", "background"})
@@ -80,11 +92,18 @@ class ClassSpecError(ValueError):
 
 
 @dataclass(frozen=True)
+class Mask:
+    primitive: str
+    params: dict
+
+
+@dataclass(frozen=True)
 class Layer:
     primitive: str
     palette: tuple[str, ...]
     params: dict
     background: bool
+    mask: Mask | None = None
 
 
 @dataclass(frozen=True)
@@ -110,11 +129,25 @@ def _check_keys(d: Mapping, allowed: set[str], where: str, required: Sequence[st
             raise ClassSpecError(f"{where}: missing required key {key!r}")
 
 
+def _parse_mask(where: str, raw: Any) -> Mask:
+    if not isinstance(raw, Mapping):
+        raise ClassSpecError(f"{where}: mask must be an object")
+    _check_keys(raw, {"primitive", "params"}, f"{where} mask", ("primitive",))
+    prim = raw["primitive"]
+    if not isinstance(prim, str):
+        raise ClassSpecError(f"{where}: mask primitive must be a string")
+    params = raw.get("params", {})
+    if not isinstance(params, Mapping):
+        raise ClassSpecError(f"{where}: mask params must be an object")
+    return Mask(prim, dict(params))
+
+
 def _parse_layer(where: str, index: int, raw: Any) -> Layer:
     if not isinstance(raw, Mapping):
         raise ClassSpecError(f"{where} layer {index}: must be an object")
     w = f"{where} layer {index}"
-    _check_keys(raw, {"primitive", "palette", "params", "background"}, w, ("primitive", "palette"))
+    _check_keys(raw, {"primitive", "palette", "params", "background", "mask"}, w,
+                ("primitive", "palette"))
     prim = raw["primitive"]
     if not isinstance(prim, str):
         raise ClassSpecError(f"{w}: primitive must be a string")
@@ -127,7 +160,8 @@ def _parse_layer(where: str, index: int, raw: Any) -> Layer:
     background = raw.get("background", index == 0)
     if not isinstance(background, bool):
         raise ClassSpecError(f"{w}: background must be true or false")
-    return Layer(prim, tuple(names), dict(params), background)
+    mask = _parse_mask(w, raw["mask"]) if raw.get("mask") is not None else None
+    return Layer(prim, tuple(names), dict(params), background, mask)
 
 
 def _parse_class(name: str, raw: Any) -> PieceClass:
@@ -149,8 +183,8 @@ def _parse_class(name: str, raw: Any) -> PieceClass:
     return PieceClass(layers, directional, tuple(rots))
 
 
-def _layer_seed(piece_seed: int, index: int) -> int:
-    digest = hashlib.sha256(f"{int(piece_seed)}:{index}".encode("utf-8")).digest()
+def _layer_seed(piece_seed: int, tag: int | str) -> int:
+    digest = hashlib.sha256(f"{int(piece_seed)}:{tag}".encode("utf-8")).digest()
     return int.from_bytes(digest[:8], "big")
 
 
@@ -162,13 +196,14 @@ class ClassSpec:
 
     palette: dict[str, str]
     classes: dict[str, PieceClass]
+    ref_size: float = DEFAULT_REF_SIZE
 
     @classmethod
     def from_dict(cls, data: Any) -> "ClassSpec":
         """Parse the JSON structure. Checks shape and keys; ``validate`` checks the rest."""
         if not isinstance(data, Mapping):
             raise ClassSpecError("spec must be a JSON object")
-        _check_keys(data, {"palette", "classes"}, "spec", ("classes",))
+        _check_keys(data, {"palette", "classes", "ref_size"}, "spec", ("classes",))
         palette = data.get("palette", {})
         if not isinstance(palette, Mapping) or not all(
             isinstance(k, str) and isinstance(v, str) for k, v in palette.items()
@@ -184,7 +219,10 @@ class ClassSpec:
         }
         if not parsed:
             raise ClassSpecError("classes must be a non-empty object")
-        return cls(palette=dict(palette), classes=parsed)
+        ref = data.get("ref_size", DEFAULT_REF_SIZE)
+        if isinstance(ref, bool) or not isinstance(ref, (int, float)) or not ref > 0:
+            raise ClassSpecError("ref_size must be a positive number")
+        return cls(palette=dict(palette), classes=parsed, ref_size=float(ref))
 
     def _resolve(self, names: Sequence[str]) -> list[str]:
         out = []
@@ -199,25 +237,41 @@ class ClassSpec:
                 raise ClassSpecError(f"unknown palette name {n!r}")
         return out
 
+    @staticmethod
+    def _check_params(name: str, fn, params: dict, reserved: frozenset = frozenset()) -> None:
+        bad = reserved & set(params)
+        if bad:
+            raise ClassSpecError(f"params may not set {sorted(bad)}; 'background' is a layer key")
+        accepted = set(inspect.signature(fn).parameters) - _RESERVED_PARAMS
+        unknown = set(params) - accepted
+        if unknown:
+            raise ClassSpecError(f"{name} has no parameter(s) {sorted(unknown)}; "
+                                 f"accepts {sorted(accepted)}")
+
     def _check_layer(self, layer: Layer) -> None:
         fn = PRIMITIVES.get(layer.primitive)
         if fn is None:
             raise ClassSpecError(f"unknown primitive {layer.primitive!r}; use one of {sorted(PRIMITIVES)}")
         palette = self._resolve(layer.palette)
-        reserved = _RESERVED_PARAMS & set(layer.params)
-        if reserved:
-            raise ClassSpecError(f"params may not set {sorted(reserved)}; 'background' is a layer key")
-        accepted = set(inspect.signature(fn).parameters) - _RESERVED_PARAMS
-        unknown = set(layer.params) - accepted
-        if unknown:
-            raise ClassSpecError(f"{layer.primitive} has no parameter(s) {sorted(unknown)}; "
-                                 f"accepts {sorted(accepted)}")
+        self._check_params(layer.primitive, fn, layer.params, reserved=_RESERVED_PARAMS)
         try:
             frag = fn(_TEST_SEED, _TEST_SIZE, palette, background=layer.background, **layer.params)
         except Exception as e:  # the primitive's own message is the useful part
             raise ClassSpecError(f"{type(e).__name__}: {e}") from e
         if not frag.strip():
             raise ClassSpecError("primitive produced an empty fragment")
+        if layer.mask is not None:
+            mfn = MASK_PRIMITIVES.get(layer.mask.primitive)
+            if mfn is None:
+                raise ClassSpecError(f"unknown mask primitive {layer.mask.primitive!r}; "
+                                     f"use one of {sorted(MASK_PRIMITIVES)}")
+            self._check_params(f"mask {layer.mask.primitive}", mfn, layer.mask.params)
+            try:
+                clip, cid = mfn(_TEST_SEED, _TEST_SIZE, palette, **layer.mask.params)
+            except Exception as e:
+                raise ClassSpecError(f"mask {type(e).__name__}: {e}") from e
+            if f'id="{cid}"' not in clip:
+                raise ClassSpecError("mask primitive did not return a clipPath with its id")
 
     def validate(self) -> None:
         """Check every class: primitives, palette names, parameters, rotations.
@@ -226,6 +280,8 @@ class ClassSpec:
         listing every problem found.
         """
         errors: list[str] = []
+        if not self.ref_size > 0:
+            errors.append(f"ref_size must be positive, got {self.ref_size!r}")
         for key, value in self.palette.items():
             if not _HEX.match(value):
                 errors.append(f"palette {key!r}: {value!r} is not #rgb or #rrggbb")
@@ -250,19 +306,30 @@ class ClassSpec:
 
     def _layer_fragment(self, layer: Layer, index: int, piece_seed: int, size: float) -> str:
         palette = self._resolve(layer.palette)
-        return PRIMITIVES[layer.primitive](
+        body = PRIMITIVES[layer.primitive](
             _layer_seed(piece_seed, index), size, palette,
             background=layer.background, **layer.params,
         )
+        if layer.mask is None:
+            return body
+        clip, cid = MASK_PRIMITIVES[layer.mask.primitive](
+            _layer_seed(piece_seed, f"{index}:mask"), size, palette, **layer.mask.params,
+        )
+        return f'<defs>{clip}</defs><g clip-path="url(#{cid})">{body}</g>'
 
     def drawer(self) -> PieceDrawer:
         """A ``PieceDrawer`` that draws each piece from its class's layers.
+
+        Each piece is built at ``ref_size`` and the result is wrapped in
+        ``<g transform="scale(size / ref_size)">``. Mark counts therefore do not depend
+        on ``size``, and the artwork is the same at every size.
 
         Unknown classes draw a neutral grey stipple and emit one warning per class.
         The drawer is a pure function of (cls, rng_seed, size).
         """
         self.validate()
         warned: set[str] = set()
+        ref = float(self.ref_size)
 
         def draw(piece_id: str, cls: str, rng_seed: int, size: float) -> str:
             pc = self.classes.get(cls)
@@ -274,10 +341,11 @@ class ClassSpec:
                 layers = _NEUTRAL_LAYERS
             else:
                 layers = pc.layers
-            return tx.compose(*(
-                self._layer_fragment(layer, i, rng_seed, float(size))
+            inner = tx.compose(*(
+                self._layer_fragment(layer, i, rng_seed, ref)
                 for i, layer in enumerate(layers)
             ))
+            return f'<g transform="scale({float(size) / ref:.6g})">{inner}</g>'
 
         return draw
 

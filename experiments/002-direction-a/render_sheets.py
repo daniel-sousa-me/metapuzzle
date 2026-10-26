@@ -1,7 +1,7 @@
 """Contact sheet and pairs sheet for the Direction A class spec.
 
-Pieces are drawn at the spec's reference cell (100 units, the unit the counts
-are written in) and scaled into 64 px cells, so the density matches the lexicon.
+Pieces are drawn at the spec's ref_size (100 units, the unit the counts are written
+in) and scaled into 64 px cells by the drawer, so the density matches the lexicon.
 Run: PYTHONPATH=src python3 experiments/002-direction-a/render_sheets.py
 """
 import json
@@ -10,7 +10,6 @@ from pathlib import Path
 from metapuzzle.classes import _write_sheet, load_class_spec
 
 HERE = Path(__file__).resolve().parent
-REF = 100.0   # the unit the spec's counts are written in
 CELL = 64.0   # displayed cell size in px
 
 spec = load_class_spec(HERE / "classes.json")
@@ -19,8 +18,8 @@ draw = spec.drawer()
 
 
 def frag(cls: str, seed: int) -> str:
-    body = draw(f"{cls}#{seed}", cls, seed, REF)
-    return f'<g transform="scale({CELL / REF:g})">{body}</g>'
+    # The drawer builds the piece at the spec's ref_size and scales it to CELL itself.
+    return draw(f"{cls}#{seed}", cls, seed, CELL)
 
 
 def contact_rows():

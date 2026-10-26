@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import os
 import re
@@ -10,13 +11,19 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
+from metapuzzle import textures as tx
+from metapuzzle.board import square_board
 from metapuzzle.classes import (
     SAMPLE_SPEC_PATH,
     ClassSpec,
     ClassSpecError,
+    _layer_seed,
     load_class_spec,
 )
 from metapuzzle.cli import main
+from metapuzzle.optimize import solve
+from metapuzzle.pieces import make_inventory
+from metapuzzle.render import render_solution_svg
 
 SRC = Path(__file__).resolve().parents[1] / "src"
 SAMPLE_CLASSES = ["canopy", "sea", "shore", "sun"]
@@ -285,3 +292,140 @@ def test_render_cli_bad_spec_is_error(tmp_path, capsys):
     capsys.readouterr()
     assert main(["render", str(sol_path), "--out", str(tmp_path / "o"), "--classes", str(bad)]) == 1
     assert "unknown primitive" in capsys.readouterr().err
+
+
+# ------------------------------------------------------------ render size and reference size
+
+MARK_TAG = re.compile(r"<(circle|ellipse|path)[ >]")
+
+
+def test_mark_count_is_the_same_at_every_render_size(sample):
+    draw = sample.drawer()
+    for cls in SAMPLE_CLASSES:
+        small = draw("5", cls, 5, 40.0)
+        large = draw("5", cls, 5, 256.0)
+        assert len(MARK_TAG.findall(small)) == len(MARK_TAG.findall(large)), cls
+    # canopy and sun are built from circles and paths, so the check is not vacuous
+    assert MARK_TAG.findall(draw("5", "canopy", 5, 256.0))
+    assert MARK_TAG.findall(draw("5", "sun", 5, 256.0))
+
+
+def test_artwork_is_identical_at_every_size_up_to_the_scale_wrapper(sample):
+    draw = sample.drawer()
+    for cls in SAMPLE_CLASSES:
+        ref = draw("5", cls, 5, 100.0)
+        prefix = '<g transform="scale(1)">'
+        assert ref.startswith(prefix) and ref.endswith("</g>"), cls
+        body = ref[len(prefix):-len("</g>")]
+        assert draw("5", cls, 5, 256.0) == f'<g transform="scale(2.56)">{body}</g>'
+        assert draw("5", cls, 5, 40.0) == f'<g transform="scale(0.4)">{body}</g>'
+
+
+def test_solution_marks_do_not_depend_on_cell_size(sample):
+    boards = [square_board(6, 4), square_board(4, 6), square_board(8, 3)]
+    sol = solve(boards, make_inventory(boards), seed=1, iters=300)
+    sol.pieces = [dataclasses.replace(p, cls=SAMPLE_CLASSES[p.piece_id % len(SAMPLE_CLASSES)])
+                  for p in sol.pieces]
+    draw = sample.drawer()
+    small = render_solution_svg(sol, 0, draw, cell_size=40)
+    large = render_solution_svg(sol, 0, draw, cell_size=256)
+    assert len(MARK_TAG.findall(small)) == len(MARK_TAG.findall(large)) > 0
+
+
+def test_clip_ids_are_unique_within_a_piece_and_across_pieces(sample):
+    draw = sample.drawer()
+    seen: list[str] = []
+    for seed, cls in enumerate(SAMPLE_CLASSES * 3, start=1):
+        ids = re.findall(r'clipPath id="([^"]+)"', draw(str(seed), cls, seed, 64.0))
+        assert len(ids) == len(set(ids)), cls
+        seen += ids
+    assert len(seen) == len(set(seen))
+
+
+def test_ref_size_is_the_drawing_unit():
+    d = _one_class(_layer("stipple", params={"density": 40}))
+    d["ref_size"] = 50
+    spec = _load(d)
+    assert spec.ref_size == 50
+    frag = spec.drawer()("1", "c", 1, 100.0)
+    assert frag.startswith('<g transform="scale(2)">')
+    assert _load(_one_class(_layer())).ref_size == 100
+
+
+@pytest.mark.parametrize("bad", [0, -5, "100", True, None])
+def test_ref_size_must_be_a_positive_number(bad):
+    d = _one_class(_layer())
+    d["ref_size"] = bad
+    with pytest.raises(ClassSpecError, match="ref_size must be a positive number"):
+        _load(d)
+
+
+def test_sample_transition_uses_a_mask(sample):
+    assert "clip-blotch_mask-" in sample.drawer()("2", "shore", 2, 64.0)
+
+
+# ------------------------------------------------------------ masks
+
+MASK = {"primitive": "blotch_mask", "params": {"coverage": 0.35, "side": "right", "count": 3}}
+
+
+def _masked(mask, **layer_extra):
+    return _one_class(_layer("stipple", params={"density": 50}, mask=mask, background=True,
+                             **layer_extra))
+
+
+MASK_BAD = {
+    "unknown mask primitive": ({"primitive": "sparkle"}, "unknown mask primitive 'sparkle'"),
+    "unknown mask param": ({"primitive": "blotch_mask", "params": {"densty": 2}},
+                           "mask blotch_mask has no parameter(s) ['densty']"),
+    "bad mask side": ({"primitive": "blotch_mask", "params": {"side": "middle"}},
+                      "side must be one of"),
+    "bad mask count": ({"primitive": "blotch_mask", "params": {"count": 0}}, "count must be"),
+    "mask palette not allowed": ({"primitive": "blotch_mask", "palette": ["moss"]},
+                                 "unknown key 'palette'"),
+}
+
+
+@pytest.mark.parametrize("name", list(MASK_BAD))
+def test_bad_masks_are_reported(name):
+    mask, fragment = MASK_BAD[name]
+    with pytest.raises(ClassSpecError, match=re.escape(fragment)):
+        _load(_masked(mask)).validate()
+
+
+@pytest.mark.parametrize("mask, fragment", [
+    ("blotch_mask", "mask must be an object"),
+    ({"params": {}}, "missing required key 'primitive'"),
+    ({"primitive": "blotch_mask", "params": []}, "mask params must be an object"),
+    ({"primitive": 3}, "mask primitive must be a string"),
+])
+def test_structural_mask_errors_raise_on_parse(mask, fragment):
+    with pytest.raises(ClassSpecError, match=fragment):
+        _load(_masked(mask))
+
+
+def test_masked_layer_is_clipped_to_its_mask():
+    frag = _load(_masked(MASK)).drawer()("4", "c", 4, 64.0)
+    mid = re.search(r'<g clip-path="url\(#(clip-blotch_mask-[^)]+)\)"', frag)
+    assert mid, frag[:300]
+    assert f'clipPath id="{mid.group(1)}"' in frag
+    # the mask's <defs> comes before the group that uses it
+    assert frag.index(f'clipPath id="{mid.group(1)}"') < mid.start()
+
+
+def test_mask_is_derived_from_the_piece_seed():
+    draw = _load(_masked(MASK)).drawer()
+    a = draw("4", "c", 4, 100.0)
+    assert a == draw("4", "c", 4, 100.0)
+    assert a != draw("5", "c", 5, 100.0)
+    # the mask uses seed (piece seed, "0:mask") and the layer's resolved palette
+    _, expected_id = tx.blotch_mask(_layer_seed(4, "0:mask"), 100.0, [PALETTE["moss"], PALETTE["pine"]],
+                                    coverage=0.35, side="right", count=3)
+    assert expected_id in a
+
+
+def test_mask_applies_only_to_its_own_class():
+    spec = _load(_masked(MASK))
+    with pytest.warns(UserWarning, match="not in spec"):
+        frag = spec.drawer()("9", "other", 9, 64.0)
+    assert "clip-blotch_mask-" not in frag

@@ -33,8 +33,10 @@
       "layers": [
         {"primitive": "hatch_multi", "palette": ["water", "foam", "deep"],
          "params": {"count": 150, "length": 0.08, "width": 0.012, "families": 3}, "background": true},
-        {"primitive": "blotch", "palette": ["water", "sand"],
-         "params": {"coverage": 0.5, "side": "bottom"}, "background": false}
+        {"primitive": "stipple", "palette": ["sand", "paper", "sand"],
+         "params": {"density": 180}, "background": true,
+         "mask": {"primitive": "blotch_mask",
+                  "params": {"coverage": 0.5, "side": "bottom", "count": 3}}}
       ],
       "directional": true,
       "allowed_rotations": [0]
