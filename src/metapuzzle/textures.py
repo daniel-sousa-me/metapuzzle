@@ -21,7 +21,7 @@ Conventions
 
 Public API
 ----------
-stipple, dabs, mosaic, hatch_multi, scatter_shapes, blotch,
+stipple, dabs, mosaic, hatch_multi, scatter_shapes, blotch, motif,
 compose, cell_svg
 """
 
@@ -39,6 +39,8 @@ __all__ = [
     "hatch_multi",
     "scatter_shapes",
     "blotch",
+    "motif",
+    "MOTIF_KINDS",
     "compose",
     "cell_svg",
 ]
@@ -368,6 +370,135 @@ def blotch(seed: int, size: float, palette: Sequence[str], *,
         parts.append(f'<path d="{_smooth_closed(halo)}" fill="{color}" fill-opacity="0.3"/>')
         parts.append(f'<path d="{_smooth_closed(pts)}" fill="{color}"/>')
     return _wrap("blotch", seed, size, palette, params, "".join(parts))
+
+
+MOTIF_KINDS = ("disc", "ring", "silhouette_bird", "leaf", "fish", "boat",
+               "window", "star", "drop")
+_MOTIF_ROTATIONS = ("none", "any", "flip")
+_MOTIF_MARGIN = 0.08   # minimum gap between a motif and any cell edge, as a fraction of size
+
+
+def _motif_unit(kind: str, fill: str, ink: str) -> str:
+    """One motif in unit coordinates: centered on the origin, every point within
+    radius 1, so any rotation or mirror stays within the scaled circumcircle.
+    ``fill`` is the motif color; ``ink`` is the base color used for details."""
+    if kind == "disc":
+        return f'<circle cx="0" cy="0" r="1" fill="{fill}"/>'
+    if kind == "ring":
+        outer = "M-1 0A1 1 0 1 0 1 0A1 1 0 1 0-1 0Z"
+        inner = "M-0.55 0A0.55 0.55 0 1 1 0.55 0A0.55 0.55 0 1 1-0.55 0Z"
+        return f'<path d="{outer} {inner}" fill-rule="evenodd" fill="{fill}"/>'
+    if kind == "silhouette_bird":
+        # Two filled arches meeting at the body, with a small body ellipse.
+        left = "M-0.95 0.15Q-0.5-0.7 0-0.05Q-0.5-0.05-0.95 0.15Z"
+        right = "M0.95 0.15Q0.5-0.7 0-0.05Q0.5-0.05 0.95 0.15Z"
+        return (f'<path d="{left} {right}" fill="{fill}"/>'
+                f'<ellipse cx="0" cy="0" rx="0.24" ry="0.2" fill="{fill}"/>')
+    if kind == "leaf":
+        d = "M-1 0C-0.4-0.62 0.4-0.62 1 0C0.4 0.62-0.4 0.62-1 0Z"
+        return (f'<g transform="rotate(-45)"><path d="{d}" fill="{fill}"/>'
+                f'<line x1="-0.8" y1="0" x2="0.8" y2="0" stroke="{ink}" '
+                f'stroke-width="0.09" stroke-linecap="round"/></g>')
+    if kind == "fish":
+        body = "M0.85 0Q0.2-0.8-0.45 0Q0.2 0.8 0.85 0Z"
+        tail = "M-0.92-0.38L-0.4 0L-0.92 0.38Z"
+        return (f'<path d="{body} {tail}" fill="{fill}"/>'
+                f'<circle cx="0.4" cy="-0.1" r="0.09" fill="{ink}"/>')
+    if kind == "boat":
+        hull = "M-0.72 0.12L0.72 0.12L0.5 0.6L-0.5 0.6Z"
+        sail = "M0.06-0.6L0.06 0.1L0.62 0.1Z"
+        return (f'<path d="{hull} {sail}" fill="{fill}"/>'
+                f'<line x1="0" y1="-0.6" x2="0" y2="0.12" stroke="{fill}" stroke-width="0.08"/>')
+    if kind == "window":
+        return (f'<rect x="-0.62" y="-0.78" width="1.24" height="1.56" rx="0.14" fill="{fill}"/>'
+                f'<path d="M0-0.78V0.78M-0.62 0H0.62" stroke="{ink}" stroke-width="0.12"/>')
+    if kind == "star":
+        pts = []
+        for k in range(10):
+            a = -math.pi / 2 + k * math.pi / 5
+            r = 0.97 if k % 2 == 0 else 0.42
+            pts.append((r * math.cos(a), r * math.sin(a)))
+        return (f'<polygon points="{_points(pts)}" fill="{fill}" stroke="{fill}" '
+                f'stroke-width="0.06" stroke-linejoin="round"/>')
+    if kind == "drop":
+        d = "M0-1C0.35-0.45 0.7-0.1 0.7 0.3A0.7 0.7 0 0 1-0.7 0.3C-0.7-0.1-0.35-0.45 0-1Z"
+        return (f'<path d="{d}" fill="{fill}"/>'
+                f'<ellipse cx="-0.3" cy="0.22" rx="0.11" ry="0.2" fill="{ink}" fill-opacity="0.8"/>')
+    raise ValueError(f"kind must be one of {MOTIF_KINDS}, not {kind!r}")
+
+
+def motif(seed: int, size: float, palette: Sequence[str], background: bool = True,
+          kind: str = "disc", scale: float = 0.5, jitter: float = 0.08,
+          rotation: str = "none", halo: float = 0.0, color_index: int = 1,
+          halo_color_index: int = 2) -> str:
+    """One recognizable shape, centered in the cell with a small seeded jitter.
+
+    The shape never comes within ``_MOTIF_MARGIN`` (8%) of a cell edge.
+
+    kind: one of MOTIF_KINDS: disc, ring, silhouette_bird, leaf, fish, boat,
+        window, star, drop.
+    scale: diameter of the circle enclosing the shape, as a fraction of size.
+        Must satisfy scale / 2 + jitter <= 0.42, so the default fits with jitter.
+    jitter: maximum center offset per axis, as a fraction of size.
+    rotation: "none"; "any" (seeded angle); or "flip" (mirror horizontally
+        with 50% chance).
+    halo: 0 for none. Above 0, 2 or 3 concentric circles of decreasing opacity
+        are drawn behind the shape, out to radius (1 + halo) times the shape's
+        radius. The halo is not kept inside the margin and may be clipped by
+        the cell edge.
+    color_index: palette index of the shape color (default: palette[1]).
+    halo_color_index: palette index of the halo color (default: palette[2]).
+    """
+    params = _key_args(locals())
+    if kind not in MOTIF_KINDS:
+        raise ValueError(f"kind must be one of {MOTIF_KINDS}, not {kind!r}")
+    if rotation not in _MOTIF_ROTATIONS:
+        raise ValueError(f"rotation must be one of {_MOTIF_ROTATIONS}, not {rotation!r}")
+    if scale <= 0.0:
+        raise ValueError("scale must be positive")
+    if jitter < 0.0:
+        raise ValueError("jitter must be non-negative")
+    if scale / 2.0 + jitter > 0.5 - _MOTIF_MARGIN + 1e-9:
+        raise ValueError(
+            f"scale {scale} with jitter {jitter} would reach the cell edge; "
+            f"need scale / 2 + jitter <= {0.5 - _MOTIF_MARGIN:g}"
+        )
+    if halo < 0.0:
+        raise ValueError("halo must be non-negative")
+    for name, idx in (("color_index", color_index), ("halo_color_index", halo_color_index)):
+        if not 0 <= idx < len(palette):
+            raise ValueError(f"{name} is out of range for palette")
+    base = palette[0]
+    color = palette[color_index]
+    halo_color = palette[halo_color_index]
+
+    rng = random.Random(seed)
+    cx = size * (0.5 + rng.uniform(-jitter, jitter))
+    cy = size * (0.5 + rng.uniform(-jitter, jitter))
+    radius = size * scale / 2.0
+    angle = 0.0
+    mirror = False
+    if rotation == "any":
+        angle = rng.uniform(0.0, 360.0)
+    elif rotation == "flip":
+        mirror = rng.random() < 0.5
+
+    parts = [_ground(base, size, background)]
+    if halo > 0.0:
+        if halo <= 0.3:
+            fracs, opacities = (1.0, 0.5), (0.18, 0.34)
+        else:
+            fracs, opacities = (1.0, 0.6, 0.3), (0.12, 0.22, 0.34)
+        for f, op in zip(fracs, opacities):
+            r = radius * (1.0 + halo * f)
+            parts.append(
+                f'<circle cx="{_f(cx)}" cy="{_f(cy)}" r="{_f(r)}" '
+                f'fill="{halo_color}" fill-opacity="{op}"/>'
+            )
+    sx = -radius if mirror else radius
+    xf = f"translate({_f(cx)} {_f(cy)}) rotate({_f(angle)}) scale({_f(sx)} {_f(radius)})"
+    parts.append(f'<g transform="{xf}">{_motif_unit(kind, color, base)}</g>')
+    return _wrap("motif", seed, size, palette, params, "".join(parts))
 
 
 # ---------------------------------------------------------------- helpers

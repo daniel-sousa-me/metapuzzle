@@ -18,8 +18,8 @@ Spec format (see ``data/sample_classes.json``)::
       }
     }
 
-* ``primitive`` is one of the functions in ``textures`` (stipple, dabs, mosaic,
-  hatch_multi, scatter_shapes, blotch).
+* ``primitive`` is one of the keys of ``PRIMITIVES`` (stipple, dabs, mosaic,
+  hatch_multi, scatter_shapes, blotch, motif).
 * ``palette`` entries are names from the top-level palette or raw ``#rgb``/``#rrggbb``.
 * ``background`` defaults to true for the first layer and false for the others.
 * Layers are drawn in order. Layer ``i`` of a piece with seed ``s`` uses a seed derived
@@ -64,6 +64,7 @@ PRIMITIVES = {
     "hatch_multi": tx.hatch_multi,
     "scatter_shapes": tx.scatter_shapes,
     "blotch": tx.blotch,
+    "motif": tx.motif,
 }
 ROTATIONS = (0, 90, 180, 270)
 SAMPLE_SPEC_PATH = Path(__file__).resolve().parent / "data" / "sample_classes.json"

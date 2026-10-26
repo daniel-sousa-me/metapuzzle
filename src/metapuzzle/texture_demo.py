@@ -53,6 +53,9 @@ ROWS: list[tuple[object, dict]] = [
 ]
 
 
+MOTIF_ROW_LABEL = "motif  scale=0.5, color_index=2, stipple background"
+
+
 def _label(fn, params: dict) -> str:
     args = ", ".join(f"{k}={v}" for k, v in params.items())
     return f"{fn.__name__}  {args}"
@@ -62,9 +65,11 @@ def build_sheet(palette: list[str] = SAMPLE_PALETTE) -> str:
     """Return the demo sheet as an SVG document string."""
     per_col = math.ceil(len(ROWS) / SHEET_COLS)
     col_w = CELLS_PER_ROW * CELL
-    width = 2 * PAD + SHEET_COLS * col_w + (SHEET_COLS - 1) * COL_GAP
     row_h = LABEL_H + CELL + ROW_GAP
-    height = TITLE_H + PAD + per_col * row_h
+    motif_w = 2 * PAD + len(tx.MOTIF_KINDS) * CELL
+    width = max(2 * PAD + SHEET_COLS * col_w + (SHEET_COLS - 1) * COL_GAP, motif_w)
+    grid_h = per_col * row_h
+    height = TITLE_H + PAD + grid_h + row_h
 
     parts = [
         f'<rect x="0" y="0" width="{width}" height="{height}" fill="#ffffff"/>',
@@ -86,6 +91,26 @@ def build_sheet(palette: list[str] = SAMPLE_PALETTE) -> str:
             parts.append(
                 f'<g transform="translate({x0 + i * CELL} {y0 + LABEL_H})">{frag}</g>'
             )
+
+    # Full-width row: every motif kind at scale 0.5 over a stipple background.
+    y0 = TITLE_H + grid_h
+    parts.append(
+        f'<text x="{PAD}" y="{y0 + 14}" font-family="sans-serif" font-size="12" fill="#222">'
+        f"{escape(MOTIF_ROW_LABEL)}</text>"
+    )
+    for i, kind in enumerate(tx.MOTIF_KINDS):
+        seed = 5000 + i
+        x = PAD + i * CELL
+        base = tx.stipple(seed, CELL, palette, density=150)
+        shape = tx.motif(seed, CELL, palette, background=False, kind=kind,
+                         scale=0.5, color_index=2, halo=0.0)
+        parts.append(
+            f'<g transform="translate({x} {y0 + LABEL_H})">{tx.compose(base, shape)}</g>'
+        )
+        parts.append(
+            f'<text x="{x + CELL / 2}" y="{y0 + LABEL_H + CELL + 14}" font-family="sans-serif" '
+            f'font-size="11" fill="#222" text-anchor="middle">{escape(kind)}</text>'
+        )
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
