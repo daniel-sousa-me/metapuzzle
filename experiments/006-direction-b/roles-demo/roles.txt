@@ -1,0 +1,36 @@
+# Family roles of docs/design/alt-b/scenes-8x10-b.txt: sky, gold, ochre, teal
+# A
+sky sky sky sky sky sky sky sky
+sky sky sky gold gold sky sky teal
+sky gold gold gold gold gold gold sky
+sky gold ochre ochre ochre ochre gold sky
+sky gold ochre ochre ochre ochre gold gold
+teal gold ochre ochre ochre ochre gold teal
+teal gold gold gold gold gold gold teal
+teal teal teal teal teal sky teal teal
+teal teal teal teal teal teal teal teal
+teal teal sky teal teal teal teal teal
+
+# B
+sky sky sky sky sky sky sky sky
+sky sky sky gold sky gold sky sky
+sky gold gold gold gold gold gold gold
+sky gold gold sky gold gold gold sky
+teal teal gold gold teal teal teal teal
+teal teal teal gold gold teal teal teal
+teal teal gold gold gold teal teal teal
+teal ochre ochre ochre ochre ochre ochre teal
+sky ochre ochre ochre ochre ochre ochre teal
+teal teal teal sky teal teal teal teal
+
+# C
+sky sky sky sky sky sky sky sky
+sky gold gold sky sky ochre ochre teal
+teal teal gold gold ochre ochre gold teal
+teal gold teal teal ochre teal gold gold
+teal gold gold ochre teal gold gold sky
+sky teal gold ochre sky sky teal teal
+sky teal ochre ochre sky gold gold teal
+sky gold ochre teal gold teal gold sky
+teal ochre ochre gold gold gold teal teal
+teal teal teal teal sky teal teal teal

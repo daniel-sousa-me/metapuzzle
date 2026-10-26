@@ -1,0 +1,51 @@
+{
+  "_comment": "Families of docs/design/alt-b/03-three-scenes.md; target_counts = the designer's histogram.",
+  "roles": {
+    "sky": {
+      "classes": [
+        "BL",
+        "CB",
+        "CR",
+        "SU"
+      ]
+    },
+    "gold": {
+      "classes": [
+        "GD",
+        "GB",
+        "GT",
+        "DK"
+      ]
+    },
+    "ochre": {
+      "classes": [
+        "OC",
+        "OG"
+      ]
+    },
+    "teal": {
+      "classes": [
+        "TE",
+        "NT",
+        "GR",
+        "DT"
+      ]
+    }
+  },
+  "target_counts": {
+    "BL": 12,
+    "CB": 3,
+    "CR": 4,
+    "DK": 3,
+    "DT": 3,
+    "GB": 6,
+    "GD": 5,
+    "GR": 3,
+    "GT": 7,
+    "NT": 10,
+    "OC": 9,
+    "OG": 3,
+    "SU": 1,
+    "TE": 11
+  }
+}

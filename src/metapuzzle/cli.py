@@ -100,6 +100,18 @@ def build_parser() -> argparse.ArgumentParser:
     ps.add_argument("--scenes", required=True, nargs="+", metavar="FILE",
                     help="scene files: three files, or one file with three maps")
     ps.add_argument("--out", required=True, metavar="NEW.json", help="output class spec")
+    rs = sub.add_parser(
+        "roles-to-scenes",
+        help="solve a role map into three class maps with identical histograms and border counts",
+        epilog="exit status 0 on success, 1 on an input error or when no common histogram is found",
+    )
+    rs.add_argument("roles", metavar="ROLES.txt", help="three role grids in scene-file layout")
+    rs.add_argument("--spec", required=True, metavar="ROLES.json", help="allowed classes and weights per role")
+    rs.add_argument("--out", required=True, metavar="SCENES.txt", help="output scene file")
+    rs.add_argument("--rotation", choices=["none", "quarter"], default="none")
+    rs.add_argument("--seed", type=int, default=0)
+    rs.add_argument("--iters", type=int, default=20000, help="annealing iterations per phase")
+    rs.add_argument("--restarts", type=int, default=1, help="runs with seeds SEED, SEED+1, ...; keep the best")
     return ap
 
 
@@ -220,10 +232,31 @@ def _cmd_prune_spec(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_roles_to_scenes(a: argparse.Namespace) -> int:
+    from .roles import NAMES, assign_classes, load_role_maps, load_roles_spec, write_scene_file
+    from .scene import validate_scenes
+
+    maps = assign_classes(
+        load_role_maps(a.roles), load_roles_spec(a.spec), rotation=a.rotation, seed=a.seed, iters=a.iters,
+        restarts=a.restarts,
+    )
+    hist = maps[0].histogram()
+    print("histogram: " + " ".join(f"{c}={n}" for c, n in sorted(hist.items(), key=lambda kv: (-kv[1], kv[0]))))
+    for i, j in ((0, 1), (0, 2), (1, 2)):
+        cnt, frac = scene_metrics.same_position_overlap(maps[i], maps[j])
+        print(f"same-position {NAMES[i]}-{NAMES[j]}: {cnt} cells ({100 * frac:.1f}%)")
+    write_scene_file(maps, a.out)
+    board = square_board(maps[0].cols, maps[0].rows, "standard", a.rotation)
+    validate_scenes([board] * 3, load_scenes(a.out))  # round trip through the scene loader
+    print(f"wrote {a.out}: validate_scenes OK")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     a = build_parser().parse_args(argv)
     handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render, "scene-metrics": _cmd_scene_metrics, "prototype": _cmd_prototype,
-                "gen-transitions": _cmd_gen_transitions, "prune-spec": _cmd_prune_spec}
+                "gen-transitions": _cmd_gen_transitions, "prune-spec": _cmd_prune_spec,
+                "roles-to-scenes": _cmd_roles_to_scenes}
     try:
         return handlers[a.cmd](a)
     except (SceneError, ValueError) as e:
