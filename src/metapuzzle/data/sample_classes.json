@@ -1,5 +1,5 @@
 {
-  "_note": "Sample class spec: two textures, one transition, one feature. Palette[0] is unused on layers with background false.",
+  "_note": "Sample class spec: two textures, one transition (a named mask), one feature. Palette[0] is unused on layers with background false.",
   "palette": {
     "paper": "#e8dcc4",
     "sand": "#c9a66b",
@@ -30,13 +30,15 @@
       "allowed_rotations": [0, 90, 180, 270]
     },
     "shore": {
+      "masks": {
+        "edge": {"primitive": "blotch_mask",
+                 "params": {"coverage": 0.5, "side": "bottom", "count": 3}}
+      },
       "layers": [
         {"primitive": "hatch_multi", "palette": ["water", "foam", "deep"],
          "params": {"count": 150, "length": 0.08, "width": 0.012, "families": 3}, "background": true},
         {"primitive": "stipple", "palette": ["sand", "paper", "sand"],
-         "params": {"density": 180}, "background": true,
-         "mask": {"primitive": "blotch_mask",
-                  "params": {"coverage": 0.5, "side": "bottom", "count": 3}}}
+         "params": {"density": 180}, "background": true, "mask": "edge"}
       ],
       "directional": true,
       "allowed_rotations": [0]

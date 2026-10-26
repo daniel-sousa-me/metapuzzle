@@ -1,3 +1,4 @@
+import hashlib
 import io
 import math
 import re
@@ -294,3 +295,100 @@ def test_hull_is_a_hull_without_mast_or_sail():
 def test_fleck_is_a_soft_blob():
     frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="fleck", jitter=0.0)
     assert 'fill-opacity="0.92"' in frag and frag.count("<path") == 1
+
+
+# ------------------------------------------------------------------ blotch inset
+
+INSET = 0.08
+EDGES = ("top", "bottom", "left", "right")
+
+
+def _dirty_pixels(frag: str, size: int, edges) -> list[tuple[int, int]]:
+    """Pixels inside the inset margin of the given edges that are not background."""
+    px = _render_cell(frag, size).load()
+    m = int(INSET * size) - 1
+    base = tx._hex_to_rgb(PALETTE[0])
+    bad = []
+    for x in range(size):
+        for y in range(size):
+            in_margin = (("left" in edges and x < m) or ("right" in edges and x >= size - m)
+                         or ("top" in edges and y < m) or ("bottom" in edges and y >= size - m))
+            if in_margin and max(abs(a - b) for a, b in zip(px[x, y], base)) > 2:
+                bad.append((x, y))
+    return bad
+
+
+@pytest.mark.parametrize("coverage", [0.30, 0.45, 1.0])
+def test_blotch_inset_keeps_blotches_and_halo_inside_the_margin(coverage):
+    # coverage 1.0 makes blotches too large to fit, so they are scaled down to the margin.
+    for seed in range(4):
+        frag = tx.blotch(seed, 100.0, PALETTE, coverage=coverage, inset=INSET)
+        assert _dirty_pixels(frag, 100, EDGES) == [], (coverage, seed)
+
+
+def test_without_inset_blotches_meet_the_edges():
+    # the margin check above is not vacuous: without inset the same seeds reach the edge
+    assert any(_dirty_pixels(tx.blotch(seed, 100.0, PALETTE, coverage=0.45), 100, EDGES)
+               for seed in range(4))
+
+
+@pytest.mark.parametrize("side", ["top", "bottom", "left", "right"])
+def test_blotch_inset_with_side_insets_only_the_other_edges(side):
+    other = tuple(e for e in EDGES if e != side)
+    for seed in range(4):
+        frag = tx.blotch(seed, 100.0, PALETTE, coverage=0.45, side=side, inset=INSET)
+        assert _dirty_pixels(frag, 100, other) == [], (side, seed)
+    # the biased edge is still reached, so the transition keeps its cut
+    assert any(_dirty_pixels(tx.blotch(seed, 100.0, PALETTE, coverage=0.45, side=side,
+                                       inset=INSET), 100, (side,))
+               for seed in range(6))
+
+
+def _mask_margin_hits(clip: str, cid: str, edges, size: int = 100) -> int:
+    grid = _mask_coverage(clip, cid, size)
+    m = int(INSET * size) - 1
+    hits = 0
+    for y in range(size):
+        for x in range(size):
+            in_margin = (("left" in edges and x < m) or ("right" in edges and x >= size - m)
+                         or ("top" in edges and y < m) or ("bottom" in edges and y >= size - m))
+            hits += in_margin and grid[y][x]
+    return hits
+
+
+@pytest.mark.parametrize("side", [None, "top", "bottom", "left", "right"])
+def test_blotch_mask_inset_keeps_the_region_inside_the_margin(side):
+    edges = EDGES if side is None else tuple(e for e in EDGES if e != side)
+    for seed in range(4):
+        clip, cid = tx.blotch_mask(seed, 100.0, PALETTE, coverage=0.45, side=side,
+                                   count=3, inset=INSET)
+        assert clip.count("<path") == 3                    # inset does not change the count
+        assert _mask_margin_hits(clip, cid, edges) == 0, (side, seed)
+
+
+def test_blotch_mask_inset_shares_geometry_with_blotch():
+    clip, _ = tx.blotch_mask(4, 100.0, PALETTE, coverage=0.45, side="left", inset=INSET)
+    frag = tx.blotch(4, 100.0, PALETTE, coverage=0.45, side="left", inset=INSET, background=False)
+    paths = re.findall(r'<path d="([^"]+)"', clip)
+    assert paths
+    for d in paths:
+        assert f'<path d="{d}" fill="#5b7f5b"/>' in frag
+
+
+def test_inset_zero_keeps_the_original_output():
+    # Golden hashes from before inset existed: the default output must not change.
+    def h(s):
+        return hashlib.sha256(s.encode()).hexdigest()[:16]
+    assert h(tx.blotch(1, 100.0, PALETTE, coverage=0.45)) == "4653e6b097f9a715"
+    assert h(tx.blotch_mask(1, 100.0, PALETTE, coverage=0.45)[0]) == "567f7468fb550c82"
+    assert tx.blotch(1, 100.0, PALETTE, inset=0.0) == tx.blotch(1, 100.0, PALETTE)
+    assert tx.blotch_mask(1, 100.0, PALETTE, inset=0) == tx.blotch_mask(1, 100.0, PALETTE)
+
+
+@pytest.mark.parametrize("bad", [-0.1, 0.5, 0.9, float("nan")])
+def test_inset_must_be_a_fraction_below_one_half(bad):
+    with pytest.raises(ValueError, match="inset must be in"):
+        tx.blotch(1, 100.0, PALETTE, inset=bad)
+    with pytest.raises(ValueError, match="inset must be in"):
+        tx.blotch_mask(1, 100.0, PALETTE, inset=bad)
+

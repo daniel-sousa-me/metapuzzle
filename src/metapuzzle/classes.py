@@ -26,9 +26,14 @@ Spec format (see ``data/sample_classes.json``)::
   whole layer to a blotch-shaped region: the layer is drawn normally, then wrapped in
   ``<g clip-path>``. A transition is a full-cell base layer plus a second full-cell
   layer with a ``mask``, so both sides are textured and the boundary is ragged.
+* A class may define named masks under ``"masks"``, and several layers may reference
+  one by name with ``"mask": "name"``. The layers then share one clip region, and its
+  ``<clipPath>`` is written once per piece. Example: a mosaic fill and its chips both
+  clipped to the same blotch. Every named mask must be used by a layer.
 * Layers are drawn in order. Layer ``i`` of a piece with seed ``s`` uses a seed derived
-  from ``(s, i)`` through SHA-256 (a mask uses ``(s, "i:mask")``), so layers are
-  independent and the output does not depend on ``PYTHONHASHSEED``.
+  from ``(s, i)`` through SHA-256 (an inline mask uses ``(s, "i:mask")``, a named mask
+  ``(s, "mask:name")``), so layers are independent and the output does not depend on
+  ``PYTHONHASHSEED``.
 * Top-level ``ref_size`` (default 100) is the unit the spec is written in. Every piece
   is drawn at that size and the fragment is scaled to the display size, so the artwork
   is the same at every render size; only the resolution changes.
@@ -43,7 +48,7 @@ import inspect
 import json
 import re
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 from xml.sax.saxutils import escape
@@ -103,7 +108,7 @@ class Layer:
     palette: tuple[str, ...]
     params: dict
     background: bool
-    mask: Mask | None = None
+    mask: Mask | str | None = None   # an inline Mask, or the name of a class mask
 
 
 @dataclass(frozen=True)
@@ -111,6 +116,7 @@ class PieceClass:
     layers: tuple[Layer, ...]
     directional: bool
     allowed_rotations: tuple[int, ...]
+    masks: dict[str, Mask] = field(default_factory=dict)
 
 
 _NEUTRAL_LAYERS = (
@@ -160,7 +166,13 @@ def _parse_layer(where: str, index: int, raw: Any) -> Layer:
     background = raw.get("background", index == 0)
     if not isinstance(background, bool):
         raise ClassSpecError(f"{w}: background must be true or false")
-    mask = _parse_mask(w, raw["mask"]) if raw.get("mask") is not None else None
+    raw_mask = raw.get("mask")
+    if raw_mask is None:
+        mask = None
+    elif isinstance(raw_mask, str):
+        mask = raw_mask                    # a named mask of this class, checked in _parse_class
+    else:
+        mask = _parse_mask(w, raw_mask)
     return Layer(prim, tuple(names), dict(params), background, mask)
 
 
@@ -168,11 +180,29 @@ def _parse_class(name: str, raw: Any) -> PieceClass:
     where = f"class {name!r}"
     if not isinstance(raw, Mapping):
         raise ClassSpecError(f"{where}: must be an object")
-    _check_keys(raw, {"layers", "directional", "allowed_rotations"}, where, ("layers",))
+    _check_keys(raw, {"layers", "directional", "allowed_rotations", "masks"}, where, ("layers",))
+    masks_raw = raw.get("masks", {})
+    if not isinstance(masks_raw, Mapping):
+        raise ClassSpecError(f"{where}: masks must be an object")
+    masks = {
+        mname: _parse_mask(f"{where} mask {mname!r}", m)
+        for mname, m in masks_raw.items()
+        if not str(mname).startswith("_")
+    }
     layers_raw = raw["layers"]
     if not isinstance(layers_raw, list) or not layers_raw:
         raise ClassSpecError(f"{where}: layers must be a non-empty list")
     layers = tuple(_parse_layer(where, i, lr) for i, lr in enumerate(layers_raw))
+    used = set()
+    for i, layer in enumerate(layers):
+        if isinstance(layer.mask, str):
+            if layer.mask not in masks:
+                raise ClassSpecError(f"{where} layer {i}: unknown mask {layer.mask!r}; "
+                                     f"define it under 'masks'")
+            used.add(layer.mask)
+    unused = sorted(set(masks) - used)
+    if unused:
+        raise ClassSpecError(f"{where}: mask(s) {unused} defined but not used by any layer")
     directional = raw.get("directional", False)
     if not isinstance(directional, bool):
         raise ClassSpecError(f"{where}: directional must be true or false")
@@ -180,7 +210,7 @@ def _parse_class(name: str, raw: Any) -> PieceClass:
     rots = raw.get("allowed_rotations", default_rot)
     if not isinstance(rots, list):
         raise ClassSpecError(f"{where}: allowed_rotations must be a list")
-    return PieceClass(layers, directional, tuple(rots))
+    return PieceClass(layers, directional, tuple(rots), masks)
 
 
 def _layer_seed(piece_seed: int, tag: int | str) -> int:
@@ -248,7 +278,21 @@ class ClassSpec:
             raise ClassSpecError(f"{name} has no parameter(s) {sorted(unknown)}; "
                                  f"accepts {sorted(accepted)}")
 
-    def _check_layer(self, layer: Layer) -> None:
+    @staticmethod
+    def _check_mask(mask: Mask, palette: list[str] | tuple) -> None:
+        mfn = MASK_PRIMITIVES.get(mask.primitive)
+        if mfn is None:
+            raise ClassSpecError(f"unknown mask primitive {mask.primitive!r}; "
+                                 f"use one of {sorted(MASK_PRIMITIVES)}")
+        ClassSpec._check_params(f"mask {mask.primitive}", mfn, mask.params)
+        try:
+            clip, cid = mfn(_TEST_SEED, _TEST_SIZE, palette, **mask.params)
+        except Exception as e:
+            raise ClassSpecError(f"mask {type(e).__name__}: {e}") from e
+        if f'id="{cid}"' not in clip:
+            raise ClassSpecError("mask primitive did not return a clipPath with its id")
+
+    def _check_layer(self, layer: Layer, masks: Mapping[str, Mask]) -> None:
         fn = PRIMITIVES.get(layer.primitive)
         if fn is None:
             raise ClassSpecError(f"unknown primitive {layer.primitive!r}; use one of {sorted(PRIMITIVES)}")
@@ -260,18 +304,13 @@ class ClassSpec:
             raise ClassSpecError(f"{type(e).__name__}: {e}") from e
         if not frag.strip():
             raise ClassSpecError("primitive produced an empty fragment")
-        if layer.mask is not None:
-            mfn = MASK_PRIMITIVES.get(layer.mask.primitive)
-            if mfn is None:
-                raise ClassSpecError(f"unknown mask primitive {layer.mask.primitive!r}; "
-                                     f"use one of {sorted(MASK_PRIMITIVES)}")
-            self._check_params(f"mask {layer.mask.primitive}", mfn, layer.mask.params)
-            try:
-                clip, cid = mfn(_TEST_SEED, _TEST_SIZE, palette, **layer.mask.params)
-            except Exception as e:
-                raise ClassSpecError(f"mask {type(e).__name__}: {e}") from e
-            if f'id="{cid}"' not in clip:
-                raise ClassSpecError("mask primitive did not return a clipPath with its id")
+        if isinstance(layer.mask, str):
+            if layer.mask not in masks:
+                raise ClassSpecError(f"unknown mask {layer.mask!r}")
+            # A named mask is built with no palette, so every layer that uses it gets one id.
+            self._check_mask(masks[layer.mask], ())
+        elif layer.mask is not None:
+            self._check_mask(layer.mask, palette)
 
     def validate(self) -> None:
         """Check every class: primitives, palette names, parameters, rotations.
@@ -293,7 +332,7 @@ class ClassSpec:
                               f"{list(ROTATIONS)}, got {list(rots)}")
             for i, layer in enumerate(pc.layers):
                 try:
-                    self._check_layer(layer)
+                    self._check_layer(layer, pc.masks)
                 except ClassSpecError as e:
                     errors.append(f"{where} layer {i} ({layer.primitive}): {e}")
         if errors:
@@ -304,7 +343,19 @@ class ClassSpec:
         pc = self.classes.get(cls)
         return ROTATIONS if pc is None else pc.allowed_rotations
 
-    def _layer_fragment(self, layer: Layer, index: int, piece_seed: int, size: float) -> str:
+    def _named_clips(self, layers: Sequence[Layer], masks: Mapping[str, Mask],
+                     piece_seed: int, size: float) -> dict[str, tuple[str, str]]:
+        """``(clip_svg, clip_id)`` for each named mask that a layer uses, built once per piece."""
+        used = {layer.mask for layer in layers if isinstance(layer.mask, str)}
+        return {
+            name: MASK_PRIMITIVES[mask.primitive](
+                _layer_seed(piece_seed, f"mask:{name}"), size, (), **mask.params,
+            )
+            for name, mask in masks.items() if name in used
+        }
+
+    def _layer_fragment(self, layer: Layer, index: int, piece_seed: int, size: float,
+                        clips: Mapping[str, tuple[str, str]]) -> str:
         palette = self._resolve(layer.palette)
         body = PRIMITIVES[layer.primitive](
             _layer_seed(piece_seed, index), size, palette,
@@ -312,6 +363,10 @@ class ClassSpec:
         )
         if layer.mask is None:
             return body
+        if isinstance(layer.mask, str):
+            # The clipPath itself is written once by the piece (see drawer).
+            _, cid = clips[layer.mask]
+            return f'<g clip-path="url(#{cid})">{body}</g>'
         clip, cid = MASK_PRIMITIVES[layer.mask.primitive](
             _layer_seed(piece_seed, f"{index}:mask"), size, palette, **layer.mask.params,
         )
@@ -338,13 +393,16 @@ class ClassSpec:
                     warned.add(cls)
                     warnings.warn(f"class {cls!r} not in spec; drawing neutral stipple",
                                   UserWarning, stacklevel=2)
-                layers = _NEUTRAL_LAYERS
+                layers, masks = _NEUTRAL_LAYERS, {}
             else:
-                layers = pc.layers
-            inner = tx.compose(*(
-                self._layer_fragment(layer, i, rng_seed, ref)
-                for i, layer in enumerate(layers)
-            ))
+                layers, masks = pc.layers, pc.masks
+            clips = self._named_clips(layers, masks, rng_seed, ref)
+            defs = "".join(clip for clip, _ in clips.values())
+            inner = tx.compose(
+                f"<defs>{defs}</defs>" if defs else "",
+                *(self._layer_fragment(layer, i, rng_seed, ref, clips)
+                  for i, layer in enumerate(layers)),
+            )
             return f'<g transform="scale({float(size) / ref:.6g})">{inner}</g>'
 
         return draw

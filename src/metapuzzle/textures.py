@@ -332,17 +332,46 @@ def scatter_shapes(seed: int, size: float, palette: Sequence[str], *,
     return _wrap("scatter_shapes", seed, size, palette, params, "".join(parts))
 
 
-def _check_blotch_args(coverage: float, side: str | None) -> None:
+_HALO_SCALE = 1.18   # blotch() paints a halo out to this multiple of the blob radius
+
+
+def _check_blotch_args(coverage: float, side: str | None, inset: float = 0.0) -> None:
     if not 0.0 <= coverage <= 1.0:
         raise ValueError("coverage must be in [0, 1]")
     if side not in _SIDES:
         raise ValueError(f"side must be one of {_SIDES}")
+    if not 0.0 <= inset < 0.5:
+        raise ValueError("inset must be in [0, 0.5)")
+
+
+def _inset_blotch(cx: float, cy: float, offs: list[tuple[float, float]], size: float,
+                  side: str | None, inset: float):
+    """Move one blotch so it lies inside the cell, ``inset * size`` from each edge.
+
+    The edge named by ``side`` is not inset: the blotch must still reach it. The
+    reach counts blotch()'s halo, so the halo stays inside as well. If a blotch is
+    too large to fit, its outline is scaled down to fit. Returns (cx, cy, offs)."""
+    reach = _HALO_SCALE * max(math.hypot(dx, dy) for dx, dy in offs)
+    half = size * (0.5 - inset)                 # largest reach that fits in the cell
+    if reach > half:
+        f = half / reach
+        offs = [(dx * f, dy * f) for dx, dy in offs]
+        reach = half
+    lo, hi = size * inset + reach, size * (1.0 - inset) - reach
+    x_lo = -math.inf if side == "left" else lo
+    x_hi = math.inf if side == "right" else hi
+    y_lo = -math.inf if side == "top" else lo
+    y_hi = math.inf if side == "bottom" else hi
+    return min(max(cx, x_lo), x_hi), min(max(cy, y_lo), y_hi), offs
 
 
 def _blotch_polys(rng: random.Random, size: float, coverage: float, side: str | None,
-                  count: int | None = None) -> list[tuple[float, float, list[tuple[float, float]]]]:
+                  count: int | None = None, inset: float = 0.0,
+                  ) -> list[tuple[float, float, list[tuple[float, float]]]]:
     """Wobbly blotches as ``(center_x, center_y, outline)``, 1-3 of them unless
-    ``count`` is given. Draws from ``rng`` in a fixed order, so ``blotch`` output is stable."""
+    ``count`` is given. Draws from ``rng`` in a fixed order, so ``blotch`` output is stable.
+    ``inset > 0`` moves blotches inside the cell (see ``_inset_blotch``); the draws are
+    the same, so the blotches keep their random shapes."""
     r_base = size * (0.12 + 0.5 * coverage)
     polys = []
     for _ in range(rng.randint(1, 3) if count is None else count):
@@ -359,38 +388,49 @@ def _blotch_polys(rng: random.Random, size: float, coverage: float, side: str | 
                 "right": (size - t, along),
             }[side]
         m = rng.randint(10, 14)
-        pts = []
+        offs = []
         for k in range(m):
             a = (k + rng.uniform(-0.15, 0.15)) * 2.0 * math.pi / m
             rr = r * rng.uniform(0.7, 1.15)
-            pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
-        polys.append((cx, cy, pts))
+            offs.append((rr * math.cos(a), rr * math.sin(a)))
+        if inset > 0.0:
+            cx, cy, offs = _inset_blotch(cx, cy, offs, size, side, inset)
+        polys.append((cx, cy, [(cx + dx, cy + dy) for dx, dy in offs]))
     return polys
 
 
 def blotch(seed: int, size: float, palette: Sequence[str], *,
            coverage: float = 0.45, side: str | None = None, color_index: int = 1,
-           background: bool = True) -> str:
+           background: bool = True, inset: float = 0.0) -> str:
     """1-3 large soft, wobbly blotches over the background.
 
     coverage: 0-1, scales blotch radius (about 0.12 to 0.62 of size).
     side: None, or "top"/"bottom"/"left"/"right" to bias the blotch centers
         toward that edge. The cut through the cell is the piece's transition.
     color_index: palette index of the blotch color (default: palette[1]).
-    Blotches are not padded, so they intentionally meet the edges as a
-    visible boundary. Neighboring cells will differ there unless deliberately
-    matched. To clip another texture to the same shape, use ``blotch_mask``.
+    inset: 0 (default) lets blotches meet the cell edges, so they are clipped
+        there. Above 0, each blotch, halo included, stays inside the cell by
+        ``inset * size``. Blotches that cannot fit are scaled down. With a
+        ``side``, the three edges other than that side are inset; the biased
+        side is not, so the blotch still reaches it. Use 0.08 to keep a
+        same-class neighbour from showing a hard cut.
+    Blotches are not padded, so with ``inset=0`` they intentionally meet the
+    edges as a visible boundary. Neighboring cells will differ there unless
+    deliberately matched. To clip another texture to the same shape, use
+    ``blotch_mask``.
     """
     params = _key_args(locals())
-    _check_blotch_args(coverage, side)
+    _check_blotch_args(coverage, side, inset)
+    if inset == 0:
+        del params["inset"]     # keeps clip ids, and so existing output, unchanged
     if not 0 <= color_index < len(palette):
         raise ValueError("color_index is out of range for palette")
     base = palette[0]
     color = palette[color_index]
     rng = random.Random(seed)
     parts = [_ground(base, size, background)]
-    for cx, cy, pts in _blotch_polys(rng, size, coverage, side):
-        halo = [(cx + (px - cx) * 1.18, cy + (py - cy) * 1.18) for px, py in pts]
+    for cx, cy, pts in _blotch_polys(rng, size, coverage, side, inset=inset):
+        halo = [(cx + (px - cx) * _HALO_SCALE, cy + (py - cy) * _HALO_SCALE) for px, py in pts]
         parts.append(f'<path d="{_smooth_closed(halo)}" fill="{color}" fill-opacity="0.3"/>')
         parts.append(f'<path d="{_smooth_closed(pts)}" fill="{color}"/>')
     return _wrap("blotch", seed, size, palette, params, "".join(parts))
@@ -398,26 +438,29 @@ def blotch(seed: int, size: float, palette: Sequence[str], *,
 
 def blotch_mask(seed: int, size: float, palette: Sequence[str], *,
                 coverage: float = 0.45, side: str | None = None,
-                count: int | None = None) -> tuple[str, str]:
+                count: int | None = None, inset: float = 0.0) -> tuple[str, str]:
     """Clip path for a blotch-shaped region: ``(clip_svg, clip_id)``.
 
     ``clip_svg`` is a ``<clipPath id="clip_id">`` element holding only the blotch
     outlines (no fill, no halo). Put it in a ``<defs>`` and reference it with
     ``clip-path="url(#clip_id)"``. Parameters have the same meaning as in
-    ``blotch``. ``count`` sets the number of blotches (1-6); by default it is
-    random, 1 to 3, as in ``blotch``.
+    ``blotch``, including ``inset``. ``count`` sets the number of blotches (1-6);
+    by default it is random, 1 to 3, as in ``blotch``. With ``inset``, the
+    outlines keep the halo margin that ``blotch`` uses, so the two share geometry.
 
     ``palette`` is accepted for parity with the painting primitives. A mask has
     no colour, so the palette is not read.
     """
     params = _key_args(locals())
-    _check_blotch_args(coverage, side)
+    _check_blotch_args(coverage, side, inset)
+    if inset == 0:
+        del params["inset"]     # keeps clip ids, and so existing output, unchanged
     if count is not None and not (isinstance(count, int) and 1 <= count <= 6):
         raise ValueError("count must be an integer in [1, 6], or None")
     rng = random.Random(seed)
     cid = _clip_id("blotch_mask", seed, size, palette, params)
     paths = "".join(f'<path d="{_smooth_closed(pts)}"/>'
-                    for _, _, pts in _blotch_polys(rng, size, coverage, side, count))
+                    for _, _, pts in _blotch_polys(rng, size, coverage, side, count, inset))
     return f'<clipPath id="{cid}">{paths}</clipPath>', cid
 
 

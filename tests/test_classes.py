@@ -394,7 +394,7 @@ def test_bad_masks_are_reported(name):
 
 
 @pytest.mark.parametrize("mask, fragment", [
-    ("blotch_mask", "mask must be an object"),
+    (["blotch_mask"], "mask must be an object"),
     ({"params": {}}, "missing required key 'primitive'"),
     ({"primitive": "blotch_mask", "params": []}, "mask params must be an object"),
     ({"primitive": 3}, "mask primitive must be a string"),
@@ -429,3 +429,117 @@ def test_mask_applies_only_to_its_own_class():
     with pytest.warns(UserWarning, match="not in spec"):
         frag = spec.drawer()("9", "other", 9, 64.0)
     assert "clip-blotch_mask-" not in frag
+
+
+# ------------------------------------------------------------ named masks
+
+SHARED_MASK = {"primitive": "blotch_mask",
+               "params": {"coverage": 0.35, "side": None, "count": 3, "inset": 0.08}}
+
+
+def _shared_spec(name="m1", masks=None):
+    """A mosaic-like fill and its chips, both clipped by the one named mask ``name``."""
+    masks = {name: SHARED_MASK} if masks is None else masks
+    return _spec_dict({"c": {
+        "masks": masks,
+        "layers": [
+            _layer("dabs", ("moss", "pine", "paper"), {"count": 60}, background=True, mask=name),
+            _layer("scatter_shapes", ("paper", "moss"),
+                   {"kinds": ["disc"], "count": 10, "scale": 0.05}, background=False, mask=name),
+            _layer("stipple", ("paper", "pine"), {"density": 40}, background=False),
+        ],
+    }})
+
+
+def test_named_mask_is_one_clip_shared_by_its_layers():
+    frag = _load(_shared_spec()).drawer()("4", "c", 4, 64.0)
+    # primitives also clip to their own cell, so keep only the mask's references
+    refs = [r for r in re.findall(r'clip-path="url\(#([^)]+)\)"', frag) if "blotch_mask" in r]
+    defined = [d for d in re.findall(r'<clipPath id="([^"]+)"', frag) if "blotch_mask" in d]
+    assert len(refs) == 2 and len(set(refs)) == 1
+    assert defined == refs[:1]                       # defined once, before the first use
+    assert frag.index(f'<clipPath id="{refs[0]}"') < frag.index(f'url(#{refs[0]})')
+
+
+def test_named_mask_id_comes_from_piece_seed_and_name():
+    draw = _load(_shared_spec()).drawer()
+    frag = draw("4", "c", 4, 64.0)
+    _, cid = tx.blotch_mask(_layer_seed(4, "mask:m1"), 100.0, (),
+                            coverage=0.35, side=None, count=3, inset=0.08)
+    assert f'<clipPath id="{cid}">' in frag
+    assert f'<clipPath id="{cid}">' not in draw("5", "c", 5, 64.0)
+    renamed = _load(_shared_spec(name="m2")).drawer()("4", "c", 4, 64.0)
+    assert f'<clipPath id="{cid}">' not in renamed
+
+
+def test_named_mask_output_is_deterministic():
+    draw = _load(_shared_spec()).drawer()
+    assert draw("7", "c", 7, 80.0) == draw("7", "c", 7, 80.0)
+
+
+def test_inline_and_named_masks_can_mix_in_one_class():
+    d = _spec_dict({"c": {
+        "masks": {"m1": SHARED_MASK},
+        "layers": [_layer("stipple", ("moss", "pine"), {"density": 50}, mask="m1"),
+                   _layer("stipple", ("paper", "pine"), {"density": 50}, background=True,
+                          mask=dict(MASK))],
+    }})
+    frag = _load(d).drawer()("3", "c", 3, 64.0)
+    assert frag.count('<clipPath id="clip-blotch_mask-') == 2
+    assert frag.count('clip-path="url(#clip-blotch_mask-') == 2
+
+
+def test_named_masks_are_local_to_their_class():
+    d = _spec_dict({
+        "c": {"masks": {"m1": SHARED_MASK}, "layers": [_layer(mask="m1")]},
+        "e": {"layers": [_layer(mask="m1")]},
+    })
+    with pytest.raises(ClassSpecError, match="class 'e' layer 0: unknown mask 'm1'"):
+        _load(d)
+
+
+def _with_mask(mask_ref, masks):
+    return _spec_dict({"c": {"masks": masks, "layers": [_layer(mask=mask_ref)]}})
+
+
+NAMED_BAD = {
+    "unknown name": (_with_mask("nope", {"m1": SHARED_MASK}), "unknown mask 'nope'"),
+    "unused name": (_with_mask(None, {"m1": SHARED_MASK}), "mask(s) ['m1'] defined but not used"),
+    "masks not an object": (_spec_dict({"c": {"layers": [_layer()], "masks": ["m1"]}}),
+                            "masks must be an object"),
+    "named mask missing primitive": (_with_mask("m1", {"m1": {"params": {}}}),
+                                     "missing required key 'primitive'"),
+    "named mask palette key": (_with_mask("m1", {"m1": {"primitive": "blotch_mask", "palette": []}}),
+                               "unknown key 'palette'"),
+    "named mask unknown primitive": (_with_mask("m1", {"m1": {"primitive": "sparkle"}}),
+                                     "unknown mask primitive 'sparkle'"),
+    "named mask unknown param": (_with_mask("m1", {"m1": {"primitive": "blotch_mask",
+                                                          "params": {"densty": 2}}}),
+                                 "mask blotch_mask has no parameter(s) ['densty']"),
+    "inset too large": (_with_mask("m1", {"m1": {"primitive": "blotch_mask",
+                                                 "params": {"inset": 0.5}}}),
+                        "inset must be in [0, 0.5)"),
+}
+
+
+@pytest.mark.parametrize("name", list(NAMED_BAD))
+def test_named_mask_errors_are_reported(name):
+    data, fragment = NAMED_BAD[name]
+    with pytest.raises(ClassSpecError, match=re.escape(fragment)):
+        _load(data).validate()
+
+
+def test_named_mask_accepts_comment_keys():
+    d = _with_mask("m1", {"_note": "shared edge", "m1": SHARED_MASK})
+    _load(d).validate()
+    assert list(_load(d).classes["c"].masks) == ["m1"]
+
+
+def test_sample_transition_is_a_named_mask(sample):
+    shore = sample.classes["shore"]
+    assert list(shore.masks) == ["edge"]
+    assert [layer.mask for layer in shore.layers] == [None, "edge"]
+    frag = sample.drawer()("2", "shore", 2, 64.0)
+    assert frag.count('<clipPath id="clip-blotch_mask-') == 1
+    assert frag.count('clip-path="url(#clip-blotch_mask-') == 1
+
