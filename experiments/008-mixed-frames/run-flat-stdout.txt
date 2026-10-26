@@ -1,0 +1,8 @@
+extra=64 shared AB/AC/BC=0/0/0 valid=False violations=41 out=run-flat
+piece gates: PASS
+scene gates: FAIL (A-B 2x2 window reuse 60.6% ≥ 30%; A-C 2x2 window reuse 71.6% ≥ 30%; B-C 2x2 window reuse 73.6% ≥ 30%)
+  violation: A: pieces 21 and 88 touch with sides that do not mate
+  violation: A: pieces 7 and 120 touch with sides that do not mate
+  violation: A: pieces 5 and 18 touch with sides that do not mate
+  violation: A: pieces 182 and 130 touch with sides that do not mate
+  violation: A: pieces 180 and 289 touch with sides that do not mate

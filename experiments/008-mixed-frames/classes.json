@@ -1,0 +1,213 @@
+{
+  "_note": "Density-field mosaic (004). Six non-directional tone classes T0 (darkest) .. T5 (lightest), all stipple dapples. Neighbouring classes share mark colours so boundaries soften. One 8-colour palette.",
+  "palette": {
+    "navy": "#1c2536",
+    "charcoal": "#343a44",
+    "slate": "#5a6b7f",
+    "olive": "#6f7344",
+    "steel": "#8fa1b3",
+    "khaki": "#b8a878",
+    "sky": "#cfe3ee",
+    "cream": "#f4eedd"
+  },
+  "classes": {
+    "T0": {
+      "layers": [
+        {
+          "primitive": "stipple",
+          "palette": [
+            "navy",
+            "charcoal",
+            "navy",
+            "slate"
+          ],
+          "params": {
+            "density": 120,
+            "radius": [
+              0.03,
+              0.06
+            ],
+            "weights": [
+              2,
+              2,
+              1
+            ]
+          },
+          "background": true
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "T1": {
+      "layers": [
+        {
+          "primitive": "stipple",
+          "palette": [
+            "charcoal",
+            "slate",
+            "navy",
+            "olive"
+          ],
+          "params": {
+            "density": 100,
+            "radius": [
+              0.03,
+              0.06
+            ],
+            "weights": [
+              2,
+              1,
+              1
+            ]
+          },
+          "background": true
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "T2": {
+      "layers": [
+        {
+          "primitive": "stipple",
+          "palette": [
+            "slate",
+            "olive",
+            "charcoal",
+            "slate"
+          ],
+          "params": {
+            "density": 90,
+            "radius": [
+              0.03,
+              0.06
+            ],
+            "weights": [
+              2,
+              1,
+              1
+            ]
+          },
+          "background": true
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "T3": {
+      "layers": [
+        {
+          "primitive": "stipple",
+          "palette": [
+            "olive",
+            "steel",
+            "khaki",
+            "olive"
+          ],
+          "params": {
+            "density": 90,
+            "radius": [
+              0.03,
+              0.06
+            ],
+            "weights": [
+              2,
+              2,
+              1
+            ]
+          },
+          "background": true
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "T4": {
+      "layers": [
+        {
+          "primitive": "stipple",
+          "palette": [
+            "khaki",
+            "sky",
+            "steel",
+            "olive"
+          ],
+          "params": {
+            "density": 80,
+            "radius": [
+              0.03,
+              0.06
+            ],
+            "weights": [
+              2,
+              1,
+              1
+            ]
+          },
+          "background": true
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "T5": {
+      "layers": [
+        {
+          "primitive": "stipple",
+          "palette": [
+            "sky",
+            "cream",
+            "khaki",
+            "sky"
+          ],
+          "params": {
+            "density": 70,
+            "radius": [
+              0.03,
+              0.06
+            ],
+            "weights": [
+              2,
+              1,
+              1
+            ]
+          },
+          "background": true
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    }
+  }
+}
