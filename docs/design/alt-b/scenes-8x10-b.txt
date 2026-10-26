@@ -1,0 +1,40 @@
+# Direction B class maps, 8 cols x 10 rows, engine text format (scene.parse_text).
+# Class codes: docs/design/alt-b/02-piece-classes.md
+# Verified with scene.validate_scenes (strict_border, rotation none and quarter): identical histograms,
+# identical per-corner and per-side border class counts.
+
+# A  The Sunflower (radial)
+BL BL BL CB CR BL BL BL
+CB BL CB GD GB BL SU TE
+CR GD GD DK GD DK GB BL
+BL GB OG OC OC OG GB BL
+BL GB OC OC OC OC GD GB
+NT GT OC OC OC OG GT NT
+TE GT GT DK GT GT GT GR
+TE TE TE TE TE CR TE TE
+NT NT DT TE TE NT DT DT
+NT NT CR GR GR NT NT NT
+
+# B  Sunset Bay (horizontal bands)
+BL BL CR BL BL BL CB BL
+BL CB BL GB BL GB CR BL
+BL GB GB GD GB GD GD GB
+CB DK GD SU GD DK DK BL
+TE TE GT GT DT TE TE TE
+TE TE TE GT GT TE TE DT
+NT DT GT GT GT NT NT TE
+NT OC OC OC OC OC OC NT
+CR OG OG OC OG OC OC GR
+NT NT GR CR NT GR NT NT
+
+# C  Koi Pond (scattered, diagonal stepping-stone path)
+BL CB BL BL BL CR BL BL
+CR GT GD BL CB OC OC DT
+NT TE GT GB OC OC DK GR
+TE GT TE TE OG TE GT GB
+NT GD DK OG TE GT GB BL
+BL NT GD OG SU CR DT TE
+BL TE OC OC BL GB GD NT
+CB GB OC DT DK TE GT BL
+TE OC OC GD GB GT NT TE
+NT GR NT NT CR NT GR NT
