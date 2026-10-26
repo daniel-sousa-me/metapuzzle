@@ -82,6 +82,24 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--iters", type=int, default=None)
     pt.add_argument("--cell", type=int, default=48, help="cell size in pixels")
     pt.add_argument("--labels", action="store_true", help="print piece ids in the cells")
+    gt = sub.add_parser(
+        "gen-transitions",
+        help="add transition classes (base texture + masked mass texture) for field pairs",
+        epilog="writes the new spec only after it validates; exit status 1 on an input error",
+    )
+    gt.add_argument("spec", metavar="SPEC.json", help="class spec to extend")
+    gt.add_argument("--fields", required=True, metavar="CODES", help="comma-separated field class codes, e.g. SK,ME,DP,FO")
+    gt.add_argument("--out", required=True, metavar="NEW.json", help="output class spec")
+    gt.add_argument("--sides", default="top,bottom,left,right", help="comma-separated mask sides")
+    gt.add_argument("--coverage", type=float, default=0.45, help="blotch_mask coverage in [0, 1]")
+    gt.add_argument("--rotatable", action="store_true",
+                    help="one side per pair, non-directional; orient in scenes with the @90 suffix")
+    gt.add_argument("--corners", action="store_true", help="also add a class per pair of adjacent sides")
+    ps = sub.add_parser("prune-spec", help="keep only the classes that the scene files use")
+    ps.add_argument("spec", metavar="SPEC.json", help="class spec to prune")
+    ps.add_argument("--scenes", required=True, nargs="+", metavar="FILE",
+                    help="scene files: three files, or one file with three maps")
+    ps.add_argument("--out", required=True, metavar="NEW.json", help="output class spec")
     return ap
 
 
@@ -168,9 +186,44 @@ def _cmd_prototype(a: argparse.Namespace) -> int:
     return 0 if res["valid"] else 2
 
 
+def _write_spec(data: dict, out: str) -> None:
+    Path(out).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def _cmd_gen_transitions(a: argparse.Namespace) -> int:
+    from .classes import ClassSpec, load_class_spec  # lazy: cairosvg is only needed for validation
+    from .spec_tools import generate_transitions
+
+    load_class_spec(a.spec)  # the input must be a valid spec
+    raw = json.loads(Path(a.spec).read_text(encoding="utf-8"))
+    fields = [f.strip() for f in a.fields.split(",") if f.strip()]
+    sides = [s.strip() for s in a.sides.split(",") if s.strip()]
+    out = generate_transitions(raw, fields, sides=sides, coverage=a.coverage,
+                               rotatable=a.rotatable, corner=a.corners)
+    ClassSpec.from_dict(out).validate()
+    _write_spec(out, a.out)
+    added = len(out["classes"]) - len(raw["classes"])
+    print(f"wrote {a.out}: {len(out['classes'])} classes, {added} generated")
+    return 0
+
+
+def _cmd_prune_spec(a: argparse.Namespace) -> int:
+    from .classes import ClassSpec, load_class_spec
+    from .spec_tools import prune_unused
+
+    load_class_spec(a.spec)
+    raw = json.loads(Path(a.spec).read_text(encoding="utf-8"))
+    out = prune_unused(raw, a.scenes)
+    ClassSpec.from_dict(out).validate()
+    _write_spec(out, a.out)
+    print(f"wrote {a.out}: kept {len(out['classes'])} of {len(raw['classes'])} classes")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     a = build_parser().parse_args(argv)
-    handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render, "scene-metrics": _cmd_scene_metrics, "prototype": _cmd_prototype}
+    handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render, "scene-metrics": _cmd_scene_metrics, "prototype": _cmd_prototype,
+                "gen-transitions": _cmd_gen_transitions, "prune-spec": _cmd_prune_spec}
     try:
         return handlers[a.cmd](a)
     except (SceneError, ValueError) as e:
