@@ -118,7 +118,21 @@ def build_parser() -> argparse.ArgumentParser:
         epilog="score 1 (grid invisible) to 5 (strong); bands on the visible fraction are in grid_metric.GRID_SCORE_BANDS",
     )
     gm.add_argument("run_dir", metavar="RUN_DIR", help="prototype output folder (summary.md, solution.json, solution-*.png)")
+    cn = sub.add_parser(
+        "connectors",
+        help="mating classes (connector shapes) and false fits of a solution JSON",
+        epilog="exit status 0 when every touching non-flat pair mates, 2 when some do not, 1 on an input error",
+    )
+    cn.add_argument("path", metavar="SOLUTION.json")
     return ap
+
+
+def _cmd_connectors(a: argparse.Namespace) -> int:
+    from .connectors import class_summary, format_summary  # lazy, like the other analysis commands
+
+    s = class_summary(Solution.load(a.path))
+    print(format_summary(s))
+    return 0 if s["mismatched"] == 0 else 2
 
 
 def _cmd_solve(a: argparse.Namespace) -> int:
@@ -274,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
     handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render, "scene-metrics": _cmd_scene_metrics, "prototype": _cmd_prototype,
                 "gen-transitions": _cmd_gen_transitions, "prune-spec": _cmd_prune_spec,
                 "roles-to-scenes": _cmd_roles_to_scenes,
-                "grid-metric": _cmd_grid_metric}
+                "grid-metric": _cmd_grid_metric, "connectors": _cmd_connectors}
     try:
         return handlers[a.cmd](a)
     except (SceneError, ValueError) as e:
