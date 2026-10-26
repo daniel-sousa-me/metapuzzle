@@ -20,3 +20,11 @@ Think broadly during experiments, then make explicit narrowing decisions and rec
 ## 2026-10-26 — Square lattice is the base (owner clarification)
 
 The base tiling is a square lattice; hexagonal or triangular tilings are not pursued. "Unconventional shapes" means individual piece cuts that deviate from a square (e.g. curving toward a triangle) while still occupying one lattice cell. For now the prototypes use plain squares; shape deviation within the lattice is a later-stage experiment to revisit once the visual grammar is validated.
+
+## 2026-10-26 — Solutions may have different aspect ratios (owner)
+
+The three images need not share an aspect ratio; only the piece count is fixed. Consequences:
+- The engine takes one board per solution (equal slot counts, possibly different cols×rows) instead of one shared board.
+- Different frames have different perimeter lengths, so border inventories only match if edge pieces can rotate or if flat-sided pieces may sit in the interior (see docs/IDEAS.md). These ideas are now linked.
+- Piece counts with several factorizations become attractive: 96 = 8×12 = 12×8 = 16×6 for prototypes; 480 = 20×24 = 30×16 = 40×12 or 504 = 21×24 = 28×18 = 36×14 near the 500 target. Final count is open; "500" is a target, not a contract.
+- Plan: prototype 1 uses identical frames (simplest, isolates the visual-grammar question); prototype 2 varies frames (portrait / landscape / panorama) and compares distinctiveness and border cost.
