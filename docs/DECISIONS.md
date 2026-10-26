@@ -40,7 +40,7 @@ After three grammars were rendered and blind-tested (direction A "Dapple Mosaic"
 - Every tier boundary lies inside a two-material transition piece (masked ragged blob), so no colour step lands on a cut; frame cells are plain for now (engine limitation to fix).
 - The role-map solver gives the histogram slack by letting interior regions absorb surplus transition pieces as texture variation.
 - Quarter rotation is used; all classes are non-directional.
-First render at 20×25: piece-level shared adjacencies 0/0/0; cat, sailboat and tree readable. Directions A and B are retired as scene designs; their lexicon mechanisms (masked transitions, context-dependent readings, role maps) are kept.
+First render at 20×25: piece-level shared adjacencies 0/0/0; distinctiveness 4/5; the tree was recognized blind, the cat and boat were not (silhouette fixes in progress). Directions A and B are retired as scene designs; their lexicon mechanisms (masked transitions, context-dependent readings, role maps) are kept.
 
 ## 2026-10-26 — Scene-level gates are difficulty indicators, not hard gates, for the tone-field grammar
 

@@ -41,3 +41,33 @@
 **Scene metrics** (`scene-metrics.txt`, gates fail). Same position A-B / A-C / B-C: 45.8 / 44.4 / 43.2%, or 34.1 / 30.7 / 33.0% excluding the dominant light class. 2x2 reuse plain/rotated: 0.71/0.81, 0.75/0.85, 0.73/0.89.
 
 Light cells (45% of each map) dominate same-position overlap. Proposal: count matches only over cells whose class is not the most common class of either map, dividing by that count.
+
+## Step 3: first render and evaluation
+
+**Command** (`run-quarter/summary.md` parameters; repo root):
+
+`metapuzzle prototype --scenes experiments/005-hybrid-tones/scenes.txt --classes experiments/005-hybrid-tones/classes.json --out experiments/005-hybrid-tones/run-quarter --sizes 20x25,20x25,20x25 --border standard --rotation quarter --seed 0 --iters 300000 --cell 32`
+
+**Scorecard** (EVALUATION.md format, `run-quarter`)
+
+| Check | Gate | Value | Result |
+|---|---|---|---|
+| Piece adjacency AB / AC / BC | < 5% each | 0.00 / 0.00 / 0.00% | PASS |
+| Largest shared cluster | < 4 | 0 | PASS |
+| Same-position overlap AB / AC / BC | < 25% each | 45.8 / 44.4 / 43.2% (excl. dominant L: 34.1 / 30.7 / 33.0%) | FAIL, indicator |
+| 2x2 window reuse | < 30% | larger of plain/rotated: 81 / 85 / 89% | FAIL, indicator |
+| Transferable blob | < 10% | 31.2 / 31.0 / 25.6% | FAIL, indicator |
+| T1 blind test | subjects 3+, distinct 4+, grid 2 or lower | cat unnamed, boat unnamed, tree 4/5; distinct 4/5; grid 4 / 4 / 3 | FAIL |
+| T2 grid visibility | verdict 2 or lower, 70%+ invisible | C 2/5 (about 90% invisible), A 3/5 (worst), B not recorded | FAIL |
+
+**Interpretation**
+- Passes the piece-level gate at 500 pieces with zero shared adjacencies, as 004 did. Scene-level gates fail.
+- Only the tree is recognized (canopy and trunk 4/5). The cat is not named, and the sail is light on light, so the boat is lost.
+- Transition lobes form a regular rhythm of white holes along silhouettes, which makes the grid faintly visible.
+- Frame cells stay plain, leaving square olive and navy blocks at the edges.
+- Scene-level numbers are difficulty indicators, not hard gates, per `docs/DECISIONS.md`.
+
+**Next**
+- Rougher, edge-spanning transition masks: `run-quarter-v2`.
+- Subject fixes (bigger cat head and ears; mid-tone sail): `scenes-v2`.
+- Frame-cell transitions in the engine.
