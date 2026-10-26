@@ -1,0 +1,13 @@
+board A: 8x10 standard rotation=quarter
+board B: 8x10 standard rotation=quarter
+board C: 8x10 standard rotation=quarter
+pieces: 80  adjacencies per board: [142, 142, 142]
+AB: shared=1 (0.70%)  clusters(3+)=[]  largest=2  familiar pieces=2  max fam=1  mean fam=0.025
+AC: shared=0 (0.00%)  clusters(3+)=[]  largest=0  familiar pieces=0  max fam=0  mean fam=0.000
+BC: shared=0 (0.00%)  clusters(3+)=[]  largest=0  familiar pieces=0  max fam=0  mean fam=0.000
+total shared=1  cluster penalty=0
+rotated pieces per solution: [48, 50, 53]
+corner orders: [[0, 1, 2, 3], [0, 3, 2, 1], [0, 2, 3, 1]]
+meta: seed=0, iters=300000, iters_used=300000, energy=1.0, cluster_penalty=0, valid=True, violations=0, distinct_corner_orders=False, elapsed_s=3.13
+piece gates: PASS
+validity: OK
