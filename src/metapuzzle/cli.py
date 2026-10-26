@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from .board import square_board
 from .metrics import report
@@ -46,6 +47,12 @@ def build_parser() -> argparse.ArgumentParser:
     r = sub.add_parser("report", help="print metrics for a solution JSON")
     r.add_argument("path")
     r.add_argument("--json", action="store_true", help="print the metrics dict as JSON")
+    g = sub.add_parser("render", help="draw the three placements and a piece sheet as SVG/PNG")
+    g.add_argument("path")
+    g.add_argument("--out", required=True, help="output directory")
+    g.add_argument("--cell", type=int, default=40, help="cell size in pixels")
+    g.add_argument("--grid", choices=["none", "faint", "strong"], default="none", help="cell outlines")
+    g.add_argument("--labels", action="store_true", help="print piece ids in the cells")
     return ap
 
 
@@ -90,10 +97,24 @@ def _cmd_report(a: argparse.Namespace) -> int:
     return 0 if not errs else 2
 
 
+def _cmd_render(a: argparse.Namespace) -> int:
+    from .render import flat_class_drawer, render_all  # lazy: cairosvg is only needed here
+
+    sol = Solution.load(a.path)
+    written = render_all(
+        sol, flat_class_drawer(), a.out, Path(a.path).stem,
+        cell_size=a.cell, grid=a.grid, labels=a.labels,
+    )
+    for path in written.values():
+        print(path)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     a = build_parser().parse_args(argv)
+    handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render}
     try:
-        return _cmd_solve(a) if a.cmd == "solve" else _cmd_report(a)
+        return handlers[a.cmd](a)
     except (SceneError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
