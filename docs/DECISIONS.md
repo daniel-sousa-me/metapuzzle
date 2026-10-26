@@ -28,3 +28,7 @@ The three images need not share an aspect ratio; only the piece count is fixed. 
 - Different frames have different perimeter lengths, so border inventories only match if edge pieces can rotate or if flat-sided pieces may sit in the interior (see docs/IDEAS.md). These ideas are now linked.
 - Piece counts with several factorizations become attractive: 96 = 8×12 = 12×8 = 16×6 for prototypes; 480 = 20×24 = 30×16 = 40×12 or 504 = 21×24 = 28×18 = 36×14 near the 500 target. Final count is open; "500" is a target, not a contract.
 - Plan: prototype 1 uses identical frames (simplest, isolates the visual-grammar question); prototype 2 varies frames (portrait / landscape / panorama) and compares distinctiveness and border cost.
+
+## 2026-10-26 — Image-generation models as an occasional reference channel (owner)
+
+Image models are not used by the toolkit. Once style, elements and scenes are settled, the owner can run a small number of prompts manually and return the images as creative reference for the design. This is a slow channel: use it rarely (a batch of two or three prompts at a milestone), never block work on it, and record the prompts sent in docs/IDEAS.md or the experiment log.
