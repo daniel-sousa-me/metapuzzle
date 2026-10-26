@@ -112,6 +112,12 @@ def build_parser() -> argparse.ArgumentParser:
     rs.add_argument("--seed", type=int, default=0)
     rs.add_argument("--iters", type=int, default=20000, help="annealing iterations per phase")
     rs.add_argument("--restarts", type=int, default=1, help="runs with seeds SEED, SEED+1, ...; keep the best")
+    gm = sub.add_parser(
+        "grid-metric",
+        help="automatic grid visibility: colour steps along piece edges in a run's solution PNGs",
+        epilog="score 1 (grid invisible) to 5 (strong); bands on the visible fraction are in grid_metric.GRID_SCORE_BANDS",
+    )
+    gm.add_argument("run_dir", metavar="RUN_DIR", help="prototype output folder (summary.md, solution.json, solution-*.png)")
     return ap
 
 
@@ -252,11 +258,23 @@ def _cmd_roles_to_scenes(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_grid_metric(a: argparse.Namespace) -> int:
+    from .grid_metric import run_grid_metric  # lazy: pulls in PIL and render
+
+    res = run_grid_metric(a.run_dir)
+    g = res["geometry"]
+    print(f"cell={g['cell']}px margin={g['margin']}px (render default; not recorded) boards={g['sizes']}")
+    for s in res["solutions"]:
+        print(f"{s['solution']}  visible {s['visible_fraction']:.3f}  lines {s['line_fraction']:.3f}  score {s['score']:g}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     a = build_parser().parse_args(argv)
     handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render, "scene-metrics": _cmd_scene_metrics, "prototype": _cmd_prototype,
                 "gen-transitions": _cmd_gen_transitions, "prune-spec": _cmd_prune_spec,
-                "roles-to-scenes": _cmd_roles_to_scenes}
+                "roles-to-scenes": _cmd_roles_to_scenes,
+                "grid-metric": _cmd_grid_metric}
     try:
         return handlers[a.cmd](a)
     except (SceneError, ValueError) as e:
