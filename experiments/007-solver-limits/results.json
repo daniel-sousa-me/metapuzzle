@@ -1,0 +1,3710 @@
+{
+ "specs": {
+  "A": "classes.json",
+  "B": "classes.json"
+ },
+ "grid_wall_s": 207.6,
+ "aggregate": [
+  {
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 37,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 10,
+    "AC": 13,
+    "BC": 14
+   },
+   "best_gates_ok": false,
+   "best_gate_failures": [
+    "AB shared 7.0% \u2265 5%",
+    "AC shared 9.2% \u2265 5%",
+    "AC largest shared cluster 6 pieces \u2265 4",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "mean_total": 37.4,
+   "sd_total": 0.4898979485566356,
+   "min_pair": {
+    "AB": 10,
+    "AC": 11,
+    "BC": 12
+   },
+   "mean_pair": {
+    "AB": 11.6,
+    "AC": 12.2,
+    "BC": 13.6
+   },
+   "gates_pass_runs": 0,
+   "mean_wall_s": 6.55,
+   "mean_class_pair": {
+    "AB": {
+     "DP|FO": 2,
+     "DP|HD": 2,
+     "FO|ME": 0.8,
+     "ME|ME": 2.8,
+     "PH|RU": 1,
+     "S/|SN": 1,
+     "SK|SK": 2
+    },
+    "AC": {
+     "DP|FO": 2,
+     "DP|HD": 2,
+     "FO|ME": 0.4,
+     "ME|ME": 2.4,
+     "PH|RU": 2,
+     "S/|SN": 1,
+     "SK|SK": 2.4
+    },
+    "BC": {
+     "DP|FO": 2,
+     "DP|HD": 2,
+     "FO|ME": 0.8,
+     "HB|HL": 1,
+     "ME|ME": 2.8,
+     "PH|RU": 1,
+     "S/|SN": 2,
+     "SK|SK": 2
+    }
+   }
+  },
+  {
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 37,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 10,
+    "AC": 13,
+    "BC": 14
+   },
+   "best_gates_ok": false,
+   "best_gate_failures": [
+    "AB shared 7.0% \u2265 5%",
+    "AC shared 9.2% \u2265 5%",
+    "AC largest shared cluster 6 pieces \u2265 4",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "mean_total": 37.2,
+   "sd_total": 0.4,
+   "min_pair": {
+    "AB": 10,
+    "AC": 11,
+    "BC": 12
+   },
+   "mean_pair": {
+    "AB": 11.2,
+    "AC": 11.8,
+    "BC": 14.2
+   },
+   "gates_pass_runs": 0,
+   "mean_wall_s": 42.48,
+   "mean_class_pair": {
+    "AB": {
+     "DP|FO": 2,
+     "DP|HD": 2,
+     "FO|ME": 0.6,
+     "ME|ME": 2.6,
+     "PH|RU": 1,
+     "S/|SN": 1,
+     "SK|SK": 2
+    },
+    "AC": {
+     "DP|FO": 2,
+     "DP|HD": 2,
+     "FO|ME": 0.4,
+     "ME|ME": 2.4,
+     "PH|RU": 2,
+     "S/|SN": 1,
+     "SK|SK": 2
+    },
+    "BC": {
+     "DP|FO": 2,
+     "DP|HD": 2,
+     "FO|ME": 1,
+     "HB|HL": 1,
+     "ME|ME": 3,
+     "PH|RU": 1,
+     "S/|SN": 2,
+     "SK|SK": 2,
+     "SK|SU": 0.2
+    }
+   }
+  },
+  {
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 13,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 13,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "mean_pair": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 5.32,
+   "mean_class_pair": {
+    "AB": {
+     "DP|FO": 0.4,
+     "DP|HD": 1.6,
+     "PH|RU": 1,
+     "S/|SN": 1
+    },
+    "AC": {
+     "DP|FO": 1.6,
+     "DP|HD": 0.4,
+     "PH|RU": 2,
+     "S/|SN": 1
+    },
+    "BC": {
+     "HB|HL": 1,
+     "PH|RU": 1,
+     "S/|SN": 2
+    }
+   }
+  },
+  {
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 13,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 2,
+    "AC": 5,
+    "BC": 6
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 13,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 2,
+    "AC": 3,
+    "BC": 4
+   },
+   "mean_pair": {
+    "AB": 3.2,
+    "AC": 4.6,
+    "BC": 5.2
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 35.84,
+   "mean_class_pair": {
+    "AB": {
+     "DP|FO": 0.4,
+     "DP|HD": 0.8,
+     "PH|RU": 1,
+     "S/|SN": 1
+    },
+    "AC": {
+     "DP|FO": 1.2,
+     "DP|HD": 0.4,
+     "PH|RU": 2,
+     "S/|SN": 1
+    },
+    "BC": {
+     "DP|FO": 0.4,
+     "DP|HD": 0.8,
+     "HB|HL": 1,
+     "PH|RU": 1,
+     "S/|SN": 2
+    }
+   }
+  },
+  {
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 13,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 7,
+    "AC": 2,
+    "BC": 4
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 13,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 5,
+    "AC": 2,
+    "BC": 3
+   },
+   "mean_pair": {
+    "AB": 6.2,
+    "AC": 3.2,
+    "BC": 3.6
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 4.15,
+   "mean_class_pair": {
+    "AB": {
+     "BL|BL": 1.6,
+     "BL|CB": 0.2,
+     "BL|CR": 0.2,
+     "BL|GB": 1,
+     "CR|NT": 0.2,
+     "DT|TE": 1,
+     "GR|NT": 1,
+     "TE|TE": 1
+    },
+    "AC": {
+     "BL|BL": 1.4,
+     "BL|CR": 0.8,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|BL": 1,
+     "BL|CB": 0.8,
+     "BL|GB": 1,
+     "CR|NT": 0.8
+    }
+   }
+  },
+  {
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 13,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 6,
+    "AC": 3,
+    "BC": 4
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 13,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 5,
+    "AC": 2,
+    "BC": 3
+   },
+   "mean_pair": {
+    "AB": 6.6,
+    "AC": 2.8,
+    "BC": 3.6
+   },
+   "gates_pass_runs": 4,
+   "mean_wall_s": 30.61,
+   "mean_class_pair": {
+    "AB": {
+     "BL|BL": 1.8,
+     "BL|CB": 0.2,
+     "BL|CR": 0.2,
+     "BL|GB": 1,
+     "CR|NT": 0.4,
+     "DT|TE": 1,
+     "GR|NT": 1,
+     "TE|TE": 1
+    },
+    "AC": {
+     "BL|BL": 1.2,
+     "BL|CR": 0.6,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|BL": 1,
+     "BL|CB": 0.8,
+     "BL|CR": 0.2,
+     "BL|GB": 1,
+     "CR|NT": 0.6
+    }
+   }
+  },
+  {
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 1,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 1,
+    "AC": 0,
+    "BC": 0
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 1,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0.4,
+    "AC": 0,
+    "BC": 0.6
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 3.6,
+   "mean_class_pair": {
+    "AB": {
+     "BL|CB": 0.4
+    },
+    "AC": {},
+    "BC": {
+     "BL|CB": 0.6
+    }
+   }
+  },
+  {
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 1,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 1,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0.2,
+    "AC": 0,
+    "BC": 0.8
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 36.41,
+   "mean_class_pair": {
+    "AB": {
+     "BL|CB": 0.2
+    },
+    "AC": {},
+    "BC": {
+     "BL|CB": 0.8
+    }
+   }
+  },
+  {
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 0,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 0,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 0.25,
+   "mean_class_pair": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   }
+  },
+  {
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 2000000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 0,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 0,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 0.28,
+   "mean_class_pair": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   }
+  },
+  {
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 0,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 0,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 0.0,
+   "mean_class_pair": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   }
+  },
+  {
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 2000000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 0,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 0,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 0.01,
+   "mean_class_pair": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   }
+  },
+  {
+   "scene": "B",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 0,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 0,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 0.26,
+   "mean_class_pair": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   }
+  },
+  {
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "runs": 5,
+   "valid_runs": 5,
+   "best_total": 0,
+   "best_seed": 0,
+   "best_shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "best_gates_ok": true,
+   "best_gate_failures": [],
+   "mean_total": 0,
+   "sd_total": 0.0,
+   "min_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "mean_pair": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "gates_pass_runs": 5,
+   "mean_wall_s": 0.01,
+   "mean_class_pair": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   }
+  }
+ ],
+ "analysis": {
+  "A": {
+   "per_class": [
+    {
+     "class": "DP",
+     "n": 10,
+     "internal": [
+      9,
+      9,
+      10
+     ],
+     "components": [
+      2,
+      3,
+      1
+     ],
+     "n_minus_1": 9,
+     "connected_all": false,
+     "baseline_AB": 2.86,
+     "baseline_all": 8.93,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "F/",
+     "n": 2,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      2,
+      2,
+      2
+     ],
+     "n_minus_1": 1,
+     "connected_all": false,
+     "baseline_AB": 0.43,
+     "baseline_all": 1.46,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "FO",
+     "n": 9,
+     "internal": [
+      6,
+      4,
+      5
+     ],
+     "components": [
+      3,
+      5,
+      4
+     ],
+     "n_minus_1": 8,
+     "connected_all": false,
+     "baseline_AB": 1.56,
+     "baseline_all": 5.01,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "F\\",
+     "n": 2,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      2,
+      2,
+      2
+     ],
+     "n_minus_1": 1,
+     "connected_all": false,
+     "baseline_AB": 0.4,
+     "baseline_all": 1.38,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "HB",
+     "n": 1,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 0,
+     "connected_all": true,
+     "baseline_AB": 0.25,
+     "baseline_all": 0.85,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "HD",
+     "n": 2,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      2,
+      2,
+      2
+     ],
+     "n_minus_1": 1,
+     "connected_all": false,
+     "baseline_AB": 0.4,
+     "baseline_all": 0.75,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "HL",
+     "n": 1,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 0,
+     "connected_all": true,
+     "baseline_AB": 0.2,
+     "baseline_all": 0.9,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "ME",
+     "n": 24,
+     "internal": [
+      37,
+      34,
+      37
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 23,
+     "connected_all": true,
+     "baseline_AB": 4.73,
+     "baseline_all": 14.57,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "PH",
+     "n": 1,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 0,
+     "connected_all": true,
+     "baseline_AB": 0.6,
+     "baseline_all": 2.29,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "RU",
+     "n": 2,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      2,
+      2,
+      2
+     ],
+     "n_minus_1": 1,
+     "connected_all": false,
+     "baseline_AB": 0.69,
+     "baseline_all": 2.71,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "S/",
+     "n": 2,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      2,
+      2,
+      2
+     ],
+     "n_minus_1": 1,
+     "connected_all": false,
+     "baseline_AB": 0.96,
+     "baseline_all": 3.0,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "SK",
+     "n": 21,
+     "internal": [
+      22,
+      24,
+      23
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 20,
+     "connected_all": true,
+     "baseline_AB": 3.51,
+     "baseline_all": 10.9,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "SN",
+     "n": 1,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 0,
+     "connected_all": true,
+     "baseline_AB": 0.55,
+     "baseline_all": 2.12,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "SU",
+     "n": 1,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 0,
+     "connected_all": true,
+     "baseline_AB": 0.46,
+     "baseline_all": 1.04,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "S\\",
+     "n": 1,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 0,
+     "connected_all": true,
+     "baseline_AB": 0.19,
+     "baseline_all": 0.76,
+     "pigeonhole_AB": 0
+    }
+   ],
+   "pairs": {
+    "AB": {
+     "baseline_mean": 17.81,
+     "forced_floor": 0,
+     "forced_notes": []
+    },
+    "AC": {
+     "baseline_mean": 19.02,
+     "forced_floor": 2,
+     "forced_notes": [
+      "R2 PH touches all 2 RU pieces in both maps"
+     ]
+    },
+    "BC": {
+     "baseline_mean": 19.82,
+     "forced_floor": 3,
+     "forced_notes": [
+      "R3 singletons HB-HL adjacent in both maps",
+      "R2 SN touches all 2 S/ pieces in both maps"
+     ]
+    }
+   },
+   "pair_baseline": {
+    "AB": {
+     "S/|SK": 0.42857142857142855,
+     "F/|F\\": 0.25,
+     "F/|SK": 0.2857142857142857,
+     "FO|FO": 0.6666666666666666,
+     "SK|SU": 0.42857142857142855,
+     "F/|FO": 0.3333333333333333,
+     "DP|HD": 0.2,
+     "FO|ME": 0.25925925925925924,
+     "DP|RU": 0.3,
+     "HB|HD": 0.5,
+     "F\\|SK": 0.2857142857142857,
+     "ME|ME": 4.557971014492754,
+     "S/|SU": 0.5,
+     "DP|F\\": 0.05,
+     "SK|SN": 0.09523809523809523,
+     "DP|PH": 0.2,
+     "HD|SK": 0.09523809523809523,
+     "DP|HL": 0.4,
+     "DP|FO": 0.9777777777777777,
+     "S/|SN": 1.0,
+     "SK|S\\": 0.38095238095238093,
+     "PH|RU": 1.0,
+     "SK|SK": 2.5142857142857142,
+     "DP|DP": 1.8,
+     "ME|RU": 0.08333333333333333,
+     "FO|F\\": 0.2222222222222222
+    },
+    "AC": {
+     "S/|SK": 0.7142857142857143,
+     "F/|F\\": 0.5,
+     "F/|SK": 0.21428571428571427,
+     "FO|FO": 0.8333333333333334,
+     "SK|SU": 0.5714285714285714,
+     "DP|HB": 0.2,
+     "F/|FO": 0.2222222222222222,
+     "DP|HD": 0.2,
+     "DP|RU": 0.2,
+     "FO|ME": 0.16203703703703703,
+     "F\\|SK": 0.2857142857142857,
+     "ME|ME": 4.9601449275362315,
+     "SK|SN": 0.09523809523809523,
+     "DP|PH": 0.2,
+     "HD|SK": 0.09523809523809523,
+     "DP|HL": 0.2,
+     "DP|FO": 0.9777777777777777,
+     "S/|SN": 1.0,
+     "SK|S\\": 0.38095238095238093,
+     "FO|RU": 0.3333333333333333,
+     "PH|RU": 2.0,
+     "SK|SK": 2.4095238095238094,
+     "DP|DP": 2.0,
+     "ME|RU": 0.041666666666666664,
+     "FO|F\\": 0.2222222222222222
+    },
+    "BC": {
+     "S/|SK": 0.35714285714285715,
+     "F/|F\\": 0.5,
+     "F/|SK": 0.2857142857142857,
+     "ME|PH": 0.08333333333333333,
+     "FO|FO": 0.5555555555555556,
+     "SK|SU": 0.5714285714285714,
+     "F/|FO": 0.3333333333333333,
+     "DP|HD": 0.2,
+     "DP|RU": 0.3,
+     "FO|ME": 0.18518518518518517,
+     "F\\|SK": 0.21428571428571427,
+     "ME|ME": 4.557971014492754,
+     "SK|SN": 0.047619047619047616,
+     "DP|PH": 0.1,
+     "HD|SK": 0.09523809523809523,
+     "DP|HL": 0.2,
+     "DP|FO": 1.3444444444444446,
+     "S/|SN": 2.0,
+     "SK|S\\": 0.7619047619047619,
+     "HB|HL": 1.0,
+     "FO|HD": 0.1111111111111111,
+     "PH|RU": 1.0,
+     "SK|SK": 2.6285714285714286,
+     "DP|DP": 2.0,
+     "ME|RU": 0.16666666666666666,
+     "FO|F\\": 0.2222222222222222
+    }
+   },
+   "cross_edges_total": 68
+  },
+  "B": {
+   "per_class": [
+    {
+     "class": "BL",
+     "n": 12,
+     "internal": [
+      8,
+      7,
+      5
+     ],
+     "components": [
+      4,
+      5,
+      7
+     ],
+     "n_minus_1": 11,
+     "connected_all": false,
+     "baseline_AB": 1.79,
+     "baseline_all": 4.49,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "CB",
+     "n": 3,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      3,
+      3,
+      3
+     ],
+     "n_minus_1": 2,
+     "connected_all": false,
+     "baseline_AB": 0.5,
+     "baseline_all": 1.31,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "CR",
+     "n": 4,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      4,
+      4,
+      4
+     ],
+     "n_minus_1": 3,
+     "connected_all": false,
+     "baseline_AB": 0.33,
+     "baseline_all": 0.88,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "DK",
+     "n": 3,
+     "internal": [
+      0,
+      1,
+      0
+     ],
+     "components": [
+      3,
+      2,
+      3
+     ],
+     "n_minus_1": 2,
+     "connected_all": false,
+     "baseline_AB": 0.62,
+     "baseline_all": 1.54,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "DT",
+     "n": 3,
+     "internal": [
+      1,
+      0,
+      0
+     ],
+     "components": [
+      2,
+      3,
+      3
+     ],
+     "n_minus_1": 2,
+     "connected_all": false,
+     "baseline_AB": 0.37,
+     "baseline_all": 0.67,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "GB",
+     "n": 6,
+     "internal": [
+      2,
+      1,
+      0
+     ],
+     "components": [
+      4,
+      5,
+      6
+     ],
+     "n_minus_1": 5,
+     "connected_all": false,
+     "baseline_AB": 1.27,
+     "baseline_all": 2.4,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "GD",
+     "n": 5,
+     "internal": [
+      1,
+      1,
+      0
+     ],
+     "components": [
+      4,
+      4,
+      5
+     ],
+     "n_minus_1": 4,
+     "connected_all": false,
+     "baseline_AB": 1.34,
+     "baseline_all": 2.58,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "GR",
+     "n": 3,
+     "internal": [
+      1,
+      0,
+      0
+     ],
+     "components": [
+      2,
+      3,
+      3
+     ],
+     "n_minus_1": 2,
+     "connected_all": false,
+     "baseline_AB": 0.21,
+     "baseline_all": 0.83,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "GT",
+     "n": 7,
+     "internal": [
+      5,
+      7,
+      0
+     ],
+     "components": [
+      2,
+      1,
+      7
+     ],
+     "n_minus_1": 6,
+     "connected_all": false,
+     "baseline_AB": 1.93,
+     "baseline_all": 2.96,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "NT",
+     "n": 10,
+     "internal": [
+      7,
+      4,
+      1
+     ],
+     "components": [
+      4,
+      6,
+      9
+     ],
+     "n_minus_1": 9,
+     "connected_all": false,
+     "baseline_AB": 1.04,
+     "baseline_all": 2.48,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "OC",
+     "n": 9,
+     "internal": [
+      11,
+      9,
+      7
+     ],
+     "components": [
+      1,
+      1,
+      2
+     ],
+     "n_minus_1": 8,
+     "connected_all": false,
+     "baseline_AB": 3.49,
+     "baseline_all": 8.1,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "OG",
+     "n": 3,
+     "internal": [
+      0,
+      1,
+      1
+     ],
+     "components": [
+      3,
+      2,
+      2
+     ],
+     "n_minus_1": 2,
+     "connected_all": false,
+     "baseline_AB": 0.67,
+     "baseline_all": 1.53,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "SU",
+     "n": 1,
+     "internal": [
+      0,
+      0,
+      0
+     ],
+     "components": [
+      1,
+      1,
+      1
+     ],
+     "n_minus_1": 0,
+     "connected_all": true,
+     "baseline_AB": 0.0,
+     "baseline_all": 0.13,
+     "pigeonhole_AB": 0
+    },
+    {
+     "class": "TE",
+     "n": 11,
+     "internal": [
+      9,
+      10,
+      1
+     ],
+     "components": [
+      3,
+      3,
+      10
+     ],
+     "n_minus_1": 10,
+     "connected_all": false,
+     "baseline_AB": 2.25,
+     "baseline_all": 3.98,
+     "pigeonhole_AB": 0
+    }
+   ],
+   "pairs": {
+    "AB": {
+     "baseline_mean": 15.78,
+     "forced_floor": 0,
+     "forced_notes": []
+    },
+    "AC": {
+     "baseline_mean": 8.77,
+     "forced_floor": 0,
+     "forced_notes": []
+    },
+    "BC": {
+     "baseline_mean": 9.34,
+     "forced_floor": 0,
+     "forced_notes": []
+    }
+   },
+   "pair_baseline": {
+    "AB": {
+     "NT|NT": 0.6222222222222222,
+     "CR|GB": 0.041666666666666664,
+     "GT|NT": 0.02857142857142857,
+     "OC|OC": 2.75,
+     "BL|TE": 0.015151515151515152,
+     "OC|OG": 1.3333333333333333,
+     "BL|CR": 0.16666666666666666,
+     "GT|GT": 1.6666666666666667,
+     "GR|NT": 0.3333333333333333,
+     "BL|CB": 0.8333333333333334,
+     "TE|TE": 1.6363636363636365,
+     "GT|OC": 0.14285714285714285,
+     "DT|TE": 0.6060606060606061,
+     "DT|NT": 0.13333333333333333,
+     "DK|TE": 0.09090909090909091,
+     "CR|NT": 0.15,
+     "CR|GR": 0.08333333333333333,
+     "CB|CR": 0.16666666666666666,
+     "BL|BL": 0.8484848484848485,
+     "GB|GD": 1.3333333333333333,
+     "BL|GB": 0.8333333333333334,
+     "GD|GT": 0.02857142857142857,
+     "GD|GD": 0.1,
+     "DK|GD": 1.0666666666666667,
+     "CR|GD": 0.05,
+     "BL|DK": 0.027777777777777776,
+     "GB|GB": 0.13333333333333333,
+     "NT|TE": 0.18181818181818182,
+     "GT|TE": 0.3246753246753247,
+     "DK|GB": 0.05555555555555555
+    },
+    "AC": {
+     "NT|NT": 0.15555555555555556,
+     "DK|OG": 0.1111111111111111,
+     "CR|GB": 0.08333333333333333,
+     "GT|NT": 0.08571428571428572,
+     "BL|SU": 0.16666666666666666,
+     "OC|OC": 2.138888888888889,
+     "BL|TE": 0.045454545454545456,
+     "OC|OG": 0.4444444444444444,
+     "BL|CR": 0.125,
+     "BL|NT": 0.025,
+     "GR|NT": 0.3333333333333333,
+     "BL|CB": 0.6944444444444444,
+     "TE|TE": 0.16363636363636364,
+     "DT|TE": 0.12121212121212122,
+     "DK|TE": 0.06060606060606061,
+     "BL|GD": 0.03333333333333333,
+     "CR|NT": 0.15,
+     "CR|DT": 0.08333333333333333,
+     "BL|BL": 0.6060606060606061,
+     "GB|GD": 0.3333333333333333,
+     "BL|GB": 0.3333333333333333,
+     "GB|GT": 0.11904761904761904,
+     "GD|GT": 0.11428571428571428,
+     "GB|OC": 0.05555555555555555,
+     "GD|OC": 0.08888888888888889,
+     "DK|GD": 0.5333333333333333,
+     "DK|GT": 0.09523809523809523,
+     "CR|GT": 0.07142857142857142,
+     "BL|DK": 0.027777777777777776,
+     "SU|TE": 0.09090909090909091,
+     "DK|OC": 0.14814814814814814,
+     "NT|TE": 0.2909090909090909,
+     "GD|OG": 0.06666666666666667,
+     "GT|TE": 0.7142857142857143,
+     "DK|GB": 0.05555555555555555
+    },
+    "BC": {
+     "NT|NT": 0.08888888888888889,
+     "OG|OG": 0.3333333333333333,
+     "CR|GB": 0.08333333333333333,
+     "GT|NT": 0.04285714285714286,
+     "OC|OC": 1.75,
+     "CB|GB": 0.05555555555555555,
+     "BL|TE": 0.022727272727272728,
+     "OC|OG": 0.4444444444444444,
+     "BL|CR": 0.25,
+     "NT|TE": 0.36363636363636365,
+     "GR|NT": 0.8333333333333334,
+     "BL|CB": 0.8333333333333334,
+     "TE|TE": 0.18181818181818182,
+     "DT|TE": 0.15151515151515152,
+     "NT|OC": 0.05555555555555555,
+     "DK|TE": 0.18181818181818182,
+     "CR|NT": 0.225,
+     "CB|TE": 0.030303030303030304,
+     "GR|OC": 0.07407407407407407,
+     "BL|BL": 0.5303030303030303,
+     "GB|GD": 0.5333333333333333,
+     "BL|GB": 0.5555555555555556,
+     "GD|GT": 0.11428571428571428,
+     "DT|GD": 0.13333333333333333,
+     "DK|GD": 0.5333333333333333,
+     "DT|OC": 0.1111111111111111,
+     "BL|DK": 0.027777777777777776,
+     "CR|OC": 0.027777777777777776,
+     "GT|TE": 0.7142857142857143,
+     "DK|GB": 0.05555555555555555
+    }
+   },
+   "cross_edges_total": 97
+  }
+ },
+ "runs": [
+  {
+   "class_pairs": {
+    "AB": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 4,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 2,
+     "S/|SN": 2,
+     "SK|SU": 1,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 3,
+   "shared": {
+    "AB": 10,
+    "AC": 11,
+    "BC": 17
+   },
+   "total": 38,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 7.0% \u2265 5%",
+    "AC shared 7.7% \u2265 5%",
+    "BC shared 12.0% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 2000000,
+   "wall_s": 45.21
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 1,
+   "shared": {
+    "AB": 12,
+    "AC": 11,
+    "BC": 14
+   },
+   "total": 37,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 8.5% \u2265 5%",
+    "AB largest shared cluster 6 pieces \u2265 4",
+    "AC shared 7.7% \u2265 5%",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 2000000,
+   "wall_s": 45.52
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "ME|ME": 4,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 2,
+   "shared": {
+    "AB": 14,
+    "AC": 11,
+    "BC": 12
+   },
+   "total": 37,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 9.9% \u2265 5%",
+    "AB largest shared cluster 6 pieces \u2265 4",
+    "AC shared 7.7% \u2265 5%",
+    "BC shared 8.5% \u2265 5%"
+   ],
+   "iters_used": 2000000,
+   "wall_s": 46.19
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 0,
+   "shared": {
+    "AB": 10,
+    "AC": 13,
+    "BC": 14
+   },
+   "total": 37,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 7.0% \u2265 5%",
+    "AC shared 9.2% \u2265 5%",
+    "AC largest shared cluster 6 pieces \u2265 4",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 2000000,
+   "wall_s": 47.05
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "DP|FO": 2,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 0,
+   "shared": {
+    "AB": 2,
+    "AC": 5,
+    "BC": 6
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 26.49
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 1,
+   "shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 27.04
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 4,
+   "shared": {
+    "AB": 10,
+    "AC": 13,
+    "BC": 14
+   },
+   "total": 37,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 7.0% \u2265 5%",
+    "AC shared 9.2% \u2265 5%",
+    "AC largest shared cluster 6 pieces \u2265 4",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 2000000,
+   "wall_s": 28.43
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 2,
+   "shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 27.51
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DT|TE": 1,
+     "BL|BL": 1,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1
+    },
+    "AC": {
+     "BL|BL": 2,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|CR": 1,
+     "BL|GB": 1,
+     "BL|BL": 1,
+     "CR|NT": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 1,
+   "shared": {
+    "AB": 5,
+    "AC": 3,
+    "BC": 5
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 41.39
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|BL": 2,
+     "DT|TE": 1,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1
+    },
+    "AC": {
+     "BL|CR": 1,
+     "BL|BL": 1,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|GB": 1,
+     "BL|BL": 1,
+     "CR|NT": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 0,
+   "shared": {
+    "AB": 6,
+    "AC": 3,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 42.88
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "DP|HD": 2,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 3,
+   "shared": {
+    "AB": 2,
+    "AC": 5,
+    "BC": 6
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 48.38
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "DP|HD": 2,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 4,
+   "shared": {
+    "AB": 4,
+    "AC": 3,
+    "BC": 6
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 49.78
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|BL": 2,
+     "DT|TE": 1,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1,
+     "CR|NT": 1
+    },
+    "AC": {
+     "BL|CR": 1,
+     "BL|BL": 1,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|GB": 1,
+     "BL|BL": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 2,
+   "shared": {
+    "AB": 7,
+    "AC": 3,
+    "BC": 3
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 21.89
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|BL": 2,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1,
+     "DT|TE": 1,
+     "BL|CB": 1
+    },
+    "AC": {
+     "BL|CR": 1,
+     "BL|BL": 1,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|BL": 1,
+     "BL|GB": 1,
+     "CR|NT": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 3,
+   "shared": {
+    "AB": 7,
+    "AC": 3,
+    "BC": 3
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 22.54
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|BL": 2,
+     "BL|CR": 1,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1,
+     "DT|TE": 1,
+     "CR|NT": 1
+    },
+    "AC": {
+     "BL|BL": 1,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|GB": 1,
+     "BL|BL": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 4,
+   "shared": {
+    "AB": 8,
+    "AC": 2,
+    "BC": 3
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 5.6% \u2265 5%"
+   ],
+   "iters_used": 2000000,
+   "wall_s": 24.34
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 0,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 24.89
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 39.23
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|CB": 1
+    },
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 2,
+   "shared": {
+    "AB": 1,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 38.44
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 38.84
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 10,
+    "AC": 13,
+    "BC": 14
+   },
+   "total": 37,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 7.0% \u2265 5%",
+    "AC shared 9.2% \u2265 5%",
+    "AC largest shared cluster 6 pieces \u2265 4",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 300000,
+   "wall_s": 7.63
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "ME|ME": 4,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "SK|SK": 3,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 14,
+    "AC": 12,
+    "BC": 12
+   },
+   "total": 38,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 9.9% \u2265 5%",
+    "AB largest shared cluster 6 pieces \u2265 4",
+    "AC shared 8.5% \u2265 5%",
+    "BC shared 8.5% \u2265 5%"
+   ],
+   "iters_used": 300000,
+   "wall_s": 7.72
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 2000000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 2000000,
+   "wall_s": 40.67
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 12,
+    "AC": 11,
+    "BC": 14
+   },
+   "total": 37,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 8.5% \u2265 5%",
+    "AB largest shared cluster 6 pieces \u2265 4",
+    "AC shared 7.7% \u2265 5%",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 300000,
+   "wall_s": 5.99
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 10,
+    "AC": 13,
+    "BC": 14
+   },
+   "total": 37,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 7.0% \u2265 5%",
+    "AC shared 9.2% \u2265 5%",
+    "AC largest shared cluster 6 pieces \u2265 4",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 300000,
+   "wall_s": 5.8
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "SK|SK": 3,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "ME|ME": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "ME|ME": 3,
+     "SK|SK": 2,
+     "DP|HD": 2,
+     "DP|FO": 2,
+     "FO|ME": 1,
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 12,
+    "AC": 12,
+    "BC": 14
+   },
+   "total": 38,
+   "valid": true,
+   "violations": [],
+   "gates_ok": false,
+   "gate_failures": [
+    "AB shared 8.5% \u2265 5%",
+    "AB largest shared cluster 6 pieces \u2265 4",
+    "AC shared 8.5% \u2265 5%",
+    "BC shared 9.9% \u2265 5%",
+    "BC largest shared cluster 6 pieces \u2265 4"
+   ],
+   "iters_used": 300000,
+   "wall_s": 5.63
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 5.1
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 5.43
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 5.33
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 5.21
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DP|FO": 2,
+     "S/|SN": 1,
+     "PH|RU": 1
+    },
+    "AC": {
+     "DP|HD": 2,
+     "S/|SN": 1,
+     "PH|RU": 2
+    },
+    "BC": {
+     "S/|SN": 2,
+     "HB|HL": 1,
+     "PH|RU": 1
+    }
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 4,
+    "AC": 5,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 5.54
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|CR": 1,
+     "BL|BL": 2,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1,
+     "DT|TE": 1
+    },
+    "AC": {
+     "BL|BL": 1,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|BL": 1,
+     "BL|GB": 1,
+     "CR|NT": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 7,
+    "AC": 2,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 4.27
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|BL": 2,
+     "DT|TE": 1,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1,
+     "BL|CB": 1
+    },
+    "AC": {
+     "BL|CR": 1,
+     "BL|BL": 1,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|BL": 1,
+     "BL|GB": 1,
+     "CR|NT": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 7,
+    "AC": 3,
+    "BC": 3
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 4.11
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|BL": 1,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1,
+     "DT|TE": 1,
+     "CR|NT": 1
+    },
+    "AC": {
+     "BL|CR": 1,
+     "BL|BL": 2,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|GB": 1,
+     "BL|BL": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 6,
+    "AC": 4,
+    "BC": 3
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 4.16
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|BL": 2,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1,
+     "DT|TE": 1
+    },
+    "AC": {
+     "BL|CR": 1,
+     "BL|BL": 1,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|GB": 1,
+     "BL|BL": 1,
+     "CR|NT": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 6,
+    "AC": 3,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 3.92
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "DT|TE": 1,
+     "BL|BL": 1,
+     "BL|GB": 1,
+     "GR|NT": 1,
+     "TE|TE": 1
+    },
+    "AC": {
+     "BL|CR": 1,
+     "BL|BL": 2,
+     "NT|TE": 1
+    },
+    "BC": {
+     "BL|GB": 1,
+     "BL|BL": 1,
+     "CR|NT": 1,
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 5,
+    "AC": 4,
+    "BC": 4
+   },
+   "total": 13,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 4.3
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|CB": 1
+    },
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 1,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 4.05
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 3.99
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 18860,
+   "wall_s": 0.18
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 13570,
+   "wall_s": 0.14
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 44378,
+   "wall_s": 0.37
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 41992,
+   "wall_s": 0.35
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 27977,
+   "wall_s": 0.23
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 285,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 197,
+   "wall_s": 0.0
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 178,
+   "wall_s": 0.0
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 234,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 103,
+   "wall_s": 0.0
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 18860,
+   "wall_s": 0.16
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 13570,
+   "wall_s": 0.12
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 44378,
+   "wall_s": 0.41
+  },
+  {
+   "class_pairs": {
+    "AB": {
+     "BL|CB": 1
+    },
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 1,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 3.48
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 41992,
+   "wall_s": 0.37
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 0,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 285,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 197,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 2,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 178,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 234,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 103,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 0,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 14259,
+   "wall_s": 0.15
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "B",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 27977,
+   "wall_s": 0.26
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 3.3
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 2,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 17549,
+   "wall_s": 0.16
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 10604,
+   "wall_s": 0.1
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 0,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 285,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 197,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 2,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 178,
+   "wall_s": 0.0
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 234,
+   "wall_s": 0.01
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "quarter",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 103,
+   "wall_s": 0.0
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {
+     "BL|CB": 1
+    }
+   },
+   "scene": "B",
+   "rotation": "quarter",
+   "mode": "classes",
+   "iters": 300000,
+   "seed": 4,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 1
+   },
+   "total": 1,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 300000,
+   "wall_s": 3.2
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 1,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 46291,
+   "wall_s": 0.41
+  },
+  {
+   "class_pairs": {
+    "AB": {},
+    "AC": {},
+    "BC": {}
+   },
+   "scene": "A",
+   "rotation": "none",
+   "mode": "free",
+   "iters": 2000000,
+   "seed": 3,
+   "shared": {
+    "AB": 0,
+    "AC": 0,
+    "BC": 0
+   },
+   "total": 0,
+   "valid": true,
+   "violations": [],
+   "gates_ok": true,
+   "gate_failures": [],
+   "iters_used": 71112,
+   "wall_s": 0.6
+  }
+ ]
+}

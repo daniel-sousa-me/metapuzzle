@@ -1,0 +1,91 @@
+class specs: {'A': 'classes.json', 'B': 'classes.json'}
+70 solver jobs on 4 workers
+  A none    classes 2,000,000 seed 3: AB/AC/BC 10/11/17 total 38 valid=True gates=FAIL 45.21s
+  A none    classes 2,000,000 seed 1: AB/AC/BC 12/11/14 total 37 valid=True gates=FAIL 45.52s
+  A none    classes 2,000,000 seed 2: AB/AC/BC 14/11/12 total 37 valid=True gates=FAIL 46.19s
+  A none    classes 2,000,000 seed 0: AB/AC/BC 10/13/14 total 37 valid=True gates=FAIL 47.05s
+  A quarter classes 2,000,000 seed 0: AB/AC/BC 2/5/6 total 13 valid=True gates=PASS 26.49s
+  A quarter classes 2,000,000 seed 1: AB/AC/BC 4/5/4 total 13 valid=True gates=PASS 27.04s
+  A none    classes 2,000,000 seed 4: AB/AC/BC 10/13/14 total 37 valid=True gates=FAIL 28.43s
+  A quarter classes 2,000,000 seed 2: AB/AC/BC 4/5/4 total 13 valid=True gates=PASS 27.51s
+  B none    classes 2,000,000 seed 1: AB/AC/BC 5/3/5 total 13 valid=True gates=PASS 41.39s
+  B none    classes 2,000,000 seed 0: AB/AC/BC 6/3/4 total 13 valid=True gates=PASS 42.88s
+  A quarter classes 2,000,000 seed 3: AB/AC/BC 2/5/6 total 13 valid=True gates=PASS 48.38s
+  A quarter classes 2,000,000 seed 4: AB/AC/BC 4/3/6 total 13 valid=True gates=PASS 49.78s
+  B none    classes 2,000,000 seed 2: AB/AC/BC 7/3/3 total 13 valid=True gates=PASS 21.89s
+  B none    classes 2,000,000 seed 3: AB/AC/BC 7/3/3 total 13 valid=True gates=PASS 22.54s
+  B none    classes 2,000,000 seed 4: AB/AC/BC 8/2/3 total 13 valid=True gates=FAIL 24.34s
+  B quarter classes 2,000,000 seed 0: AB/AC/BC 0/0/1 total 1 valid=True gates=PASS 24.89s
+  B quarter classes 2,000,000 seed 1: AB/AC/BC 0/0/1 total 1 valid=True gates=PASS 39.23s
+  B quarter classes 2,000,000 seed 2: AB/AC/BC 1/0/0 total 1 valid=True gates=PASS 38.44s
+  B quarter classes 2,000,000 seed 3: AB/AC/BC 0/0/1 total 1 valid=True gates=PASS 38.84s
+  A none    classes   300,000 seed 0: AB/AC/BC 10/13/14 total 37 valid=True gates=FAIL 7.63s
+  A none    classes   300,000 seed 1: AB/AC/BC 14/12/12 total 38 valid=True gates=FAIL 7.72s
+  B quarter classes 2,000,000 seed 4: AB/AC/BC 0/0/1 total 1 valid=True gates=PASS 40.67s
+  A none    classes   300,000 seed 2: AB/AC/BC 12/11/14 total 37 valid=True gates=FAIL 5.99s
+  A none    classes   300,000 seed 3: AB/AC/BC 10/13/14 total 37 valid=True gates=FAIL 5.8s
+  A none    classes   300,000 seed 4: AB/AC/BC 12/12/14 total 38 valid=True gates=FAIL 5.63s
+  A quarter classes   300,000 seed 0: AB/AC/BC 4/5/4 total 13 valid=True gates=PASS 5.1s
+  A quarter classes   300,000 seed 1: AB/AC/BC 4/5/4 total 13 valid=True gates=PASS 5.43s
+  A quarter classes   300,000 seed 2: AB/AC/BC 4/5/4 total 13 valid=True gates=PASS 5.33s
+  A quarter classes   300,000 seed 3: AB/AC/BC 4/5/4 total 13 valid=True gates=PASS 5.21s
+  A quarter classes   300,000 seed 4: AB/AC/BC 4/5/4 total 13 valid=True gates=PASS 5.54s
+  B none    classes   300,000 seed 0: AB/AC/BC 7/2/4 total 13 valid=True gates=PASS 4.27s
+  B none    classes   300,000 seed 1: AB/AC/BC 7/3/3 total 13 valid=True gates=PASS 4.11s
+  B none    classes   300,000 seed 2: AB/AC/BC 6/4/3 total 13 valid=True gates=PASS 4.16s
+  B none    classes   300,000 seed 3: AB/AC/BC 6/3/4 total 13 valid=True gates=PASS 3.92s
+  B none    classes   300,000 seed 4: AB/AC/BC 5/4/4 total 13 valid=True gates=PASS 4.3s
+  B quarter classes   300,000 seed 0: AB/AC/BC 1/0/0 total 1 valid=True gates=PASS 4.05s
+  B quarter classes   300,000 seed 1: AB/AC/BC 0/0/1 total 1 valid=True gates=PASS 3.99s
+  A none    free      300,000 seed 0: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.18s
+  A none    free      300,000 seed 1: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.14s
+  A none    free      300,000 seed 2: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.37s
+  A none    free      300,000 seed 3: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.35s
+  A none    free      300,000 seed 4: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.23s
+  A quarter free      300,000 seed 0: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  A quarter free      300,000 seed 1: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.0s
+  A quarter free      300,000 seed 2: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.0s
+  A quarter free      300,000 seed 3: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  A quarter free      300,000 seed 4: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.0s
+  B none    free      300,000 seed 0: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.16s
+  B none    free      300,000 seed 1: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.12s
+  B none    free      300,000 seed 2: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.41s
+  B quarter classes   300,000 seed 2: AB/AC/BC 1/0/0 total 1 valid=True gates=PASS 3.48s
+  B none    free      300,000 seed 3: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.37s
+  B quarter free      300,000 seed 0: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  B quarter free      300,000 seed 1: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  B quarter free      300,000 seed 2: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  B quarter free      300,000 seed 3: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  B quarter free      300,000 seed 4: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  A none    free    2,000,000 seed 0: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.15s
+  B none    free      300,000 seed 4: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.26s
+  B quarter classes   300,000 seed 3: AB/AC/BC 0/0/1 total 1 valid=True gates=PASS 3.3s
+  A none    free    2,000,000 seed 2: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.16s
+  A none    free    2,000,000 seed 4: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.1s
+  A quarter free    2,000,000 seed 0: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  A quarter free    2,000,000 seed 1: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  A quarter free    2,000,000 seed 2: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.0s
+  A quarter free    2,000,000 seed 3: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.01s
+  A quarter free    2,000,000 seed 4: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.0s
+  B quarter classes   300,000 seed 4: AB/AC/BC 0/0/1 total 1 valid=True gates=PASS 3.2s
+  A none    free    2,000,000 seed 1: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.41s
+  A none    free    2,000,000 seed 3: AB/AC/BC 0/0/0 total 0 valid=True gates=PASS 0.6s
+grid wall time 207.6s
+| scene | rotation | mode | iters | valid | best total (seed) | best AB/AC/BC | mean total (sd) | mean AB/AC/BC | best-run piece gates | gate pass runs | mean wall s |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| A | none | classes | 300,000 | 5/5 | 37 (0) | 10/13/14 | 37.4 (0.5) | 11.6/12.2/13.6 | FAIL | 0/5 | 6.55 |
+| A | none | classes | 2,000,000 | 5/5 | 37 (0) | 10/13/14 | 37.2 (0.4) | 11.2/11.8/14.2 | FAIL | 0/5 | 42.48 |
+| A | quarter | classes | 300,000 | 5/5 | 13 (0) | 4/5/4 | 13.0 (0.0) | 4.0/5.0/4.0 | PASS | 5/5 | 5.32 |
+| A | quarter | classes | 2,000,000 | 5/5 | 13 (0) | 2/5/6 | 13.0 (0.0) | 3.2/4.6/5.2 | PASS | 5/5 | 35.84 |
+| B | none | classes | 300,000 | 5/5 | 13 (0) | 7/2/4 | 13.0 (0.0) | 6.2/3.2/3.6 | PASS | 5/5 | 4.15 |
+| B | none | classes | 2,000,000 | 5/5 | 13 (0) | 6/3/4 | 13.0 (0.0) | 6.6/2.8/3.6 | PASS | 4/5 | 30.61 |
+| B | quarter | classes | 300,000 | 5/5 | 1 (0) | 1/0/0 | 1.0 (0.0) | 0.4/0.0/0.6 | PASS | 5/5 | 3.6 |
+| B | quarter | classes | 2,000,000 | 5/5 | 1 (0) | 0/0/1 | 1.0 (0.0) | 0.2/0.0/0.8 | PASS | 5/5 | 36.41 |
+| A | none | free | 300,000 | 5/5 | 0 (0) | 0/0/0 | 0.0 (0.0) | 0.0/0.0/0.0 | PASS | 5/5 | 0.25 |
+| A | none | free | 2,000,000 | 5/5 | 0 (0) | 0/0/0 | 0.0 (0.0) | 0.0/0.0/0.0 | PASS | 5/5 | 0.28 |
+| A | quarter | free | 300,000 | 5/5 | 0 (0) | 0/0/0 | 0.0 (0.0) | 0.0/0.0/0.0 | PASS | 5/5 | 0.0 |
+| A | quarter | free | 2,000,000 | 5/5 | 0 (0) | 0/0/0 | 0.0 (0.0) | 0.0/0.0/0.0 | PASS | 5/5 | 0.01 |
+| B | none | free | 300,000 | 5/5 | 0 (0) | 0/0/0 | 0.0 (0.0) | 0.0/0.0/0.0 | PASS | 5/5 | 0.26 |
+| B | quarter | free | 300,000 | 5/5 | 0 (0) | 0/0/0 | 0.0 (0.0) | 0.0/0.0/0.0 | PASS | 5/5 | 0.01 |
+
+wrote /home/user/metapuzzle/experiments/007-solver-limits/results.json
