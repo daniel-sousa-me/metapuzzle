@@ -61,3 +61,38 @@ The run was valid: 0 violations.
 - Evaluate alternative scene strategies (`docs/design/07`, not yet written) and a density-field grammar (`experiments/004`, not yet created).
 - Compare with direction B.
 - Resolve the forbidden S/ and F/ next to SK seams noted in `NOTES.md`.
+
+
+## Round 2: after texture fixes
+
+**Changes:** masked two-material transitions, size-independent drawing, motif offsets. Scenes and classes unchanged. `run-quarter` differs from `run-none-v2` only by `--rotation quarter`.
+
+| Run | AB | AC | BC | Largest cluster | Piece gates | Scene gates |
+|---|---|---|---|---|---|---|
+| run-none | 9.15% (13) | 7.75% (11) | 10.56% (15) | 6 | FAIL | FAIL |
+| run-none-v2 | 7.04% (10) | 9.15% (13) | 9.86% (14) | 6 | FAIL | FAIL |
+| run-quarter | 2.82% (4) | 3.52% (5) | 2.82% (4) | 3 | PASS | FAIL |
+
+Scene-level values match across runs: same-position 66–71%, 2x2 window reuse 48–65%, transferable blob 27.5–30%.
+
+**Scorecard: run-quarter**
+
+| Check | Gate | Value | Result |
+|---|---|---|---|
+| Piece adjacency AB / AC / BC | < 5% each | 2.82% / 3.52% / 2.82% | PASS |
+| Largest shared cluster | < 4 | 3 | PASS |
+| Same-position overlap AB / AC / BC | < 25% each | 66.2% / 71.2% / 68.8% | FAIL |
+| 2x2 window reuse | < 30% | 48% / 65% / 52% | FAIL |
+| Transferable blob | < 10% | 27.5% / 30.0% / 27.5% | FAIL |
+| T1 blind test | subjects 3+, distinct 4+, grid 2 or lower | Tree 2/5; B, C unnamed; distinct 2; grid 3/4/3 | FAIL |
+| T2 grid visibility | verdict 2 or lower, 70%+ invisible | Not run | Not run |
+
+**Blind test 2 (run-quarter):** Fails T1. A reads as a landscape; the tree is named at 2/5. B and C are unnamed. Distinctiveness fell from 3/5 to 2/5.
+
+**Grid visibility 2 (run-none-v2):** Fails T2. About 44% of interior lines are invisible, as in review 1. Verdicts A 3/5, B 4/5. Run-quarter was not reviewed.
+
+**Conclusion**
+
+- Quarter rotation alone brings piece-level overlap under the 5% gate (7.0–9.9% down to 2.8–3.5%).
+- Texture fixes do not change recognizability or distinctiveness: A is still not read as a tree, and distinctiveness fell to 2/5, though rotation may explain that drop.
+- Direction A's scene set is retired as a scene design, but its lexicon and transition mechanism remain useful.
