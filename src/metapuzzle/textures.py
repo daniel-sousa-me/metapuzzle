@@ -335,13 +335,20 @@ def scatter_shapes(seed: int, size: float, palette: Sequence[str], *,
 _HALO_SCALE = 1.18   # blotch() paints a halo out to this multiple of the blob radius
 
 
-def _check_blotch_args(coverage: float, side: str | None, inset: float = 0.0) -> None:
+def _check_blotch_args(coverage: float, side: str | None, inset: float = 0.0,
+                       roughness: float = 0.0, spread: float = 1.0) -> None:
     if not 0.0 <= coverage <= 1.0:
         raise ValueError("coverage must be in [0, 1]")
     if side not in _SIDES:
         raise ValueError(f"side must be one of {_SIDES}")
     if not 0.0 <= inset < 0.5:
         raise ValueError("inset must be in [0, 0.5)")
+    if not 0.0 <= roughness <= 1.0:
+        raise ValueError("roughness must be in [0, 1]")
+    if not 0.0 <= spread <= 1.0:
+        raise ValueError("spread must be in [0, 1]")
+    if spread != 1.0 and (side is None or roughness == 0.0):
+        raise ValueError("spread applies only with a side and roughness > 0")
 
 
 def _inset_blotch(cx: float, cy: float, offs: list[tuple[float, float]], size: float,
@@ -365,13 +372,88 @@ def _inset_blotch(cx: float, cy: float, offs: list[tuple[float, float]], size: f
     return min(max(cx, x_lo), x_hi), min(max(cy, y_lo), y_hi), offs
 
 
+def _rough_vertex_count(roughness: float) -> int:
+    """Polygon vertices for a rough outline: 16 at roughness 0.0, 28 at 1.0."""
+    return round(16 + 12 * roughness)
+
+
+def _to_xy(side: str, u: float, v: float, size: float) -> tuple[float, float]:
+    """Band coordinates: ``u`` runs along the edge named by ``side``, ``v`` is the depth
+    inward from that edge. Returns the point in the cell."""
+    if side == "top":
+        return u, v
+    if side == "bottom":
+        return u, size - v
+    if side == "left":
+        return v, u
+    return size - v, u                          # right
+
+
+def _band_polys(rng: random.Random, size: float, coverage: float, side: str,
+                count: int | None, inset: float, roughness: float, spread: float,
+                ) -> list[tuple[float, float, list[tuple[float, float]]]]:
+    """One band of mass along the ``side`` edge, cut into ``count`` overlapping pieces so
+    neighbouring pieces join. The band covers ``spread`` of the edge width, centred; at
+    spread 1 it reaches both corners. Its depth follows ``coverage`` plus or minus 0.15
+    across the width, and two frequencies of seeded radial noise make the edge ragged.
+    ``inset`` keeps the far edge clear. The side edges are not inset: the band must reach
+    the corners to join its neighbours. Pieces extend past the cell, so the cell clips them."""
+    n_pieces = rng.randint(1, 3) if count is None else count
+    phase = [rng.uniform(0.0, 2.0 * math.pi) for _ in range(3)]
+    u0 = size * (1.0 - spread) / 2.0
+    u1 = size - u0
+    if u1 <= u0:
+        return []
+    seg = (u1 - u0) / n_pieces
+    overlap = min(seg / 2.0, 0.05 * size)
+    nv = _rough_vertex_count(roughness)
+    taper = 0.15 * size if spread < 1.0 else 0.0   # spread < 1: band ends fade to nothing
+    far = size * (1.0 - inset)
+    ext = 0.1 * size                               # how far pieces run past the cell
+    polys = []
+    for i in range(n_pieces):
+        a = max(u0, u0 + i * seg - overlap)
+        b = min(u1, u0 + (i + 1) * seg + overlap)
+        edge = []
+        for k in range(nv):
+            u = a + (b - a) * k / (nv - 1)
+            t = (u - u0) / (u1 - u0)
+            cov = coverage + 0.15 * (0.6 * math.sin(2.0 * math.pi * t + phase[0])
+                                     + 0.4 * math.sin(2.0 * math.pi * 2.3 * t + phase[1]))
+            depth = size * (0.12 + 0.5 * cov)
+            low = math.sin(2.0 * math.pi * 3.0 * t + phase[2])   # slow noise across the width
+            high = rng.uniform(-1.0, 1.0)                        # fast noise per vertex
+            depth *= 1.0 + roughness * (0.25 * low + 0.3 * high)
+            if taper:
+                depth *= max(0.0, min(1.0, (u - u0) / taper, (u1 - u) / taper))
+            edge.append((u, min(max(depth, 0.0), far)))
+        if a <= u0:                                 # run out past the corner
+            head = [(a - ext, -ext), (a - ext, edge[0][1])]
+        else:
+            head = [(a, -ext)]
+        if b >= u1:
+            tail = [(b + ext, edge[-1][1]), (b + ext, -ext)]
+        else:
+            tail = [(b, -ext)]
+        uv = head + edge + tail
+        pts = [_to_xy(side, u, v, size) for u, v in uv]
+        cx, cy = _to_xy(side, (a + b) / 2.0, 0.0, size)
+        polys.append((cx, cy, pts))
+    return polys
+
+
 def _blotch_polys(rng: random.Random, size: float, coverage: float, side: str | None,
                   count: int | None = None, inset: float = 0.0,
+                  roughness: float = 0.0, spread: float = 1.0,
                   ) -> list[tuple[float, float, list[tuple[float, float]]]]:
     """Wobbly blotches as ``(center_x, center_y, outline)``, 1-3 of them unless
     ``count`` is given. Draws from ``rng`` in a fixed order, so ``blotch`` output is stable.
     ``inset > 0`` moves blotches inside the cell (see ``_inset_blotch``); the draws are
-    the same, so the blotches keep their random shapes."""
+    the same, so the blotches keep their random shapes. ``roughness > 0`` with a ``side``
+    gives one band instead (see ``_band_polys``); without a side it gives lobes with more
+    vertices and radial noise."""
+    if roughness > 0.0 and side is not None:
+        return _band_polys(rng, size, coverage, side, count, inset, roughness, spread)
     r_base = size * (0.12 + 0.5 * coverage)
     polys = []
     for _ in range(rng.randint(1, 3) if count is None else count):
@@ -387,11 +469,19 @@ def _blotch_polys(rng: random.Random, size: float, coverage: float, side: str | 
                 "left": (t, along),
                 "right": (size - t, along),
             }[side]
-        m = rng.randint(10, 14)
+        if roughness > 0.0:
+            m = _rough_vertex_count(roughness)
+            phase = rng.uniform(0.0, 2.0 * math.pi)
+        else:
+            m = rng.randint(10, 14)
         offs = []
         for k in range(m):
             a = (k + rng.uniform(-0.15, 0.15)) * 2.0 * math.pi / m
             rr = r * rng.uniform(0.7, 1.15)
+            if roughness > 0.0:
+                low = math.sin(2.0 * math.pi * 2.0 * k / m + phase)   # two lobes around the blob
+                high = rng.uniform(-1.0, 1.0)                         # per-vertex jag
+                rr *= 1.0 + roughness * (0.3 * low + 0.35 * high)
             offs.append((rr * math.cos(a), rr * math.sin(a)))
         if inset > 0.0:
             cx, cy, offs = _inset_blotch(cx, cy, offs, size, side, inset)
@@ -399,9 +489,29 @@ def _blotch_polys(rng: random.Random, size: float, coverage: float, side: str | 
     return polys
 
 
+def _outline(pts: Sequence[tuple[float, float]], roughness: float) -> str:
+    """Path data for a blotch outline: a smooth lobe at roughness 0, and a straight-edged
+    polygon above it, so the edge reads as torn rather than round."""
+    if roughness > 0.0:
+        return "M" + " L".join(f"{_f(x)} {_f(y)}" for x, y in pts) + " Z"
+    return _smooth_closed(pts)
+
+
+def _drop_blotch_defaults(params: dict, inset: float, roughness: float, spread: float) -> None:
+    """Remove parameters at their default from the clip-id key, so the ids, and so the
+    output, of existing calls do not change."""
+    if inset == 0:
+        del params["inset"]
+    if roughness == 0:
+        del params["roughness"]
+    if spread == 1.0:
+        del params["spread"]
+
+
 def blotch(seed: int, size: float, palette: Sequence[str], *,
            coverage: float = 0.45, side: str | None = None, color_index: int = 1,
-           background: bool = True, inset: float = 0.0) -> str:
+           background: bool = True, inset: float = 0.0, roughness: float = 0.0,
+           spread: float = 1.0) -> str:
     """1-3 large soft, wobbly blotches over the background.
 
     coverage: 0-1, scales blotch radius (about 0.12 to 0.62 of size).
@@ -414,53 +524,65 @@ def blotch(seed: int, size: float, palette: Sequence[str], *,
         ``side``, the three edges other than that side are inset; the biased
         side is not, so the blotch still reaches it. Use 0.08 to keep a
         same-class neighbour from showing a hard cut.
+    roughness: 0-1. 0 (default) gives the smooth lobes. Above 0 the outline is a
+        straight-edged polygon of 16 to 28 vertices with seeded radial noise at
+        two frequencies, so it reads as torn paper. With a ``side``, the mass is
+        one band along that edge instead of separate lobes. Its depth follows
+        ``coverage`` plus or minus 0.15 across the width, and the band reaches
+        both corners of the edge, so neighbouring pieces join. In band mode the
+        side edges are not inset, and ``inset`` only keeps the far edge clear.
+    spread: 0-1, the share of the biased edge's width the band covers, centred.
+        1 (default) covers the full width. Needs a ``side`` and roughness > 0.
     Blotches are not padded, so with ``inset=0`` they intentionally meet the
     edges as a visible boundary. Neighboring cells will differ there unless
     deliberately matched. To clip another texture to the same shape, use
     ``blotch_mask``.
     """
     params = _key_args(locals())
-    _check_blotch_args(coverage, side, inset)
-    if inset == 0:
-        del params["inset"]     # keeps clip ids, and so existing output, unchanged
+    _check_blotch_args(coverage, side, inset, roughness, spread)
+    _drop_blotch_defaults(params, inset, roughness, spread)
     if not 0 <= color_index < len(palette):
         raise ValueError("color_index is out of range for palette")
     base = palette[0]
     color = palette[color_index]
     rng = random.Random(seed)
     parts = [_ground(base, size, background)]
-    for cx, cy, pts in _blotch_polys(rng, size, coverage, side, inset=inset):
+    for cx, cy, pts in _blotch_polys(rng, size, coverage, side, inset=inset,
+                                     roughness=roughness, spread=spread):
         halo = [(cx + (px - cx) * _HALO_SCALE, cy + (py - cy) * _HALO_SCALE) for px, py in pts]
-        parts.append(f'<path d="{_smooth_closed(halo)}" fill="{color}" fill-opacity="0.3"/>')
-        parts.append(f'<path d="{_smooth_closed(pts)}" fill="{color}"/>')
+        parts.append(f'<path d="{_outline(halo, roughness)}" fill="{color}" fill-opacity="0.3"/>')
+        parts.append(f'<path d="{_outline(pts, roughness)}" fill="{color}"/>')
     return _wrap("blotch", seed, size, palette, params, "".join(parts))
 
 
 def blotch_mask(seed: int, size: float, palette: Sequence[str], *,
                 coverage: float = 0.45, side: str | None = None,
-                count: int | None = None, inset: float = 0.0) -> tuple[str, str]:
+                count: int | None = None, inset: float = 0.0,
+                roughness: float = 0.0, spread: float = 1.0) -> tuple[str, str]:
     """Clip path for a blotch-shaped region: ``(clip_svg, clip_id)``.
 
     ``clip_svg`` is a ``<clipPath id="clip_id">`` element holding only the blotch
     outlines (no fill, no halo). Put it in a ``<defs>`` and reference it with
     ``clip-path="url(#clip_id)"``. Parameters have the same meaning as in
-    ``blotch``, including ``inset``. ``count`` sets the number of blotches (1-6);
-    by default it is random, 1 to 3, as in ``blotch``. With ``inset``, the
-    outlines keep the halo margin that ``blotch`` uses, so the two share geometry.
+    ``blotch``, including ``inset``, ``roughness`` and ``spread``. ``count`` sets the
+    number of blotches, or band pieces in band mode (1-6); by default it is random,
+    1 to 3, as in ``blotch``. With ``inset``, the outlines keep the halo margin that
+    ``blotch`` uses, so the two share geometry.
 
     ``palette`` is accepted for parity with the painting primitives. A mask has
     no colour, so the palette is not read.
     """
     params = _key_args(locals())
-    _check_blotch_args(coverage, side, inset)
-    if inset == 0:
-        del params["inset"]     # keeps clip ids, and so existing output, unchanged
+    _check_blotch_args(coverage, side, inset, roughness, spread)
+    _drop_blotch_defaults(params, inset, roughness, spread)
     if count is not None and not (isinstance(count, int) and 1 <= count <= 6):
         raise ValueError("count must be an integer in [1, 6], or None")
     rng = random.Random(seed)
     cid = _clip_id("blotch_mask", seed, size, palette, params)
-    paths = "".join(f'<path d="{_smooth_closed(pts)}"/>'
-                    for _, _, pts in _blotch_polys(rng, size, coverage, side, count, inset))
+    paths = "".join(
+        f'<path d="{_outline(pts, roughness)}"/>'
+        for _, _, pts in _blotch_polys(rng, size, coverage, side, count, inset,
+                                       roughness, spread))
     return f'<clipPath id="{cid}">{paths}</clipPath>', cid
 
 

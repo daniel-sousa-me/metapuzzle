@@ -1,5 +1,5 @@
 {
-  "_note": "Hybrid tones (005). Three tiers D/M/L, each a dabs field on one ground colour. Transition XY: tier X texture as base, tier Y full texture clipped by blotch_mask side=top so Y's mass reaches the top edge (neighbour above). Non-directional; the renderer rotates for the other sides. ref_size 100: mark length 0.2 = 20 units.",
+  "_note": "Hybrid tones (005). Three tiers D/M/L, each a dabs field on one ground colour. Transition XY: tier X texture as base, tier Y full texture clipped by blotch_mask side=top so Y's mass reaches the top edge (neighbour above). Non-directional; the renderer rotates for the other sides. Transitions use roughness 0.6 and spread 1.0: the mass is one ragged band across the whole top edge, so neighbouring pieces join instead of forming lobes. ref_size 100: mark length 0.2 = 20 units.",
   "ref_size": 100,
   "palette": {
     "indigo": "#2b3262",
@@ -152,7 +152,9 @@
               "coverage": 0.45,
               "side": "top",
               "inset": 0.08,
-              "count": 3
+              "count": 3,
+              "roughness": 0.6,
+              "spread": 1.0
             }
           }
         }
@@ -212,7 +214,9 @@
               "coverage": 0.45,
               "side": "top",
               "inset": 0.08,
-              "count": 3
+              "count": 3,
+              "roughness": 0.6,
+              "spread": 1.0
             }
           }
         }
@@ -272,7 +276,9 @@
               "coverage": 0.45,
               "side": "top",
               "inset": 0.08,
-              "count": 3
+              "count": 3,
+              "roughness": 0.6,
+              "spread": 1.0
             }
           }
         }
@@ -332,7 +338,9 @@
               "coverage": 0.45,
               "side": "top",
               "inset": 0.08,
-              "count": 3
+              "count": 3,
+              "roughness": 0.6,
+              "spread": 1.0
             }
           }
         }
@@ -392,7 +400,9 @@
               "coverage": 0.45,
               "side": "top",
               "inset": 0.08,
-              "count": 3
+              "count": 3,
+              "roughness": 0.6,
+              "spread": 1.0
             }
           }
         }
@@ -452,7 +462,9 @@
               "coverage": 0.45,
               "side": "top",
               "inset": 0.08,
-              "count": 3
+              "count": 3,
+              "roughness": 0.6,
+              "spread": 1.0
             }
           }
         }

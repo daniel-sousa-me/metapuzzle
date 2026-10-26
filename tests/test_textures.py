@@ -21,6 +21,8 @@ PRIMITIVES = [
     (tx.hatch_multi, {}),
     (tx.scatter_shapes, {}),
     (tx.blotch, {"side": "left"}),
+    (tx.blotch, {"roughness": 0.6}),
+    (tx.blotch, {"side": "left", "roughness": 0.6}),
 ]
 
 
@@ -392,3 +394,97 @@ def test_inset_must_be_a_fraction_below_one_half(bad):
     with pytest.raises(ValueError, match="inset must be in"):
         tx.blotch_mask(1, 100.0, PALETTE, inset=bad)
 
+
+
+# ------------------------------------------------------------------ roughness and spread
+
+def _vertex_count(d: str) -> int:
+    """Vertices in a blotch outline: Q commands for the smooth lobe, L commands plus one
+    for the straight-edged polygon."""
+    return max(d.count("Q"), d.count("L") + 1)
+
+
+def test_roughness_zero_keeps_the_golden_outputs():
+    # The same hashes as test_inset_zero_keeps_the_original_output, with the new
+    # parameters given explicitly at their defaults, plus side-biased outputs.
+    def h(s):
+        return hashlib.sha256(s.encode()).hexdigest()[:16]
+    assert h(tx.blotch(1, 100.0, PALETTE, coverage=0.45, roughness=0.0, spread=1.0)) == "4653e6b097f9a715"
+    assert h(tx.blotch_mask(1, 100.0, PALETTE, coverage=0.45, roughness=0.0)[0]) == "567f7468fb550c82"
+    assert h(tx.blotch(2, 100.0, PALETTE, coverage=0.45, side="top", inset=0.08)) == "ad02087200495085"
+    assert h(tx.blotch_mask(3, 100.0, PALETTE, coverage=0.45, side="right", count=3,
+                            inset=0.08)[0]) == "f4d83e4c0bb449c7"
+    assert h(tx.blotch(5, 100.0, PALETTE, coverage=0.3, side="bottom")) == "49375d542ebec6a4"
+    assert h(tx.blotch(9, 100.0, PALETTE)) == "86bd0e0ae36e244a"
+    assert h(tx.blotch_mask(9, 100.0, PALETTE, count=2)[0]) == "7e86f7bbb2f5fb61"
+
+
+def test_roughness_is_deterministic_and_seed_dependent():
+    a = tx.blotch(4, 100.0, PALETTE, roughness=0.6)
+    assert tx.blotch(4, 100.0, PALETTE, roughness=0.6) == a
+    assert tx.blotch(5, 100.0, PALETTE, roughness=0.6) != a
+    b = tx.blotch_mask(4, 100.0, PALETTE, side="top", roughness=0.6, count=3)
+    assert tx.blotch_mask(4, 100.0, PALETTE, side="top", roughness=0.6, count=3) == b
+    assert tx.blotch_mask(5, 100.0, PALETTE, side="top", roughness=0.6, count=3) != b
+
+
+def test_roughness_gives_more_vertices():
+    smooth = tx.blotch_mask(2, 100.0, PALETTE, coverage=0.45, count=3)[0]
+    rough = tx.blotch_mask(2, 100.0, PALETTE, coverage=0.45, count=3, roughness=0.6)[0]
+    smooth_d = re.findall(r'<path d="([^"]+)"', smooth)
+    rough_d = re.findall(r'<path d="([^"]+)"', rough)
+    assert len(smooth_d) == len(rough_d) == 3
+    assert all(10 <= _vertex_count(d) <= 14 for d in smooth_d)
+    assert all(16 <= _vertex_count(d) <= 28 for d in rough_d)
+    assert "Q" not in "".join(rough_d)               # straight edges, not smoothed lobes
+
+
+def test_band_mask_reaches_both_corners_and_the_whole_top_edge():
+    # spread 1 with a side: the band covers the full width of the biased edge, so the
+    # top row is covered at every x (both corners included) for every seed.
+    for seed in range(6):
+        clip, cid = tx.blotch_mask(seed, 100.0, PALETTE, coverage=0.45, side="top",
+                                   count=3, roughness=0.6, spread=1.0)
+        grid = _mask_coverage(clip, cid)
+        assert grid[0][0] and grid[0][99], seed
+        assert all(grid[0][x] for x in range(100)), seed
+
+
+def test_band_spread_covers_only_the_centre():
+    for seed in range(6):
+        clip, cid = tx.blotch_mask(seed, 100.0, PALETTE, coverage=0.45, side="top",
+                                   count=3, roughness=0.6, spread=0.5)
+        grid = _mask_coverage(clip, cid)
+        assert not grid[0][0] and not grid[0][99], seed
+        assert grid[0][50], seed
+
+
+def test_band_inset_keeps_the_far_edge_clear():
+    # coverage 1.0 pushes the depth past the far margin, so the clamp must hold it back.
+    for seed in range(4):
+        clip, cid = tx.blotch_mask(seed, 100.0, PALETTE, coverage=1.0, side="top",
+                                   count=3, inset=INSET, roughness=0.6)
+        assert _mask_margin_hits(clip, cid, ("bottom",)) == 0, seed
+
+
+def test_band_mode_pieces_are_drawn_from_the_side_given():
+    # The band lies along the named edge: for "right" the mask covers the right columns.
+    clip, cid = tx.blotch_mask(3, 100.0, PALETTE, coverage=0.45, side="right", count=3,
+                               roughness=0.6)
+    grid = _mask_coverage(clip, cid)
+    right = sum(row[x] for row in grid for x in range(67, 100))
+    left = sum(row[x] for row in grid for x in range(0, 33))
+    assert right > 4 * max(left, 1)
+
+
+def test_roughness_and_spread_reject_bad_arguments():
+    with pytest.raises(ValueError, match="roughness must be in"):
+        tx.blotch(1, 100.0, PALETTE, roughness=1.5)
+    with pytest.raises(ValueError, match="roughness must be in"):
+        tx.blotch_mask(1, 100.0, PALETTE, roughness=-0.1)
+    with pytest.raises(ValueError, match="spread must be in"):
+        tx.blotch_mask(1, 100.0, PALETTE, side="top", roughness=0.6, spread=1.2)
+    with pytest.raises(ValueError, match="spread applies only"):
+        tx.blotch(1, 100.0, PALETTE, side="top", spread=0.5)           # roughness 0
+    with pytest.raises(ValueError, match="spread applies only"):
+        tx.blotch(1, 100.0, PALETTE, roughness=0.6, spread=0.5)        # no side
