@@ -9,6 +9,7 @@ from pathlib import Path
 from .board import square_board
 from .metrics import report
 from .optimize import Solution, solve, validate_solution
+from . import scene_metrics
 from .pieces import make_inventory
 from .scene import SceneError, load_scenes, pieces_from_scenes
 
@@ -54,6 +55,19 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--grid", choices=["none", "faint", "strong"], default="none", help="cell outlines")
     g.add_argument("--labels", action="store_true", help="print piece ids in the cells")
     g.add_argument("--classes", metavar="SPEC.json", help="draw pieces from a class spec instead of flat colours")
+    sm = sub.add_parser("scene-metrics", help="class carry-over metrics between the three class maps")
+    sm.add_argument("scenes", metavar="SCENES.txt", help="scene file with three class maps (text or JSON)")
+    pt = sub.add_parser("prototype", help="end to end: solve, metrics, renders, triptych and summary into a directory")
+    pt.add_argument("--scenes", required=True, metavar="FILE", help="three class maps (text or JSON)")
+    pt.add_argument("--classes", required=True, metavar="SPEC.json", help="class spec: drawing and per-class rotations")
+    pt.add_argument("--out", required=True, metavar="DIR", help="output directory")
+    pt.add_argument("--sizes", help="COLSxROWS,COLSxROWS,COLSxROWS; must match the class maps")
+    pt.add_argument("--border", choices=["standard", "tray"], default="standard")
+    pt.add_argument("--rotation", choices=["none", "quarter"], default="none")
+    pt.add_argument("--seed", type=int, default=0)
+    pt.add_argument("--iters", type=int, default=None)
+    pt.add_argument("--cell", type=int, default=48, help="cell size in pixels")
+    pt.add_argument("--labels", action="store_true", help="print piece ids in the cells")
     return ap
 
 
@@ -117,9 +131,29 @@ def _cmd_render(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_scene_metrics(a: argparse.Namespace) -> int:
+    print(scene_metrics.report(load_scenes(a.scenes))["text"])
+    return 0
+
+
+def _cmd_prototype(a: argparse.Namespace) -> int:
+    from .prototype import run_prototype  # lazy: pulls in PIL and the texture drawer
+
+    res = run_prototype(
+        a.scenes, a.classes, a.out, sizes=a.sizes, border=a.border, rotation=a.rotation,
+        seed=a.seed, iters=a.iters, cell=a.cell, labels=a.labels,
+    )
+    s = res["shared"]
+    print(
+        f"sizes={res['params']['sizes']} shared AB/AC/BC={s['AB']}/{s['AC']}/{s['BC']} "
+        f"valid={res['valid']} wrote {len(res['files'])} files to {res['out_dir']}"
+    )
+    return 0 if res["valid"] else 2
+
+
 def main(argv: list[str] | None = None) -> int:
     a = build_parser().parse_args(argv)
-    handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render}
+    handlers = {"solve": _cmd_solve, "report": _cmd_report, "render": _cmd_render, "scene-metrics": _cmd_scene_metrics, "prototype": _cmd_prototype}
     try:
         return handlers[a.cmd](a)
     except (SceneError, ValueError) as e:
