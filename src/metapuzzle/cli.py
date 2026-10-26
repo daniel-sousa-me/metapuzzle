@@ -53,6 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--cell", type=int, default=40, help="cell size in pixels")
     g.add_argument("--grid", choices=["none", "faint", "strong"], default="none", help="cell outlines")
     g.add_argument("--labels", action="store_true", help="print piece ids in the cells")
+    g.add_argument("--classes", metavar="SPEC.json", help="draw pieces from a class spec instead of flat colours")
     return ap
 
 
@@ -100,9 +101,15 @@ def _cmd_report(a: argparse.Namespace) -> int:
 def _cmd_render(a: argparse.Namespace) -> int:
     from .render import flat_class_drawer, render_all  # lazy: cairosvg is only needed here
 
+    if a.classes:
+        from .classes import load_class_spec  # lazy, like render
+
+        drawer = load_class_spec(a.classes).drawer()
+    else:
+        drawer = flat_class_drawer()
     sol = Solution.load(a.path)
     written = render_all(
-        sol, flat_class_drawer(), a.out, Path(a.path).stem,
+        sol, drawer, a.out, Path(a.path).stem,
         cell_size=a.cell, grid=a.grid, labels=a.labels,
     )
     for path in written.values():

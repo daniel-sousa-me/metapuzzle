@@ -1,0 +1,53 @@
+{
+  "_note": "Sample class spec: two textures, one transition, one feature. Palette[0] is unused on layers with background false.",
+  "palette": {
+    "paper": "#e8dcc4",
+    "sand": "#c9a66b",
+    "moss": "#5b7f5b",
+    "pine": "#2f4f4f",
+    "cloud": "#f4f1ea",
+    "water": "#3f6f8f",
+    "foam": "#d8ebf2",
+    "deep": "#24465c"
+  },
+  "classes": {
+    "canopy": {
+      "layers": [
+        {"primitive": "stipple", "palette": ["moss", "pine", "paper"],
+         "params": {"density": 180, "radius": [0.012, 0.03]}, "background": true},
+        {"primitive": "scatter_shapes", "palette": ["paper", "moss", "pine"],
+         "params": {"kinds": ["leaf"], "count": 20, "scale": 0.05}, "background": false}
+      ],
+      "directional": false,
+      "allowed_rotations": [0, 90, 180, 270]
+    },
+    "sea": {
+      "layers": [
+        {"primitive": "hatch_multi", "palette": ["water", "foam", "deep"],
+         "params": {"count": 150, "length": 0.08, "width": 0.012, "families": 3}, "background": true}
+      ],
+      "directional": false,
+      "allowed_rotations": [0, 90, 180, 270]
+    },
+    "shore": {
+      "layers": [
+        {"primitive": "hatch_multi", "palette": ["water", "foam", "deep"],
+         "params": {"count": 150, "length": 0.08, "width": 0.012, "families": 3}, "background": true},
+        {"primitive": "blotch", "palette": ["water", "sand"],
+         "params": {"coverage": 0.5, "side": "bottom"}, "background": false}
+      ],
+      "directional": true,
+      "allowed_rotations": [0]
+    },
+    "sun": {
+      "layers": [
+        {"primitive": "stipple", "palette": ["sand", "paper", "sand"],
+         "params": {"density": 120}, "background": true},
+        {"primitive": "scatter_shapes", "palette": ["sand", "cloud"],
+         "params": {"kinds": ["disc"], "count": 2.5, "scale": 0.14}, "background": false}
+      ],
+      "directional": false,
+      "allowed_rotations": [0, 90, 180, 270]
+    }
+  }
+}
