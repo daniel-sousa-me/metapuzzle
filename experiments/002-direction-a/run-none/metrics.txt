@@ -1,0 +1,12 @@
+board A: 8x10 standard rotation=none
+board B: 8x10 standard rotation=none
+board C: 8x10 standard rotation=none
+pieces: 80  adjacencies per board: [142, 142, 142]
+AB: shared=13 (9.15%)  clusters(3+)=[6, 3]  largest=6  familiar pieces=21  max fam=2  mean fam=0.325
+AC: shared=11 (7.75%)  clusters(3+)=[3, 3, 3]  largest=3  familiar pieces=19  max fam=2  mean fam=0.275
+BC: shared=15 (10.56%)  clusters(3+)=[6, 3, 3]  largest=6  familiar pieces=24  max fam=2  mean fam=0.375
+total shared=39  cluster penalty=30
+rotated pieces per solution: [0, 0, 0]
+corner orders: [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]]
+meta: seed=0, iters=300000, iters_used=300000, energy=46.5, cluster_penalty=30, valid=True, violations=0, distinct_corner_orders=False, elapsed_s=4.151
+validity: OK
