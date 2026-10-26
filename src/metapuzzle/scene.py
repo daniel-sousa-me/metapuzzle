@@ -6,10 +6,10 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence
+from typing import Iterable, Mapping, Sequence
 
-from .board import ROTATION_DEGREES, Board
-from .pieces import Piece, _as_boards, inventory_layout, make_inventory, rotations_for_piece
+from .board import CORNERS, ROTATION_DEGREES, SIDES, Board
+from .pieces import Piece, default_sides
 
 
 class SceneError(ValueError):
@@ -164,42 +164,118 @@ def validate_scenes(boards, maps: Sequence[ClassMap], free_corners: bool = False
                 raise SceneError(f"border class counts differ between maps A and {'ABC'[k]} at {where}")
 
 
-def pieces_from_scenes(boards, maps: Sequence[ClassMap], extra_flat_pieces: int = 0, free_corners: bool = False) -> list[Piece]:
-    """One piece per cell of map A, carrying that cell's class.
+ALL_ROTATIONS = frozenset(ROTATION_DEGREES)
+_EXTRA_HOMES = (0, 2, 3, 1)  # N, S, W, E: extra flat pieces cycle so their flats pair up in seams
+_RANK = {"corner": 0, "edge": 1, "interior": 2}
 
-    Piece types come from the inventory layout of the boards: cells on A's frame get
-    flat-sided pieces that fit them; remaining pieces (interior, plus any extra
-    flat-sided ones, spread evenly) fill A's interior cells.
+
+def _covers(home: int, rots) -> set[int]:
+    """Frame positions (side or corner index, clockwise from N or NW) a piece covers at `rots`."""
+    return {(home + r // 90) % 4 for r in rots}
+
+
+def pieces_from_scenes(
+    boards,
+    maps: Sequence[ClassMap],
+    extra_flat_pieces: int = 0,
+    free_corners: bool = False,
+    allowed_rotations: Mapping[str, Iterable[int]] | None = None,
+) -> list[Piece]:
+    """One physical piece per cell of map A, each carrying that cell's class.
+
+    The inventory is derived class by class. Each border cell of a class, in each of the three
+    maps, needs a piece of that class whose flat side(s) cover the cell at one of the class's
+    allowed rotations. A directional class (rotations {0}) keeps each piece's side, so its border
+    cells are matched side by side across the maps: each side gets as many pieces as the map
+    needing most of them there. A rotatable class pools its border cells, since any piece covers
+    any side. Pieces left over, and the plain interior pieces, fill the rest of A's cells of the
+    class. `extra_flat_pieces` flat-sided pieces go to A's interior, spread evenly.
+
+    allowed_rotations maps class -> rotations (degrees). Classes it omits get the board default:
+    all four in quarter mode, {0} otherwise (corners of free_corners get all four).
+    Raises SceneError naming the class and side when a class has too few cells for its border.
     """
     bl = _boards3(boards)
     validate_scenes(bl, maps, free_corners, strict_border=False if extra_flat_pieces else None)
-    base = make_inventory(bl, "any", extra_flat_pieces, free_corners)
-    layout = inventory_layout(bl, extra_flat_pieces, free_corners)
     a_board, a_map = bl[0], maps[0]
-    unused = list(range(len(base)))
-    slot_piece: dict[int, int] = {}
-    border = sorted((s for s in a_board.slots if s.kind != "interior"), key=lambda s: s.kind != "corner")
-    for s in border:
-        best = None
-        for i in unused:
-            if rotations_for_piece(a_board, base[i], s.id):
-                if best is None or (layout[i][0] == s.kind) > (layout[best][0] == s.kind):
-                    best = i
-        if best is None:
-            raise SceneError(f"no piece of the inventory fits border cell ({s.x},{s.y}) of map A")
-        slot_piece[s.id] = best
-        unused.remove(best)
-    interior = [s for s in a_board.slots if s.id not in slot_piece]
-    flat_left = [i for i in unused if layout[i][0] != "interior"]
-    plain_left = [i for i in unused if layout[i][0] == "interior"]
-    n_int = len(interior)
-    stride = n_int / max(1, len(flat_left))
-    flat_slots = {int(j * stride + stride / 2) for j in range(len(flat_left))}
-    fl, pl = iter(flat_left), iter(plain_left)
-    for j, s in enumerate(interior):
-        slot_piece[s.id] = next(fl) if j in flat_slots else next(pl)
-    out = []
-    for s in a_board.slots:
-        p = base[slot_piece[s.id]]
-        out.append(Piece(p.piece_id, p.shape_type, a_map.cls[s.y][s.x], p.allowed_rotations, p.home, p.sides))
-    return sorted(out, key=lambda p: p.piece_id)
+    quarter = a_board.rotation == "quarter"
+    conn = "andro" if quarter else "asym"
+    given = dict(allowed_rotations or {})
+
+    def rots_for(cls: str, shape: str) -> frozenset[int]:
+        if cls in given:
+            rots = frozenset(given[cls])
+        elif quarter or (free_corners and shape == "corner"):
+            rots = ALL_ROTATIONS
+        else:
+            rots = frozenset({0})
+        if not rots or not rots <= ALL_ROTATIONS:
+            raise SceneError(f"class {cls!r}: allowed rotations {sorted(rots)} must be a non-empty subset of {ROTATION_DEGREES}")
+        return rots
+
+    total = a_map.histogram()
+    classes = sorted(total)
+    # Border cells per map and class: (slot id, shape, side index or corner index); corners first.
+    need: list[dict[str, list[tuple[int, str, int]]]] = [{} for _ in range(3)]
+    for k in range(3):
+        for s in bl[k].slots:
+            if s.kind != "interior":
+                key = SIDES.index(s.home) if s.kind == "edge" else CORNERS.index(s.home)
+                need[k].setdefault(maps[k].cls[s.y][s.x], []).append((s.id, s.kind, key))
+        for lst in need[k].values():
+            lst.sort(key=lambda d: d[1] != "corner")
+    interior = [s for s in a_board.slots if s.kind == "interior"]
+    if extra_flat_pieces > len(interior):
+        raise SceneError(f"{extra_flat_pieces} extra flat pieces do not fit the {len(interior)} interior cells of map A")
+    if extra_flat_pieces:  # extras are flat-sided edge pieces in A's interior, evenly spread
+        stride = len(interior) / extra_flat_pieces
+        for j in range(extra_flat_pieces):
+            s = interior[int(j * stride + stride / 2)]
+            key = 0 if quarter else _EXTRA_HOMES[j % 4]
+            need[0].setdefault(a_map.cls[s.y][s.x], []).append((s.id, "edge", key))
+
+    # Greedy per class: pools[c] lists the physical frame pieces of class c as (shape, home).
+    pools: dict[str, list[tuple[str, int]]] = {c: [] for c in classes}
+    a_pick: dict[int, tuple[str, int]] = {}  # map A slot -> (class, pool index)
+    for k in range(3):
+        for c in classes:
+            used: list[bool] = [False] * len(pools[c])
+            for slot_id, shape, key in need[k].get(c, []):
+                rots = rots_for(c, shape)
+                idx = next(
+                    (i for i, (sh, h) in enumerate(pools[c]) if not used[i] and sh == shape and key in _covers(h, rots)),
+                    None,
+                )
+                if idx is None:
+                    if len(pools[c]) == total[c]:
+                        cell = bl[k].slots[slot_id]
+                        where = f"{SIDES[key]} side" if shape == "edge" else f"{CORNERS[key]} corner"
+                        raise SceneError(
+                            f"class {c!r} (allowed rotations {sorted(rots)}) has {total[c]} cells, too few for its "
+                            f"border pieces: map {'ABC'[k]} cell ({cell.x},{cell.y}) needs another piece with its "
+                            f"{where} flat"
+                        )
+                    pools[c].append((shape, (key - min(r // 90 for r in rots)) % 4))
+                    used.append(False)
+                    idx = len(pools[c]) - 1
+                used[idx] = True
+                if k == 0:
+                    a_pick[slot_id] = (c, idx)
+
+    # Fill A's cells: picked pieces first, then leftover frame pieces, then plain interior pieces.
+    spare: dict[str, list[tuple[str, int | None]]] = {}
+    for c in classes:
+        taken = {idx for cls_, idx in a_pick.values() if cls_ == c}
+        leftover = [pools[c][i] for i in range(len(pools[c])) if i not in taken]
+        spare[c] = leftover + [("interior", None)] * (total[c] - len(pools[c]))
+    out: list[Piece] = []
+    for pid, s in enumerate(sorted(a_board.slots, key=lambda s: _RANK[s.kind])):
+        c = a_map.cls[s.y][s.x]
+        if s.id in a_pick:
+            shape, home = pools[c][a_pick[s.id][1]]
+        else:
+            shape, home = spare[c].pop(0)
+        name = None if home is None else (SIDES[home] if shape == "edge" else CORNERS[home])
+        inner = "wild" if shape == "corner" and free_corners else None
+        out.append(Piece(pid, shape, c, rots_for(c, shape), name, default_sides(shape, name, conn, inner)))
+    return out

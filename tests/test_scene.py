@@ -3,6 +3,7 @@ import json
 import pytest
 
 from metapuzzle.board import square_board
+from metapuzzle.pieces import rotations_for_piece
 from metapuzzle.scene import ClassMap, SceneError, load_scenes, parse_text, parse_token, pieces_from_scenes, validate_scenes
 
 
@@ -103,3 +104,48 @@ def test_pieces_from_scenes_standard_mixed_frames():
     maps[2] = grid(16, 6, lambda x, y: "sky" if x < 8 else "sea")
     inv = pieces_from_scenes(bs, maps)
     assert len(inv) == 96 and sum(p.cls == "sky" for p in inv) == 48
+
+
+ALL_ROTATIONS = frozenset({0, 90, 180, 270})
+
+
+def _frame_scene(rails, suns):
+    """4x5 map: canopy frame, `rail` cells (directional when allowed), `sun` and `sea` inside."""
+    return grid(4, 5, lambda x, y: "rail" if (x, y) in rails else
+                "canopy" if x in (0, 3) or y in (0, 4) else "sun" if (x, y) in suns else "sea")
+
+
+def _every_cell_fits(boards, maps, pieces):
+    for b, m in zip(boards, maps):
+        for s in b.slots:
+            cls = m.cls[s.y][s.x]
+            forced = m.rot[s.y][s.x] or None
+            assert any(rotations_for_piece(b, p, s.id, forced) for p in pieces if p.cls == cls), (s.x, s.y, cls)
+
+
+def test_directional_border_class_solves_in_quarter_mode():
+    # "rail" is directional: the N-edge cell (1,0) and the W-edge cell (0,2) in every map.
+    rails = {(1, 0), (0, 2)}
+    maps = [_frame_scene(rails, {(1, 1), (2, 3)}), _frame_scene(rails, {(2, 1), (1, 3)}),
+            _frame_scene(rails, {(1, 2), (2, 2)})]
+    boards = [square_board(4, 5, rotation="quarter")] * 3
+    allowed = {"rail": {0}, "canopy": ALL_ROTATIONS, "sun": ALL_ROTATIONS, "sea": ALL_ROTATIONS}
+    pieces = pieces_from_scenes(boards, maps, allowed_rotations=allowed)
+    rail_pieces = sorted((p.shape_type, p.home) for p in pieces if p.cls == "rail")
+    assert rail_pieces == [("edge", "N"), ("edge", "W")]
+    assert all(p.allowed_rotations == {0} for p in pieces if p.cls == "rail")
+    _every_cell_fits(boards, maps, pieces)
+
+
+def test_directional_side_mismatch_is_impossible_and_named():
+    # A needs an N-edge and a W-edge "rail" piece; B needs two N-edge ones, so 2 pieces cannot do both.
+    boards = [square_board(4, 5, rotation="quarter")] * 3
+    maps = [_frame_scene({(1, 0), (0, 2)}, {(1, 1), (2, 3)}), _frame_scene({(1, 0), (2, 0)}, {(2, 1), (1, 3)}),
+            _frame_scene({(1, 0), (0, 2)}, {(1, 2), (2, 2)})]
+    allowed = {"rail": {0}}
+    with pytest.raises(SceneError, match=r"class 'rail'.*map B cell \(2,0\).*N side"):
+        pieces_from_scenes(boards, maps, allowed_rotations=allowed)
+    # The same class rotatable pools its border cells, so the case is solvable.
+    pieces = pieces_from_scenes(boards, maps, allowed_rotations={"rail": ALL_ROTATIONS})
+    assert sum(p.cls == "rail" and p.shape_type == "edge" for p in pieces) == 2
+    _every_cell_fits(boards, maps, pieces)
