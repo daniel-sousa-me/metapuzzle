@@ -1,0 +1,998 @@
+{
+  "_note": "Direction A (Dapple Mosaic). Class keys are the grid codes used by docs/design/scenes-8x10.txt; each class carries its snake_case ID in _id. Counts are per 100x100 units (reference cell = 100 units).",
+  "palette": {
+    "sky": "#A9CBE3",
+    "sky_dab_a": "#8DB8DA",
+    "sky_dab_b": "#C9DEEC",
+    "sky_spill_snow": "#D3DFEA",
+    "snow": "#F2EDE1",
+    "snow_dab_a": "#FFFFFF",
+    "snow_dab_b": "#DED6C4",
+    "meadow": "#A9BF63",
+    "meadow_dab_a": "#8EAD4B",
+    "meadow_dab_b": "#C7CF7C",
+    "meadow_spill_foliage": "#6B904D",
+    "meadow_sprig": "#7E9E40",
+    "meadow_speck": "#E2C35A",
+    "foliage": "#4F7B44",
+    "foliage_dab_a": "#3B6537",
+    "foliage_dab_b": "#6B904D",
+    "foliage_spill_deep": "#2F5A50",
+    "foliage_spill_meadow": "#8EAD4B",
+    "foliage_sprig": "#2E4F2B",
+    "foliage_speck": "#9CC07A",
+    "deep": "#34477A",
+    "deep_dab_a": "#26355F",
+    "deep_dab_b": "#4A5F95",
+    "deep_spill_foliage": "#2F5A6E",
+    "deep_speck": "#AAB6CB",
+    "rust": "#A65233",
+    "rust_dab_a": "#8A3F28",
+    "rust_dab_b": "#C26A43",
+    "rust_dab_c": "#6E3322",
+    "gold": "#F2C14E",
+    "gold_ring": "#E8A93A",
+    "gold_light": "#F7D98A",
+    "ink": "#2A2430"
+  },
+  "classes": {
+    "SK": {
+      "_id": "sky_field",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "SN": {
+      "_id": "snow_field",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "snow",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_a",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "snow_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky_spill_snow"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "ME": {
+      "_id": "meadow_field",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "meadow",
+            "meadow_dab_a",
+            "meadow_dab_a",
+            "meadow_dab_a",
+            "meadow_dab_a",
+            "meadow_dab_b",
+            "meadow_dab_b",
+            "meadow_dab_b",
+            "meadow_dab_b",
+            "meadow_spill_foliage",
+            "meadow"
+          ],
+          "background": true,
+          "params": {
+            "count": 39,
+            "length": 0.21,
+            "width": 0.17,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "hatch_multi",
+          "palette": [
+            "meadow",
+            "meadow_sprig"
+          ],
+          "background": false,
+          "params": {
+            "count": 12,
+            "length": 0.1,
+            "width": 0.02,
+            "families": 4,
+            "wobble": 40
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "meadow",
+            "meadow_speck"
+          ],
+          "background": false,
+          "params": {
+            "count": 2,
+            "length": 0.06,
+            "width": 0.05,
+            "shape": "ellipse"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "FO": {
+      "_id": "foliage_field",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "foliage",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_a",
+            "foliage_dab_b",
+            "foliage_dab_b",
+            "foliage_dab_b",
+            "foliage_spill_deep",
+            "foliage_spill_deep",
+            "foliage_spill_meadow"
+          ],
+          "background": true,
+          "params": {
+            "count": 39,
+            "length": 0.22,
+            "width": 0.18,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "hatch_multi",
+          "palette": [
+            "foliage",
+            "foliage_sprig"
+          ],
+          "background": false,
+          "params": {
+            "count": 8,
+            "length": 0.14,
+            "width": 0.02,
+            "families": 4,
+            "wobble": 40
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "foliage",
+            "foliage_speck"
+          ],
+          "background": false,
+          "params": {
+            "count": 1.5,
+            "length": 0.06,
+            "width": 0.05,
+            "shape": "ellipse"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "DP": {
+      "_id": "deep_field",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "deep",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_a",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_dab_b",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "deep_spill_foliage",
+            "foliage_spill_deep"
+          ],
+          "background": true,
+          "params": {
+            "count": 36,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "deep",
+            "deep_speck"
+          ],
+          "background": false,
+          "params": {
+            "count": 2.5,
+            "length": 0.055,
+            "width": 0.045,
+            "shape": "ellipse"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "RU": {
+      "_id": "rust_block",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "rust",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_c",
+            "rust_dab_c",
+            "rust_dab_c"
+          ],
+          "background": true,
+          "params": {
+            "count": 29,
+            "length": 0.26,
+            "width": 0.2,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "S/": {
+      "_id": "snow_flank_left",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "snow"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "right",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "snow"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "right",
+            "color_index": 1
+          }
+        }
+      ],
+      "directional": true,
+      "allowed_rotations": [
+        0
+      ]
+    },
+    "S\\": {
+      "_id": "snow_flank_right",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "snow"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "left",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "snow"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "left",
+            "color_index": 1
+          }
+        }
+      ],
+      "directional": true,
+      "allowed_rotations": [
+        0
+      ]
+    },
+    "F/": {
+      "_id": "foliage_flank_left",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "foliage"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "right",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "foliage"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "right",
+            "color_index": 1
+          }
+        }
+      ],
+      "directional": true,
+      "allowed_rotations": [
+        0
+      ]
+    },
+    "F\\": {
+      "_id": "foliage_flank_right",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "foliage"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "left",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "foliage"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "left",
+            "color_index": 1
+          }
+        }
+      ],
+      "directional": true,
+      "allowed_rotations": [
+        0
+      ]
+    },
+    "HD": {
+      "_id": "horizon_deep",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "deep"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "bottom",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "deep"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "bottom",
+            "color_index": 1
+          }
+        }
+      ],
+      "directional": true,
+      "allowed_rotations": [
+        0
+      ]
+    },
+    "SU": {
+      "_id": "pale_disc",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "sky",
+            "gold",
+            "gold"
+          ],
+          "background": false,
+          "params": {
+            "kind": "disc",
+            "scale": 0.5,
+            "jitter": 0.12
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "HB": {
+      "_id": "horizon_hull",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "deep"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "bottom",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "deep"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "bottom",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "deep",
+            "rust",
+            "rust"
+          ],
+          "background": false,
+          "params": {
+            "kind": "boat",
+            "scale": 0.62,
+            "jitter": 0.06
+          }
+        }
+      ],
+      "directional": true,
+      "allowed_rotations": [
+        0
+      ]
+    },
+    "HL": {
+      "_id": "horizon_fleck",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "sky",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_a",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_dab_b",
+            "sky_spill_snow",
+            "sky_spill_snow",
+            "sky",
+            "sky"
+          ],
+          "background": true,
+          "params": {
+            "count": 34,
+            "length": 0.24,
+            "width": 0.19,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "deep"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "bottom",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "blotch",
+          "palette": [
+            "sky",
+            "deep"
+          ],
+          "background": false,
+          "params": {
+            "coverage": 0.35,
+            "side": "bottom",
+            "color_index": 1
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "snow",
+            "snow_dab_a",
+            "snow_dab_a"
+          ],
+          "background": false,
+          "params": {
+            "kind": "drop",
+            "scale": 0.36,
+            "jitter": 0.08
+          }
+        }
+      ],
+      "directional": true,
+      "allowed_rotations": [
+        0
+      ]
+    },
+    "PH": {
+      "_id": "rust_window",
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "rust",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_a",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_b",
+            "rust_dab_c",
+            "rust_dab_c",
+            "rust_dab_c"
+          ],
+          "background": true,
+          "params": {
+            "count": 29,
+            "length": 0.26,
+            "width": 0.2,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "gold",
+            "gold",
+            "gold"
+          ],
+          "background": false,
+          "params": {
+            "kind": "window",
+            "scale": 0.52,
+            "jitter": 0.0
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "ink",
+            "ink",
+            "ink"
+          ],
+          "background": false,
+          "params": {
+            "kind": "window",
+            "scale": 0.41,
+            "jitter": 0.0
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    }
+  }
+}
