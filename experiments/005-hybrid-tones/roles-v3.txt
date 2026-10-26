@@ -1,0 +1,85 @@
+# Step 4 role maps, experiment 005 (v3). A = cat, B = sailboat, C = tree.
+# Roles: x_frame frame cells (plain tier); x_near / x_far interior plain tier cells, near a
+# transition of the same tier or not; x_edge_y interior transition cells (own x, neighbour y),
+# with @deg = orientation carried into the scene token.
+
+# A
+l_frame m_frame m_frame m_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_edge_m@0 l_edge_m@0 l_edge_m@0 l_near l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_near l_near l_near l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_near l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_near l_edge_m@180 l_near l_far l_near l_near l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_d@180 l_edge_m@180 l_near l_edge_m@180 l_edge_m@180 l_near l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 m_edge_d@180 l_edge_m@180 m_edge_d@180 m_edge_l@90 l_edge_m@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_m@0 m_edge_l@0 d_edge_m@0 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_near d_edge_m@0 d_near d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_near d_near d_near d_edge_m@90 m_edge_d@270 l_edge_m@270 l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_near d_far d_far d_near d_edge_l@90 l_edge_d@270 l_near l_near l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_near d_far d_far d_near d_edge_l@90 l_edge_d@270 l_edge_d@180 l_edge_d@180 l_near l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_l@270 d_edge_m@270 d_near d_far d_near d_edge_m@90 m_edge_d@270 d_edge_l@180 d_edge_l@0 l_edge_d@180 l_near l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_l@270 d_edge_m@270 d_near d_far d_near d_edge_m@90 m_edge_l@90 l_edge_d@90 d_edge_l@270 d_edge_l@0 l_edge_d@270 l_near l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_l@270 d_edge_m@270 d_near d_far d_near d_edge_m@90 m_edge_l@90 l_edge_m@270 l_edge_d@90 d_edge_l@270 m_edge_l@90 l_edge_m@270 l_near l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_l@270 d_edge_m@270 d_near d_far d_near d_edge_m@90 m_edge_l@90 l_edge_m@270 l_edge_d@90 d_edge_l@270 m_edge_l@90 l_edge_m@270 l_near l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_d@90 d_edge_m@270 d_near d_far d_near d_edge_m@90 m_edge_d@270 l_edge_m@180 l_edge_d@90 d_edge_l@270 m_edge_d@270 l_edge_m@270 l_near l_frame
+l_frame l_near l_near l_near l_near l_near l_edge_d@90 d_edge_l@270 d_near d_far d_near d_edge_m@90 m_edge_d@180 m_edge_l@0 m_edge_l@0 d_edge_m@90 m_edge_d@270 l_edge_m@270 l_near l_frame
+l_frame l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@90 m_edge_d@90 d_edge_m@270 d_near d_near d_edge_m@180 d_edge_m@180 d_edge_m@0 d_edge_m@180 d_edge_l@90 l_edge_d@270 l_edge_m@180 l_edge_m@180 l_frame
+d_frame m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_near m_edge_d@0 d_edge_m@180 d_edge_m@180 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_frame
+m_frame m_near m_near m_near m_near m_near m_near m_far m_near m_edge_d@0 m_edge_d@0 m_near m_near m_near m_near m_near m_near m_near m_near m_frame
+m_frame m_far m_far m_far m_far m_far m_far m_far m_far m_near m_near m_far m_far m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
+
+# B
+l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame m_edge_l@0 l_edge_m@270 l_near l_far l_far l_far l_far l_far l_near l_near l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_edge_m@0 l_near l_far l_far l_far l_far l_far l_near l_edge_m@180 l_edge_m@180 l_near l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_near l_far l_far l_far l_far l_far l_near l_edge_m@90 m_edge_l@0 m_edge_l@0 l_edge_m@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_m@0 d_edge_m@0 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 m_edge_l@90 l_edge_m@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_near l_near l_near l_near l_near l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_near l_near l_near l_near l_near l_far l_frame
+l_frame l_near l_edge_m@180 l_edge_d@180 l_edge_d@180 l_edge_d@180 l_edge_d@180 l_edge_d@180 l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@180 l_edge_d@180 l_edge_d@180 l_edge_d@180 l_edge_d@180 l_edge_d@180 l_edge_m@180 l_near l_frame
+l_frame l_edge_m@180 m_edge_l@0 d_edge_m@270 d_edge_l@0 d_edge_l@0 d_edge_l@0 d_edge_l@0 d_edge_l@0 d_near d_near d_edge_l@0 d_edge_l@0 d_edge_l@0 d_edge_l@0 d_edge_l@0 d_edge_m@90 m_edge_l@0 l_edge_m@180 l_frame
+l_frame m_edge_l@0 m_edge_d@90 d_edge_m@270 d_near d_near d_near d_near d_near d_far d_far d_near d_near d_near d_near d_near d_edge_m@90 m_edge_d@270 m_edge_l@0 l_frame
+d_frame m_edge_d@270 m_near m_edge_d@90 d_edge_m@270 d_near d_near d_near d_near d_near d_near d_near d_near d_near d_near d_edge_m@90 m_edge_d@270 m_near m_edge_l@90 l_frame
+m_frame m_near m_near m_edge_d@90 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 d_edge_m@180 m_edge_d@270 m_near m_near m_frame
+m_frame m_far m_far m_near m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_edge_d@0 m_near m_far m_far m_frame
+m_frame m_far m_far m_far m_near m_near m_near m_near m_near m_near m_near m_near m_near m_near m_near m_near m_far m_far m_far m_frame
+m_frame m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
+
+# C
+l_frame m_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_edge_m@0 l_near l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_near l_far l_far l_far l_far l_far l_far l_far l_near l_near l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_near l_edge_m@180 l_edge_m@180 l_near l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_near l_edge_m@180 l_edge_d@180 m_edge_d@180 m_edge_d@180 l_edge_d@180 l_edge_m@180 l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_near l_edge_m@90 m_edge_d@90 d_edge_l@0 d_edge_m@0 d_edge_m@0 d_edge_l@0 m_edge_d@180 l_edge_m@180 l_near l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_d@90 d_edge_m@0 d_near d_near d_near d_near d_edge_m@0 m_edge_l@90 l_edge_m@270 l_near l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_near d_far d_far d_far d_far d_near d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_frame
+l_frame l_far l_far l_near l_edge_m@90 m_edge_d@90 d_edge_m@270 d_near d_far d_far d_far d_far d_near d_edge_m@90 m_edge_d@270 l_edge_m@270 l_near l_far l_far l_frame
+l_frame l_far l_far l_near l_edge_m@90 m_edge_d@90 d_edge_m@270 d_near d_far d_far d_far d_far d_near d_edge_m@90 m_edge_d@270 l_edge_m@270 l_near l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_near d_far d_far d_far d_far d_near d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_edge_m@90 m_edge_l@270 d_edge_m@180 d_near d_far d_far d_near d_edge_m@90 m_edge_l@90 l_edge_m@270 l_near l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_near l_edge_m@0 m_edge_l@180 d_edge_l@180 d_near d_near d_edge_m@180 m_edge_l@180 l_edge_m@0 l_near l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_near l_edge_m@0 l_edge_d@0 d_edge_l@270 d_edge_m@90 m_edge_d@0 l_edge_m@0 l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_near l_near l_near l_near l_near l_near l_near l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_near l_near l_near l_near l_near l_near l_near l_frame
+l_frame l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_d@90 d_edge_l@270 d_edge_l@90 l_edge_d@270 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_edge_m@180 l_frame
+m_frame m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 d_edge_l@0 d_near d_edge_m@90 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_edge_l@0 m_frame
+m_frame m_near m_near m_near m_near m_near m_near m_near m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_near m_near m_near m_near m_near m_near m_near m_frame
+m_frame m_far m_far m_far m_far m_far m_far m_near m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_near m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_far m_far m_far m_far m_far m_far m_near m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_near m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_far m_far m_far m_far m_far m_far m_near m_edge_d@90 d_edge_m@270 d_edge_m@90 m_edge_d@270 m_near m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame d_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
