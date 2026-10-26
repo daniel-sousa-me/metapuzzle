@@ -1,0 +1,55 @@
+1. tier counts by fixed thresholds (D / M / L):
+   cat        76 / 124 / 300
+   sailboat   76 / 124 / 300
+   tree       76 / 124 / 300
+2. equalized tier target (D / M / L): 76 / 124 / 300
+   cat       cells moved across a threshold: 0
+   sailboat  cells moved across a threshold: 0
+   tree      cells moved across a threshold: 0
+3. transition cells (own tier differs from a neighbour) and cells with 2+ different sides:
+   cat       transitions 140  multi-sided  62
+   sailboat  transitions 120  multi-sided  18
+   tree      transitions 136  multi-sided  46
+4. rotation-equivalent class histogram before equalization:
+   class         D      M      L     DM     DL     MD     ML     LD     LM
+   cat          33     77    250     26     17     23     24     17     33
+   sailboat     24    100    256     16     36     18      6     36      8
+   tree         34     80    250     26     16     18     26     16     34
+   target       30     85    252     23     23     20     19     23     25
+   pairwise L1 (cat-sailboat, cat-tree, sailboat-tree): 134, 14, 132  (sum 280)
+5. equalization (rule i: side swaps with tone difference >= 0.1):
+   cat       side swaps  0  histogram D=33 M=77 L=250 DM=26 DL=17 MD=23 ML=24 LD=17 LM=33
+   sailboat  side swaps  4  histogram D=24 M=100 L=256 DM=18 DL=34 MD=18 ML=6 LD=34 LM=10
+   tree      side swaps  2  histogram D=34 M=80 L=250 DM=26 DL=16 MD=20 ML=24 LD=16 LM=34
+   residual L1 to target per image: cat 44, sailboat 82, tree 42
+   pairwise L1 after: cat-sailboat 126, cat-tree 10, sailboat-tree 124
+6. directional histogram (class@side) after equalization, for information (rotation (ii) pools these):
+   D          33   24   34
+   DL@B        1    0    0
+   DL@L       11   11    7
+   DL@R        4   11    7
+   DL@T        1   12    2
+   DM@B        6   12    3
+   DM@L        6    2    9
+   DM@R        9    2   10
+   DM@T        5    2    4
+   L         250  256  250
+   LD@B        2   11    2
+   LD@L        4   11    7
+   LD@R       11   12    7
+   LM@B       17    8   21
+   LM@L        9    1    4
+   LM@R        7    1    5
+   LM@T        0    0    4
+   M          77  100   80
+   MD@B        5    0    3
+   MD@L        7    3    7
+   MD@R        3    3    8
+   MD@T        8   12    2
+   ML@B        0    0    2
+   ML@L        4    0    2
+   ML@R        6    0    2
+   ML@T       14    6   18
+   (columns: cat, sailboat, tree)
+   max directional difference: 23
+wrote scenes.txt, quantized/*.npy, quantized-preview.png

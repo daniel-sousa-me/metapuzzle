@@ -1,0 +1,20 @@
+maps (cols x rows): A 20x25, B 20x25, C 20x25
+class histograms:
+  A: L=250 M=77 D=33 LM=33 DM=26 ML=24 MD=23 DL=17 LD=17
+  B: L=256 M=100 DL=34 LD=34 D=24 DM=18 MD=18 LM=10 ML=6
+  C: L=250 M=80 D=34 LM=34 DM=26 ML=24 MD=20 DL=16 LD=16
+largest same-class blob per class:
+  A: L=250 M=77 D=33 DM=11 LM=8 ML=7 DL=6 LD=6 MD=5
+  B: L=256 M=100 D=24 DL=22 LD=17 DM=14 MD=12 LM=3 ML=2
+  C: L=250 M=40 D=34 DM=12 DL=10 ML=9 LM=8 LD=5 MD=5
+pairs (window reuse shown as plain/rotated, window = rows x cols):
+  A-B: same position 315 (63.0%)
+    window reuse: 1x2 0.92/0.98  2x1 0.90/0.97  2x2 0.77/0.86  3x3 0.54/0.61
+    transferable blob: 210 cells (42.0% of A)
+  A-C: same position 291 (58.2%)
+    window reuse: 1x2 0.98/1.00  2x1 0.95/1.00  2x2 0.83/0.89  3x3 0.58/0.64
+    transferable blob: 205 cells (41.0% of A)
+  B-C: same position 290 (58.0%)
+    window reuse: 1x2 0.97/0.99  2x1 0.96/1.00  2x2 0.82/0.91  3x3 0.65/0.72
+    transferable blob: 204 cells (40.8% of B)
+scene gates: FAIL (A-B same-position 63.0% ≥ 25%; A-B 2x2 window reuse 76.5% ≥ 30%; A-B transferable blob 42.0% ≥ 10% of cells; A-C same-position 58.2% ≥ 25%; A-C 2x2 window reuse 83.1% ≥ 30%; A-C transferable blob 41.0% ≥ 10% of cells; B-C same-position 58.0% ≥ 25%; B-C 2x2 window reuse 82.0% ≥ 30%; B-C transferable blob 40.8% ≥ 10% of cells)
