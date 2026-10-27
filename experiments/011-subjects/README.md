@@ -116,3 +116,12 @@ W cell. Internal lines are bands at least 2 cells wide, because 1-cell strips ar
   ragged, the owl's moon is a wide cap rather than a round disc, and the swan's moon is scalloped.
   Straight runs are up to 19 (the locked branch), 45° runs in D-L are 37/64/37, and there are 72–83
   junction cells. Not yet blind-tested.
+
+## v4 matching
+
+`make_targets_v4.py` (a copy of v3) drops the frame objective and matches the class surplus that
+`budget_v3.py` reports. Figure outlines, chips and water may move one cell; hero cells, the 3x3 around
+them and the ear tops are locked; no move may add an anomaly or touch S to D, M or W. Restarts stop on
+stall. Result: surplus 193 to 78 (A 42, B 22, C 14), target under 30 not met. Figure cells changed
+7/13/15. Tier totals drift (W 36/30/36). The block-move run (`--block`, `27x38-v4-blocks/`) gives 83 and does
+not help. Outputs: `27x38-v4/` and `27x38-v4-blocks/`; log: `27x38-v4/budgets.txt`.
