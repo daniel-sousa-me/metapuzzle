@@ -7,6 +7,11 @@ base. Its boundary crosses every edge only at that edge's midpoint, so the loop 
 continuous across each cut. The rotations below are chosen so that the two sides of
 every shared edge have the same light and dark halves.
 
+Two ring cells use the new patterns. The top-middle cell is a "tip" drawn with its colours
+swapped, so its dark tent points up out of the blob as an ear. The right-middle cell is a
+"bump", a light convex bulge pushing into the dark side. Each still meets its neighbours at
+the midpoints of the shared edges, so the outline stays continuous.
+
 Run with ``python3 gallery/march-demo.py``. Writes ``gallery/march-demo.png``.
 """
 
@@ -35,8 +40,8 @@ DARK = ["#2f4f4f", "#1d3535", "#4f7070"]
 # mass above the path, and "corner_in" puts its mass in the top-left corner. The block's
 # convex corners need "corner_in" (a small dark corner), not "corner" (a small light one).
 TRANSITIONS = {
-    (2, 1): ("straight", 180),      # top side: light above
-    (3, 2): ("straight", 270),      # right side: light to the right
+    (2, 1): ("tip", 0),             # top side: the dark ear (colours swapped, see tile())
+    (3, 2): ("bump", 270),          # right side: a light bulge into the blob
     (2, 3): ("straight", 0),        # bottom side: light below
     (1, 2): ("straight", 90),       # left side: light to the left
     (1, 1): ("corner_in", 180),     # top-left corner
@@ -45,6 +50,8 @@ TRANSITIONS = {
     (1, 3): ("corner_in", 90),      # bottom-left corner
 }
 CENTER = (2, 2)
+EAR = (2, 1)                        # its "tip" has the light colour as mass, so the dark tent
+                                    # below the peak is the ear
 
 
 def tile(col: int, row: int, seed: int) -> str:
@@ -55,8 +62,9 @@ def tile(col: int, row: int, seed: int) -> str:
         return tx.stipple(seed, CELL, LIGHT)
     pattern, turn = TRANSITIONS[(col, row)]
     clip, cid = tx.march_mask(seed + 2, CELL, pattern=pattern)
-    base = tx.stipple(seed, CELL, LIGHT)
-    mass = tx.stipple(seed + 1, CELL, DARK)
+    base_colours, mass_colours = (DARK, LIGHT) if (col, row) == EAR else (LIGHT, DARK)
+    base = tx.stipple(seed, CELL, base_colours)
+    mass = tx.stipple(seed + 1, CELL, mass_colours)
     body = tx.compose(base, f'<defs>{clip}</defs><g clip-path="url(#{cid})">{mass}</g>')
     return f'<g transform="rotate({turn} 32 32)">{body}</g>'
 

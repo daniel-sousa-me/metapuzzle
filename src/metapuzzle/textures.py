@@ -608,10 +608,13 @@ def blotch_mask(seed: int, size: float, palette: Sequence[str], *,
 
 # ------------------------------------------------------------- march_mask
 
-_MARCH_PATTERNS = ("straight", "corner", "corner_in", "cap", "dot")
+_MARCH_PATTERNS = ("straight", "corner", "corner_in", "cap", "dot", "diag", "tip", "bump", "notch")
 _MARCH_DIP = 0.76           # cap: the deepest point of the dip, as a fraction of size
 _MARCH_DOT_RADIUS = 0.275   # dot: nominal radius as a fraction of size (diameter 55%)
 _MARCH_MAX_WOBBLE = 0.2     # above this a diagonal path can leave the cell
+_MARCH_HEIGHT = (0.3, 0.9)  # tip: allowed peak heights, as fractions of size
+_MARCH_MAX_AMPLITUDE = 0.3  # bump, notch: the largest bulge or dip, as a fraction of size
+_MARCH_EDGE_CLEAR = 0.02    # tip, bump, notch: vertical path points stay this far inside
 
 
 def _march_noise(rng: random.Random, n: int, size: float, roughness: float,
@@ -632,27 +635,62 @@ def _march_noise(rng: random.Random, n: int, size: float, roughness: float,
     return out
 
 
-def _march_path(rng: random.Random, n: int, size: float, pattern: str,
-                roughness: float, wobble: float) -> list[tuple[float, float]]:
-    """n points of a ragged boundary, from its first edge midpoint to its last.
+def _march_bulge(t: float) -> float:
+    """Smooth hump over the middle 60% of the width: 0 for t <= 0.2 and t >= 0.8, 1 at
+    t = 0.5. Its slope is zero where it leaves the flat path, so there is no kink."""
+    if not 0.2 < t < 0.8:
+        return 0.0
+    return math.sin(math.pi * (t - 0.2) / 0.6) ** 2
 
-    straight and cap run from the left midpoint to the right one; their offset is
-    vertical. cap also bends down to ``_MARCH_DIP * size`` at its middle. corner and
-    corner_in run diagonally, from the left midpoint to the bottom or top midpoint,
-    and their offset is along the normal. Both endpoints are exact."""
+
+def _march_path(rng: random.Random, n: int, size: float, pattern: str,
+                roughness: float, wobble: float, height: float,
+                amplitude: float) -> list[tuple[float, float]]:
+    """n points of a ragged boundary, from its first pinned point to its last.
+
+    straight, cap, bump, notch and tip run from the left midpoint to the right one, and
+    their offset is vertical. cap bends down to ``_MARCH_DIP * size`` at its middle. bump
+    bulges up, and notch dips down, by ``amplitude * size`` over the middle 60% of the
+    width. tip rises to a single peak at y = (1 - height) * size, which sits at index
+    (n - 1) // 2, and falls back to the right midpoint. corner, corner_in and diag run
+    diagonally. diag goes from the top-left corner to the bottom-right one. The others
+    go from the left midpoint to the bottom or top midpoint. Their offset is along the
+    normal. Every pinned endpoint is exact."""
     d = _march_noise(rng, n, size, roughness, wobble)
     pts: list[tuple[float, float]] = []
-    if pattern in ("straight", "cap"):
+    if pattern in ("straight", "cap", "bump", "notch", "tip"):
         start, end = (0.0, size / 2.0), (size, size / 2.0)
+        apex = (1.0 - height) * size
+        a = (n - 1) // 2
+        lo, hi = _MARCH_EDGE_CLEAR * size, (1.0 - _MARCH_EDGE_CLEAR) * size
         for i in range(n):
             t = i / (n - 1)
-            y = size / 2.0
-            if pattern == "cap":
-                y += (_MARCH_DIP - 0.5) * size * math.sin(math.pi * t) ** 0.6
-            pts.append((t * size, y + d[i]))
+            if pattern == "tip":
+                if i <= a:
+                    u = i / a
+                    x, y = u * size / 2.0, size / 2.0 + u * (apex - size / 2.0)
+                else:
+                    u = (i - a) / (n - 1 - a)
+                    x, y = size / 2.0 + u * size / 2.0, apex + u * (size / 2.0 - apex)
+            else:
+                x, y = t * size, size / 2.0
+                if pattern == "cap":
+                    y += (_MARCH_DIP - 0.5) * size * math.sin(math.pi * t) ** 0.6
+                elif pattern == "bump":
+                    y -= amplitude * size * _march_bulge(t)
+                elif pattern == "notch":
+                    y += amplitude * size * _march_bulge(t)
+            if pattern in ("tip", "bump", "notch"):
+                y = min(max(y + d[i], lo), hi)
+            else:
+                y += d[i]
+            pts.append((x, y))
     else:
-        start = (0.0, size / 2.0)
-        end = (size / 2.0, size) if pattern == "corner" else (size / 2.0, 0.0)
+        start, end = {
+            "corner": ((0.0, size / 2.0), (size / 2.0, size)),
+            "corner_in": ((0.0, size / 2.0), (size / 2.0, 0.0)),
+            "diag": ((0.0, 0.0), (size, size)),
+        }[pattern]
         dx, dy = end[0] - start[0], end[1] - start[1]
         length = math.hypot(dx, dy)
         nx, ny = -dy / length, dx / length
@@ -695,7 +733,8 @@ def _march_blob(rng: random.Random, n: int, size: float, roughness: float,
     return [(cx + x, cy + y) for x, y in rel]
 
 
-def _check_march_args(pattern: str, roughness: float, wobble: float, inset: float) -> None:
+def _check_march_args(pattern: str, roughness: float, wobble: float, inset: float,
+                      height: float, amplitude: float) -> None:
     if pattern not in _MARCH_PATTERNS:
         raise ValueError(f"pattern must be one of {_MARCH_PATTERNS}, not {pattern!r}")
     if not 0.0 <= roughness <= 1.0:
@@ -704,36 +743,47 @@ def _check_march_args(pattern: str, roughness: float, wobble: float, inset: floa
         raise ValueError(f"wobble must be in [0, {_MARCH_MAX_WOBBLE:g}]")
     if not 0.0 <= inset < 0.5:
         raise ValueError("inset must be in [0, 0.5)")
+    if not _MARCH_HEIGHT[0] <= height <= _MARCH_HEIGHT[1]:
+        raise ValueError(f"height must be in [{_MARCH_HEIGHT[0]:g}, {_MARCH_HEIGHT[1]:g}]")
+    if not 0.0 <= amplitude <= _MARCH_MAX_AMPLITUDE:
+        raise ValueError(f"amplitude must be in [0, {_MARCH_MAX_AMPLITUDE:g}]")
 
 
 def _march_boundary(seed: int, size: float, pattern: str, roughness: float,
-                    wobble: float, inset: float) -> tuple[list[tuple[float, float]], bool]:
+                    wobble: float, inset: float, height: float,
+                    amplitude: float) -> tuple[list[tuple[float, float]], bool]:
     """The boundary of one march tile: ``(points, closed)``.
 
-    An edge pattern gives its open path, from the first edge midpoint to the last
-    (``closed`` is False). "dot" gives the blob outline (``closed`` is True). ``march_mask``
-    and ``march_line`` both call this, so their boundaries are the same. The draws come from
-    ``Random(seed)`` in a fixed order: the point count first, then the geometry."""
+    An open path (every pattern except "dot") runs between its pinned endpoints.
+    "dot" gives the blob outline (``closed`` is True). ``march_mask`` and ``march_line``
+    both call this, so their boundaries are the same. The draws come from ``Random(seed)``
+    in a fixed order: the point count first, then the geometry."""
     rng = random.Random(seed)
     n = rng.randint(12, 20)
     if pattern == "dot":
         return _march_blob(rng, n, size, roughness, inset), True
-    return _march_path(rng, n, size, pattern, roughness, wobble), False
+    return _march_path(rng, n, size, pattern, roughness, wobble, height, amplitude), False
 
 
 def _march_close(pattern: str, size: float) -> list[tuple[float, float]]:
-    """Corners that close an edge pattern's mass polygon, after its path."""
+    """Corners that close an open path's mass polygon, after the path's last point."""
+    top = [(size, 0.0), (0.0, 0.0)]
     return {
-        "straight": [(size, 0.0), (0.0, 0.0)],
-        "cap": [(size, 0.0), (0.0, 0.0)],
+        "straight": top,
+        "cap": top,
+        "bump": top,
+        "notch": top,
+        "tip": top,
         "corner": [(size, size), (size, 0.0), (0.0, 0.0)],
         "corner_in": [(0.0, 0.0)],
+        "diag": [(size, 0.0)],
     }[pattern]
 
 
 def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
                pattern: str = "straight", roughness: float = 0.5, wobble: float = 0.12,
-               inset: float = 0.0, **_) -> tuple[str, str]:
+               inset: float = 0.0, height: float = 0.75, amplitude: float = 0.18,
+               **_) -> tuple[str, str]:
     """Clip path for one tile of a marching-squares set: ``(clip_svg, clip_id)``.
 
     The mass is the dark material; the rest of the cell is the base. Each edge pattern
@@ -758,6 +808,23 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
             middle line.
         "dot": an isolated ragged blob of diameter about 55% of size, with no contact
             with any edge. It is centred near the middle.
+        "diag": the path runs from the top-left corner to the bottom-right corner, and
+            the mass is the upper-right triangle. Its ends are corners, not midpoints, so
+            it touches the cell's edges only there. Its two neighbours along the
+            diagonal (the cells that share its top-left and bottom-right corners) must
+            also be "diag" tiles, so their paths meet at those corners. Its side
+            neighbours must be plain tiles: the top and right neighbours all mass on
+            the shared edge, and the left and bottom neighbours all base.
+        "tip": the path runs from the left midpoint up to a peak at y = (1 - height) *
+            size, near the middle, and back down to the right midpoint. The base forms
+            a pointed peak into the mass, so the mass has a V-shaped notch. Turn the
+            tile 180 degrees to get a notch from the bottom. To get a pointed mass
+            instead, draw the tile's base in the mass colour and its mass in the base
+            colour.
+        "bump": like "straight", but the path bulges up into the mass by ``amplitude``
+            * size over the middle 60% of the width. The base is convex there.
+        "notch": like "straight", but the path dips down by ``amplitude`` * size over
+            the middle 60% of the width. The mass intrudes into the base there.
 
     roughness: 0-1, the share of the ragged offset. At 0 the path is a straight line
         between its pinned points (for "dot", a regular polygon).
@@ -767,14 +834,21 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
     inset: 0-0.5, the clear margin kept from every edge. Used only by "dot", which does
         not touch an edge. The edge patterns must reach their midpoints, so they ignore
         it. The value is still checked.
+    height: 0.3-0.9, the peak position of "tip" (its height above the bottom edge, as a
+        fraction of size). 0.75 puts the peak a quarter of the way down from the top.
+        Ignored by the other patterns, and still checked.
+    amplitude: 0-0.3, the bulge or dip of "bump" and "notch", as a fraction of size. The
+        default 0.18 is about a fifth of the cell. Ignored by the other patterns, and
+        still checked.
 
-    Output is deterministic for a given seed. Each edge path has 12 to 20 points,
+    Output is deterministic for a given seed. Each open path has 12 to 20 points,
     endpoints included. A "dot" has the same count.
     """
     params = _key_args(locals())
     params.pop("_", None)
-    _check_march_args(pattern, roughness, wobble, inset)
-    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset)
+    _check_march_args(pattern, roughness, wobble, inset, height, amplitude)
+    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset,
+                                  height, amplitude)
     if not closed:
         pts += _march_close(pattern, size)
     cid = _clip_id("march_mask", seed, size, palette or (), params)
@@ -783,29 +857,32 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
 
 def march_line(seed: int, size: float, palette: Sequence[str],
                pattern: str = "straight", roughness: float = 0.5, wobble: float = 0.12,
-               stroke: float = 0.035, color_index: int = 1, inset: float = 0.0, **_) -> str:
+               stroke: float = 0.035, color_index: int = 1, inset: float = 0.0,
+               height: float = 0.75, amplitude: float = 0.18, **_) -> str:
     """The boundary of a ``march_mask`` tile, drawn as a stroke with no fill.
 
     It takes the same seed and parameters as ``march_mask`` and draws the same
     geometry, so an ink render and a full render of one scene have the same boundaries.
-    An edge pattern is an open polyline between its two edge midpoints. "dot" is its
-    closed blob outline. The cell clip is applied, so a stroke that runs past an edge is
-    cut there and the neighbouring tile carries on from it.
+    An open pattern is a polyline between its two pinned points. "dot" is its closed
+    blob outline. The cell clip is applied, so a stroke that runs past an edge is cut
+    there and the neighbouring tile carries on from it.
 
     stroke: stroke width as a fraction of size (default 0.035).
     color_index: palette index of the stroke colour (default: palette[1]). palette[0] is
         not drawn, so the background is left to another layer.
     Other parameters have the same meaning as in ``march_mask``. ``inset`` is used only
-    by "dot". Extra keywords are ignored.
+    by "dot", and ``height`` and ``amplitude`` only by their patterns. Extra keywords
+    are ignored.
     """
     params = _key_args(locals())
     params.pop("_", None)
-    _check_march_args(pattern, roughness, wobble, inset)
+    _check_march_args(pattern, roughness, wobble, inset, height, amplitude)
     if not stroke > 0.0:
         raise ValueError("stroke must be positive")
     if not 0 <= color_index < len(palette):
         raise ValueError("color_index is out of range for palette")
-    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset)
+    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset,
+                                  height, amplitude)
     attrs = (f'fill="none" stroke="{palette[color_index]}" '
              f'stroke-width="{_f(size * stroke)}" stroke-linejoin="round"')
     if closed:

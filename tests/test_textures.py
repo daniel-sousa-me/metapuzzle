@@ -574,17 +574,26 @@ def test_roughness_and_spread_reject_bad_arguments():
 # ------------------------------------------------------------------ march_mask
 
 MARCH_EDGE = ("straight", "corner", "corner_in", "cap")
+MARCH_NEW = ("bump", "notch", "tip", "diag")   # added after the first five patterns
 MARCH_ENDS = {                       # pinned path endpoints (size 100)
     "straight": ((0.0, 50.0), (100.0, 50.0)),
     "cap": ((0.0, 50.0), (100.0, 50.0)),
     "corner": ((0.0, 50.0), (50.0, 100.0)),
     "corner_in": ((0.0, 50.0), (50.0, 0.0)),
+    "bump": ((0.0, 50.0), (100.0, 50.0)),
+    "notch": ((0.0, 50.0), (100.0, 50.0)),
+    "tip": ((0.0, 50.0), (100.0, 50.0)),
+    "diag": ((0.0, 0.0), (100.0, 100.0)),   # corners, not midpoints
 }
 MARCH_TAIL = {                       # mass-polygon corners after the path
     "straight": [(100.0, 0.0), (0.0, 0.0)],
     "cap": [(100.0, 0.0), (0.0, 0.0)],
     "corner": [(100.0, 100.0), (100.0, 0.0), (0.0, 0.0)],
     "corner_in": [(0.0, 0.0)],
+    "bump": [(100.0, 0.0), (0.0, 0.0)],
+    "notch": [(100.0, 0.0), (0.0, 0.0)],
+    "tip": [(100.0, 0.0), (0.0, 0.0)],
+    "diag": [(100.0, 0.0)],
 }
 
 
@@ -739,7 +748,7 @@ def _line_pts(svg: str) -> tuple[list[tuple[float, float]], str]:
 
 
 @pytest.mark.parametrize("roughness", [0.0, 0.5, 1.0])
-@pytest.mark.parametrize("pattern", MARCH_EDGE + ("dot",))
+@pytest.mark.parametrize("pattern", MARCH_EDGE + ("dot",) + MARCH_NEW)
 def test_march_line_path_points_equal_the_march_mask_polygon(pattern, roughness):
     # The ink line and the mask are the same geometry: the line's points are the mask's
     # polygon points, without the corners that close the mass (none for "dot").
@@ -775,7 +784,7 @@ def test_march_line_draws_no_background_whatever_the_background_keyword():
 
 
 def test_march_line_is_deterministic_and_seed_dependent():
-    for pattern in MARCH_EDGE + ("dot",):
+    for pattern in MARCH_EDGE + ("dot",) + MARCH_NEW:
         a = tx.march_line(7, 100.0, PALETTE, pattern=pattern)
         assert tx.march_line(7, 100.0, PALETTE, pattern=pattern) == a
         assert tx.march_line(8, 100.0, PALETTE, pattern=pattern) != a
@@ -803,3 +812,143 @@ def test_march_line_is_registered_and_exported():
     assert classes.PRIMITIVES["march_line"] is tx.march_line
     assert "march_line" in tx.__all__
     assert "march_line" not in classes.MASK_PRIMITIVES
+
+
+# ------------------------------------------------ march_mask: diag, tip, bump, notch
+
+def _shoelace_area(pts: list[tuple[float, float]]) -> float:
+    n = len(pts)
+    return abs(sum(pts[i][0] * pts[(i + 1) % n][1] - pts[(i + 1) % n][0] * pts[i][1]
+                   for i in range(n))) / 2.0
+
+
+def _base_area(clip: str) -> float:
+    """Area of the base (the cell minus the mass polygon), at size 100."""
+    return 10000.0 - _shoelace_area(_march_pts(clip))
+
+
+@pytest.mark.parametrize("roughness", [0.0, 0.5, 1.0])
+@pytest.mark.parametrize("pattern", MARCH_NEW)
+def test_march_new_paths_are_pinned_and_stay_inside(pattern, roughness):
+    # The same contract as the edge patterns: exact endpoints (midpoints, or corners for
+    # diag), an unchanged tail, and no interior point on an edge, at the extremes of the
+    # new parameters with the largest wobble.
+    settings = [{}] if pattern == "diag" else [
+        {"height": 0.75, "amplitude": 0.18},
+        {"height": 0.3, "amplitude": 0.3},
+        {"height": 0.9, "amplitude": 0.3},
+    ]
+    for extra in settings:
+        for seed in range(10):
+            clip, _ = tx.march_mask(seed, 100.0, None, pattern=pattern, roughness=roughness,
+                                    wobble=0.2, **extra)
+            pts = _march_pts(clip)
+            k = len(MARCH_TAIL[pattern])
+            path = pts[:-k]
+            assert pts[-k:] == MARCH_TAIL[pattern], (pattern, seed, extra)
+            assert (path[0], path[-1]) == MARCH_ENDS[pattern], (pattern, seed, extra)
+            assert 12 <= len(path) <= 20, (pattern, seed)
+            for x, y in path[1:-1]:
+                assert 0.0 < x < 100.0 and 0.0 < y < 100.0, (pattern, seed, extra, x, y)
+
+
+def test_march_diag_is_the_diagonal_at_roughness_zero():
+    clip, _ = tx.march_mask(4, 100.0, None, pattern="diag", roughness=0.0)
+    assert all(abs(x - y) < 1e-9 for x, y in _march_pts(clip)[:-1])
+
+
+@pytest.mark.parametrize("height", [0.3, 0.5, 0.75, 0.9])
+def test_march_tip_apex_is_at_height(height):
+    # the peak is the one path point on the centre line x = 50; it sits at (1 - height) * size
+    path = _march_pts(tx.march_mask(3, 100.0, None, pattern="tip", roughness=0.0,
+                                    height=height)[0])[:-2]
+    apex = [p for p in path if abs(p[0] - 50.0) < 1e-9]
+    assert len(apex) == 1 and abs(apex[0][1] - (1.0 - height) * 100.0) < 1e-9, height
+
+
+def test_march_bump_and_notch_peak_at_the_middle_by_amplitude():
+    for seed in range(4):
+        bump = _march_pts(tx.march_mask(seed, 100.0, None, pattern="bump", roughness=0.0)[0])[:-2]
+        assert abs(min(y for _, y in bump) - 32.0) < 1.5, seed     # 50 - 0.18 * 100
+        notch = _march_pts(tx.march_mask(seed, 100.0, None, pattern="notch", roughness=0.0)[0])[:-2]
+        assert abs(max(y for _, y in notch) - 68.0) < 1.5, seed    # 50 + 0.18 * 100
+    flat = _march_pts(tx.march_mask(3, 100.0, None, pattern="bump", roughness=0.0,
+                                    amplitude=0.0)[0])[:-2]
+    assert all(y == 50.0 for _, y in flat)                         # amplitude 0 is straight
+
+
+def test_march_new_patterns_mass_is_on_the_documented_side():
+    for seed in range(4):
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="diag"))
+        assert grid[2][97] and grid[10][50] and grid[50][90]    # upper-right triangle is mass
+        assert not grid[97][2] and not grid[50][10] and not grid[90][50]
+
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="tip"))
+        assert grid[5][50] and grid[20][10] and grid[20][90]    # above the peak and the path
+        assert not grid[40][50] and not grid[60][10] and not grid[60][90]
+
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="bump"))
+        assert grid[20][50] and not grid[45][50]                # base bulges up into the mass
+        assert grid[30][10] and not grid[70][10]
+
+        grid = _mask_coverage(*tx.march_mask(seed, 100.0, None, pattern="notch"))
+        assert grid[55][50] and not grid[85][50]                # mass dips into the base
+        assert grid[30][10] and not grid[70][10]
+
+
+@pytest.mark.parametrize("roughness", [0.0, 0.5])
+def test_march_base_area_ordering_notch_straight_bump_tip(roughness):
+    # A dip takes base away, a bulge adds it, and the tip's peak adds the most.
+    for seed in range(10):
+        areas = {p: _base_area(tx.march_mask(seed, 100.0, None, pattern=p,
+                                             roughness=roughness)[0])
+                 for p in ("notch", "straight", "bump", "tip")}
+        assert areas["notch"] < areas["straight"] < areas["bump"] < areas["tip"], (seed, areas)
+
+
+@pytest.mark.parametrize("pattern, extra", [
+    ("tip", {"height": 0.3}),
+    ("tip", {"height": 0.9}),
+    ("bump", {"amplitude": 0.3}),
+    ("notch", {"amplitude": 0.05}),
+    ("diag", {}),
+])
+def test_march_line_matches_march_mask_for_new_parameters(pattern, extra):
+    for seed in range(6):
+        clip, _ = tx.march_mask(seed, 100.0, None, pattern=pattern, wobble=0.2, **extra)
+        line = tx.march_line(seed, 100.0, PALETTE, pattern=pattern, wobble=0.2, **extra)
+        pts, kind = _line_pts(line)
+        k = len(MARCH_TAIL[pattern])
+        assert kind == "polyline" and pts == _march_pts(clip)[:-k], (pattern, seed, extra)
+
+
+def test_march_height_and_amplitude_are_ignored_where_they_do_not_apply():
+    for pattern in MARCH_EDGE + ("dot", "diag", "bump", "notch"):
+        a = tx.march_mask(5, 100.0, None, pattern=pattern)[0]
+        b = tx.march_mask(5, 100.0, None, pattern=pattern, height=0.3)[0]
+        assert _march_pts(a) == _march_pts(b), pattern
+    for pattern in MARCH_EDGE + ("dot", "diag", "tip"):
+        a = tx.march_mask(5, 100.0, None, pattern=pattern)[0]
+        b = tx.march_mask(5, 100.0, None, pattern=pattern, amplitude=0.3)[0]
+        assert _march_pts(a) == _march_pts(b), pattern
+
+
+@pytest.mark.parametrize("pattern", ["tip", "bump", "notch", "diag"])
+def test_march_new_parameters_are_deterministic_and_seed_dependent(pattern):
+    extra = {"height": 0.4} if pattern == "tip" else {"amplitude": 0.25}
+    if pattern == "diag":
+        extra = {}
+    a = tx.march_mask(7, 100.0, None, pattern=pattern, **extra)
+    assert tx.march_mask(7, 100.0, None, pattern=pattern, **extra) == a
+    assert tx.march_mask(8, 100.0, None, pattern=pattern, **extra) != a
+
+
+def test_march_new_arguments_are_checked():
+    with pytest.raises(ValueError, match="height must be in"):
+        tx.march_mask(1, 100.0, None, pattern="tip", height=0.2)
+    with pytest.raises(ValueError, match="height must be in"):
+        tx.march_line(1, 100.0, PALETTE, height=0.95)
+    with pytest.raises(ValueError, match="amplitude must be in"):
+        tx.march_mask(1, 100.0, None, pattern="bump", amplitude=0.4)
+    with pytest.raises(ValueError, match="amplitude must be in"):
+        tx.march_line(1, 100.0, PALETTE, pattern="notch", amplitude=-0.1)
