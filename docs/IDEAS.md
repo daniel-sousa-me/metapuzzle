@@ -37,3 +37,9 @@ At 500 pieces (20×25) silhouettes are coarse (a cat's ears are two cells). Two 
 ## Cross-class seams and frame-histogram matching (2026-10-27)
 
 A standard rectangular border needs the three pictures' frame cells to use the same multiset of piece classes (with rotation, any side). Two ways to get there: (a) the subject designer's annealer matches the frame class histogram across pictures as one more budget term (frame cells are only about 12% of the board and mostly background, so background lines can absorb it); (b) the engine allows seam partners of different classes (a seam pair is just two flat-sided pieces at adjacent interior cells whose classes the scene prescribes), which removes the same-class restriction that currently makes seams infeasible for mixed frame mixes. (a) is cheaper and is being added to the designer; (b) is an engine improvement for later. *Status: standard-border runs at 27x38 failed on same-class seam parity (011 border-check, FINDINGS 29), so (b) is now the remaining route.*
+
+- **Cut-overlay render mode (for the border decision).** Renders draw no piece outlines, so the
+  straight interior seams of a standard-border solution are invisible in the triptych although
+  they would show in the physical puzzle. A `--cut-overlay` option drawing every piece outline
+  (tabs, blanks and flat seams) at low opacity would let the grid review judge seams and tab
+  pattern tells before manufacturing. Needed before choosing tray vs standard at the v4 tiers.
