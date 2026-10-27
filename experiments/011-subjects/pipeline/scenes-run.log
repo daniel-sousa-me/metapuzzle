@@ -1,0 +1,26 @@
+tiles used after equalize: eq
+4. scenes: border tray, rotation quarter, containers ['interior']
+   restart 0: objective 418.10
+   restart 1: objective 420.10
+   restart 2: objective 419.10
+   restart 3: objective 419.10
+   restart 4: objective 421.10
+   restart 5: objective 420.10
+   restart 6: objective 422.10
+   restart 7: objective 420.10
+   validate_scenes passed (border tray)
+   best restart 0 (objective 418.10); wrote /home/user/metapuzzle/experiments/011-subjects/pipeline/scenes.txt; all maps match target_counts
+5. scene-metrics exit 3; wrote /home/user/metapuzzle/experiments/011-subjects/pipeline/scene-metrics.txt
+   maps (cols x rows): A 27x38, B 27x38, C 27x38
+   class histograms:
+     A: L=292 M=228 D=175 S=49 DLs=44 DMs=37 MLs=37 W=29 LMc=23 LDc=21 MLc=21 MWs=17 DLc=16 MDc=13 DMc=12 WLs=5 WLc=3 LWc=2 MWc=1 WMc=1
+     B: L=292 M=228 D=175 S=49 DLs=44 DMs=37 MLs=37 W=29 LMc=23 LDc=21 MLc=21 MWs=17 DLc=16 MDc=13 DMc=12 WLs=5 WLc=3 LWc=2 MWc=1 WMc=1
+     C: L=292 M=228 D=175 S=49 DLs=44 DMs=37 MLs=37 W=29 LMc=23 LDc=21 MLc=21 MWs=17 DLc=16 MDc=13 DMc=12 WLs=5 WLc=3 LWc=2 MWc=1 WMc=1
+   largest same-class blob per class:
+     A: L=248 M=225 D=121 S=49 W=29 DMs=6 MLs=6 DLs=5 DMc=2 LMc=2 MLc=2 WLs=2 DLc=1 LDc=1 LWc=1 MDc=1 MWc=1 MWs=1 WLc=1 WMc=1
+     B: L=163 D=160 M=110 S=49 W=29 DLs=5 DMs=5 MLs=5 MWs=5 LMc=3 DLc=2 LDc=2 MLc=2 WLc=2 DMc=1 LWc=1 MDc=1 MWc=1 WLs=1 WMc=1
+     C: L=229 M=148 D=98 S=49 W=29 MLs=7 MWs=6 DMs=5 DLs=4 WLs=3 DLc=2 LDc=2 WLc=2 DMc=1 LMc=1 LWc=1 MDc=1 MLc=1 MWc=1 WMc=1
+   same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+   pairs (window reuse shown as plain/rotated, window = rows x cols):
+     A-B: same position 184 (17.9%)
+done in 0.3 s

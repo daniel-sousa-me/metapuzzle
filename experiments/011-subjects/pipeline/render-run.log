@@ -1,0 +1,18 @@
+tiles used after equalize: eq
+1. tiers per image (input) and transition cells
+   A hare   tiles D 318 M 327 W  39 L 293 S  49   transitions 224 (own D/M/W/L 136/78/10/0)
+   B owl    tiles D 318 M 327 W  39 L 293 S  49   transitions 227 (own D/M/W/L 140/85/2/0)
+   C swan   tiles D 312 M 334 W  39 L 292 S  49   transitions 232 (own D/M/W/L 127/100/5/0)
+   classify 0.0 s
+   wrote /home/user/metapuzzle/experiments/011-subjects/pipeline/quantized-codes.txt
+   classes-v4.json: used classes missing: none
+   classes-ink.json: used classes missing: none
+6. prototype run-ink (classes-ink.json, spec classes-ink.json): exit 0, 4.2 s
+   sizes=27x38, 27x38, 27x38 shared AB/AC/BC=0/0/0 valid=True wrote 16 files to /home/user/metapuzzle/experiments/011-subjects/27x38/run-ink
+   piece gates: PASS
+   scene gates: FAIL (A-B 2x2 window reuse 80.8% ≥ 30%; A-B transferable blob 12.4% ≥ 10% of cells; A-C 2x2 window reuse 81.1% ≥ 30%; B-C 2x2 window reuse 82.0% ≥ 30%)
+6. prototype run-full (classes-v4.json, spec classes-v4.json): exit 0, 56.5 s
+   sizes=27x38, 27x38, 27x38 shared AB/AC/BC=0/0/0 valid=True wrote 16 files to /home/user/metapuzzle/experiments/011-subjects/27x38/run-full
+   piece gates: PASS
+   scene gates: FAIL (A-B 2x2 window reuse 80.8% ≥ 30%; A-B transferable blob 12.4% ≥ 10% of cells; A-C 2x2 window reuse 81.1% ≥ 30%; B-C 2x2 window reuse 82.0% ≥ 30%)
+done in 60.8 s

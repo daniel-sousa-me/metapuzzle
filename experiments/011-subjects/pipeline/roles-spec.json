@@ -1,0 +1,448 @@
+{
+  "_note": "Experiment 011 roles (merged classes, W as a tier, S fixed). target_counts = per-class max over images for transitions, common plain targets, S count. Frame and edge roles fixed.",
+  "roles": {
+    "d_frame": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_near": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_far": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_slot": {
+      "classes": [
+        "D",
+        "DMc",
+        "DMs",
+        "DLc",
+        "DLs",
+        "MDc",
+        "LDc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "d_nslot": {
+      "classes": [
+        "D",
+        "DMc",
+        "DMs",
+        "DLc",
+        "DLs",
+        "MDc",
+        "LDc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "d_xslot": {
+      "classes": [
+        "D",
+        "DMc",
+        "DMs",
+        "DLc",
+        "DLs",
+        "MDc",
+        "LDc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "m_frame": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_near": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_far": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_slot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMs",
+        "MDc",
+        "MWc",
+        "MWs",
+        "MLc",
+        "MLs",
+        "WMc",
+        "LMc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "m_nslot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMs",
+        "MDc",
+        "MWc",
+        "MWs",
+        "MLc",
+        "MLs",
+        "WMc",
+        "LMc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "m_xslot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMs",
+        "MDc",
+        "MWc",
+        "MWs",
+        "MLc",
+        "MLs",
+        "WMc",
+        "LMc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "w_frame": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_near": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_far": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_slot": {
+      "classes": [
+        "W",
+        "MWc",
+        "MWs",
+        "WMc",
+        "WLc",
+        "WLs",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "w_nslot": {
+      "classes": [
+        "W",
+        "MWc",
+        "MWs",
+        "WMc",
+        "WLc",
+        "WLs",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "w_xslot": {
+      "classes": [
+        "W",
+        "MWc",
+        "MWs",
+        "WMc",
+        "WLc",
+        "WLs",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "l_frame": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_near": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_far": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_slot": {
+      "classes": [
+        "L",
+        "DLc",
+        "DLs",
+        "MLc",
+        "MLs",
+        "WLc",
+        "WLs",
+        "LDc",
+        "LMc",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "l_nslot": {
+      "classes": [
+        "L",
+        "DLc",
+        "DLs",
+        "MLc",
+        "MLs",
+        "WLc",
+        "WLs",
+        "LDc",
+        "LMc",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "l_xslot": {
+      "classes": [
+        "L",
+        "DLc",
+        "DLs",
+        "MLc",
+        "MLs",
+        "WLc",
+        "WLs",
+        "LDc",
+        "LMc",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "s_frame": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_fix": {
+      "classes": [
+        "S"
+      ]
+    },
+    "edge_dmc": {
+      "classes": [
+        "DMc"
+      ]
+    },
+    "edge_dms": {
+      "classes": [
+        "DMs"
+      ]
+    },
+    "edge_dlc": {
+      "classes": [
+        "DLc"
+      ]
+    },
+    "edge_dls": {
+      "classes": [
+        "DLs"
+      ]
+    },
+    "edge_mdc": {
+      "classes": [
+        "MDc"
+      ]
+    },
+    "edge_mwc": {
+      "classes": [
+        "MWc"
+      ]
+    },
+    "edge_mws": {
+      "classes": [
+        "MWs"
+      ]
+    },
+    "edge_mlc": {
+      "classes": [
+        "MLc"
+      ]
+    },
+    "edge_mls": {
+      "classes": [
+        "MLs"
+      ]
+    },
+    "edge_wmc": {
+      "classes": [
+        "WMc"
+      ]
+    },
+    "edge_wlc": {
+      "classes": [
+        "WLc"
+      ]
+    },
+    "edge_wls": {
+      "classes": [
+        "WLs"
+      ]
+    },
+    "edge_ldc": {
+      "classes": [
+        "LDc"
+      ]
+    },
+    "edge_lmc": {
+      "classes": [
+        "LMc"
+      ]
+    },
+    "edge_lwc": {
+      "classes": [
+        "LWc"
+      ]
+    }
+  },
+  "target_counts": {
+    "D": 175,
+    "DLc": 16,
+    "DLs": 44,
+    "DMc": 12,
+    "DMs": 37,
+    "L": 292,
+    "LDc": 21,
+    "LMc": 23,
+    "LWc": 2,
+    "M": 228,
+    "MDc": 13,
+    "MLc": 21,
+    "MLs": 37,
+    "MWc": 1,
+    "MWs": 17,
+    "S": 49,
+    "W": 29,
+    "WLc": 3,
+    "WLs": 5,
+    "WMc": 1
+  }
+}

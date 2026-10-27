@@ -1,0 +1,13 @@
+0. equalize (005 v5b logic, four tiers, S fixed)
+   cells allowed to change per image: [673, 676, 662]
+   surplus before: A 39, B 42, C 36   total 117
+   seed 0: best score 316.00 (41 s)
+    seed 1 it  30000 accepted   156 surplus [28, 26, 23] cost [16, 20, 28] score 319.00 best 319.00
+   seed 1: best score 319.00 (41 s)
+   seed 2: best score 332.00 (41 s)
+   chosen seed 0, score 316.00
+   surplus after:  A 29, B 26, C 21   total 76
+   changed cells per image: A 12, B 22, C 24 (tier totals unchanged, frame and S unchanged, changes inside the band)
+   wrote tiers-eq-A/B/C.txt and equalize-report.txt
+tiles used after equalize: eq (this run)
+done in 122.8 s

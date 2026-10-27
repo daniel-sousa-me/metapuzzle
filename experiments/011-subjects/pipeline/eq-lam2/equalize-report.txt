@@ -1,0 +1,7 @@
+# Equalized tiers, experiment 011 (A hare, B owl, C swan). Changed cells vs tiers-*.txt: (row, col) old->new.
+
+# A (6 changed): (1,7) W->L, (3,16) L->M, (5,4) L->W, (17,20) D->L, (20,17) M->L, (33,23) L->D
+# B (18 changed): (1,14) L->M, (1,17) L->M, (1,18) L->M, (1,19) L->M, (3,7) M->L, (8,25) L->M, (9,10) D->L, (9,25) L->M, (10,22) L->D, (13,25) L->M, (17,5) M->L, (17,7) L->D, (30,7) D->L, (31,12) M->L, (31,13) M->L, (31,14) M->L, (31,15) M->L, (32,19) M->L
+# C (16 changed): (2,25) L->D, (4,20) D->L, (6,10) L->D, (6,11) L->D, (6,12) D->L, (6,13) D->L, (9,9) L->D, (9,11) D->L, (12,14) D->L, (14,10) L->D, (16,24) D->L, (17,23) L->D, (32,4) L->M, (33,18) L->M, (35,18) M->L, (36,4) M->L
+
+surplus before [39, 42, 36] after [30, 27, 24] (A, B, C)
