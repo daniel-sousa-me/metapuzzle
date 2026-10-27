@@ -84,3 +84,7 @@ All on `27x38-v2`, tray border, quarter rotation, cell 21; full and ink renders 
   board, 41 to 56 of them joining two classes; 256 flat-sided pieces, 130 inside each picture, 12
   added by padding. Seams are invisible in the render (no cut lines); they would show as straight cuts
   in the physical puzzle. Supersedes the round-1 result (FINDINGS 29).
+- **Cut overlay of the standard-border run** (`border-check/round2/run-standard-cuts/`, `--cut-overlay`
+  re-rendered from the saved solution): 68 interior flat seams per board; straight runs of 3 or more
+  seams: A 1 (one vertical run of 3), B 0, C 0. The seams are scattered as dominoes, L-trominoes and
+  2x2 blocks, so the physical grid tell from seams is small. Andro profiles draw as outward bumps.

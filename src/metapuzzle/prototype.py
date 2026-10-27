@@ -170,8 +170,8 @@ def cuts_report_text(stats: Sequence[dict]) -> str:
     lines = [
         "Cut-overlay report",
         "interior flat seams: contacts where both pieces show a flat side (grid tells in the physical puzzle)",
-        f"straight runs: {CUT_RUN_MIN} or more consecutive flat seams on one grid line; "
-        "rows and columns are 0-based from the top left",
+        (f"straight runs: {CUT_RUN_MIN} or more consecutive flat seams on one grid line; "
+         "rows and columns are 0-based from the top left"),
         "",
     ]
     for st in stats:

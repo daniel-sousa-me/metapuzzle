@@ -64,11 +64,11 @@ wwwwww....,d,..............
 ......dd.......dd..SSSSS...
 ..,,,.dd......MMMM.........
 ..,d,..MMM....MMMM.........
-..,,,..MMMM...MMMMM,,,.....
-..,,...MMMM...MMMMMddd,..,,
-.,dd,..MMMMM..MMMMMDDDd,,dd
-,dDDd,,MMMMM,,MMMMMDDDDddDD
-dDDDDdddMMMMMMMMMMMMDDDDDDD
+..,,,..MMMM...MMMMM........
+.......MMMM...MMMMMDDD.....
+..DD...MMMMM..MMMMMDDDD..DD
+.DDDD..MMMMM..MMMMMDDDDDDDD
+DDDDDDDDMMMMMMMMMMMMDDDDDDD
 DDDDDDDDDMMMMMMMMMMMDDDDDDD
 DDDDDDDDDMMMMMMMMdMMMDDDDDD
 DDDDDDDDDMMMMMMMMMMMMMDDDDD
@@ -99,14 +99,14 @@ DDDDDDDDDDDDDDDDDDDDDDDDDDD
 """
 
 SKETCHES["B"] = """
-wwwwwww,,,,,,,,,,,,,,MMMMMM
-wwwwww,,,,,,,,,,,,,,,,MMMMM
-MMMM,,,,,SSSSS,,,,,,,,,MMMM
-MMMM,,,,,SSSSS,,,,,,,,,MMMM
-wwwwwww,,,,,,,,,,,,,,,,,MMM
-wwwwwww,,,,,,,,,,,,,,,,,MMM
-MMMM....................MMM
-MMMM....................MMM
+wwwwwww..............mmmmmm
+wwwwww................mmmmm
+mmmm.....SSSSS.........mmmm
+mmmm.....SSSSS.........mmmm
+wwwwwww.................mmm
+wwwwwww.................mmm
+mmmm....................mmm
+mmmm....................mmm
 MMMMDD................DDMMM
 MMMMDDD..............DDDMMM
 MMMMDDDD............DDDDMMM
