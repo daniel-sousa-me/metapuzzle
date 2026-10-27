@@ -1,23 +1,17 @@
-"""Motif maps v3 for "Field, Wood and Water" (docs/design/10-motif-vocabulary.md; experiment 011, v7).
+"""Motif maps v3 for "Field, Wood and Water" (experiment 011, v7).
 
-Copy of make_motif_maps_v2.py with the v7 changes from evaluation-v6.md. The vocabulary, the six heroes (HEROES,
-unchanged), the region preferences (REG, unchanged), the halo (carrier rule, HALO, unchanged), the spacing rule
-(CHEB_MIN, unchanged), the lattice test (unchanged) and the tier-map readers are the v2 ones.
+Copy of make_motif_maps_v2.py. Vocabulary, heroes (HEROES), region preferences (REG, heroes only), carrier halo
+(HALO = 2, boundary_distance), spacing (CHEB_MIN), lattice test and tier readers are the v2 ones.
 
-  density    placement follows a gradient by distance from the figure outline. The figure is the largest region of
-             its tier plus the holes it encloses (figure_mask); the distance is Chebyshev, on both sides of the
-             outline (figure_distance). Chance per plain cell (LADDER): 0 within 1 cell, 5% at 2, 10% at 3 and 4,
-             15, 20, 25% at 5, 6, 7, and 30% from 8 on. A cell outside its class's region takes OFF_REGION of it.
-  quotas     per picture each class is sampled with that chance (spacing and lattice checked as placed). The common
-             count of a class is the mean of the three samples, and each picture is equalized to it (equalize_class):
-             surplus cells farthest from the figure are dropped, missing cells are added farthest from the figure.
-             Counts are identical in A, B and C by construction.
-  band       B's cream top band (L cells in rows 0 to 9): within any 3 x 3 window at most one motif type (band_ok).
-  clusters   v2's organic clusters are not used: at this density a class has one to three cells, placed one by one.
-  coverage   cap MAX_COVER = 25% (v2: 18%).
-
-Outputs (in HERE; the pipeline sets HERE to its pipeline-out-v7/ folder): motif-maps-v7.txt and
-motif-counts-v7.txt. Run: python3 motifs/make_motif_maps_v3.py
+  eligible   plain cells of the class's tier (not a transition carrier) outside the carrier halo (distance >= HALO).
+  density    chance per cell by d = Chebyshev distance to the nearest non-plain cell (transition carrier, S or W):
+             d = 1 -> 10%, d = 2 -> 20%, d >= 3 -> 30% (LADDER, FAR). Shared among the four classes of a tier.
+  quotas     per picture each class is sampled with that chance (spacing and lattice checked as placed); the common
+             count is the mean of the three samples, and each picture is equalized (equalize_class): drop the placed
+             cells farthest from the non-plain cells, or add the free candidates farthest from them.
+  band       B's cream top band (L cells, rows 0 to 9): one motif type per 3 x 3 window (band_ok).
+  outputs    motif-maps-v7.txt, motif-counts-v7.txt (with ASCII maps and the pool histogram) in HERE.
+Run: python3 motifs/make_motif_maps_v3.py
 """
 import math
 import random
@@ -34,8 +28,8 @@ CHEB_MIN = 2                     # minimum Chebyshev distance between two motif 
 HALO = 2                         # minimum Chebyshev distance of a regular motif from a tier boundary cell (as v2)
 BOUNDARY = "carrier"             # boundary cells: the darker side of each tier boundary (see boundary_distance)
 FIG_TIER = {"A": "M", "B": "D", "C": "L"}   # tier of each figure (make_targets.py FIGURE)
-LADDER = {3: 0.15, 4: 0.25}     # chance per cell by silhouette distance (v7, coordinator decision)
-FAR = 0.30                       # chance from silhouette distance 5 on; 0 within 2 cells
+LADDER = {1: 0.10, 2: 0.20}      # chance per cell by distance to the nearest non-plain cell (v7 final rule)
+FAR = 0.30                       # chance from distance 3 on
 OFF_REGION = 0.25                # factor on the chance for a cell outside the class's region (weight < 2)
 BAND = {"B": (0, 9)}             # v7: cream top band of B (L cells in these rows): one motif type per 3 x 3 window
 
@@ -217,10 +211,10 @@ def region_raw(regs, r, c):
 
 
 def density(fd):
-    """Chance of a regular motif on a plain cell at silhouette distance fd (LADDER); 0 within 2 cells."""
-    if fd is None or fd < 3:
+    """Chance of a regular motif on an eligible plain cell at distance fd from the nearest non-plain cell (LADDER)."""
+    if fd is None or fd < 1:
         return 0.0
-    return FAR if fd >= 5 else LADDER[fd]
+    return FAR if fd >= 3 else LADDER[fd]
 
 
 def figure_mask(g, tier):
@@ -254,14 +248,21 @@ def figure_mask(g, tier):
     return [[main[r][c] or (out[r][c] >= 0 and out[r][c] not in border) for c in range(C)] for r in range(R)]
 
 
-def figure_distance(g, fm):
-    """Chebyshev distance of every cell to the figure outline (cells with a neighbour on the other side), both sides."""
+def nonplain_mask(g):
+    """Non-plain cells: transition carriers (a lighter 8-neighbour) and every S or W cell."""
+    dist = boundary_distance(g)
+    return [[(dist[r][c] == 0) or g[r][c] in "SW" for c in range(len(g[0]))] for r in range(len(g))]
+
+
+def nonplain_distance(g):
+    """Chebyshev distance of every cell to the nearest non-plain cell (0 on non-plain cells)."""
     R, C = len(g), len(g[0])
+    npm = nonplain_mask(g)
     dist = [[None] * C for _ in range(R)]
     q = deque()
     for r in range(R):
         for c in range(C):
-            if any(fm[rr][cc] != fm[r][c] for rr, cc in neighbours(R, C, r, c)):
+            if npm[r][c]:
                 dist[r][c] = 0
                 q.append((r, c))
     while q:
@@ -310,8 +311,7 @@ def sample_class(p, S, cls):
     for r, c in cand:
         if not free_cell(p, S, r, c, code) or makes_triple(cells, r, c):
             continue
-        in_region = region_raw(regs, r, c) >= 2
-        chance = density(S["fd"][r][c]) * (1.0 if in_region else OFF_REGION) / PER_TIER[tier]
+        chance = density(S["fd"][r][c]) / PER_TIER[tier]          # v7: no region factor for regular motifs
         if S["rng"].random() < chance:
             S["m"][r][c] = code
             cells.append((r, c))
@@ -327,13 +327,11 @@ def equalize_class(p, S, cls, target):
         for q in sorted(cells, key=lambda q: (-fd[q[0]][q[1]], rng.random()))[:len(cells) - target]:
             m[q[0]][q[1]] = "."
             cells.remove(q)
-    regs = REG[p][cls]
     while len(cells) < target:
         cand = candidates(p, S, cls)
         if not cand:
             raise SystemExit(f"{p}: no room for {code} on {tier} (placed {len(cells)} of {target})")
-        q = min(cand, key=lambda q: (makes_triple(cells, *q), region_raw(regs, *q) < 2,
-                                     -fd[q[0]][q[1]], rng.random()))
+        q = min(cand, key=lambda q: (makes_triple(cells, *q), -fd[q[0]][q[1]], rng.random()))
         m[q[0]][q[1]] = code
         cells.append(q)
 
@@ -346,11 +344,10 @@ def build_all(seed=11):
     for p in PICS:
         g = load(p)
         R, C = len(g), len(g[0])
-        fm = figure_mask(g, FIG_TIER[p])                      # v7: this picture's own figure (make_targets FIGURE)
         m = [["." for _ in range(C)] for _ in range(R)]
         for code, r, c in HEROES[p]:
             m[r][c] = code
-        S[p] = {"g": g, "m": m, "dist": boundary_distance(g), "fd": figure_distance(g, fm),
+        S[p] = {"g": g, "m": m, "dist": boundary_distance(g), "fd": nonplain_distance(g),
                 "placed": {}, "rng": random.Random(f"{seed}{p}"), "spill": {}}
     for cls in SEQ:
         for p in PICS:
@@ -359,7 +356,7 @@ def build_all(seed=11):
         for p in PICS:
             equalize_class(p, S[p], cls, target)
             regs = REG[p][cls]
-            spill = sum(1 for q in S[p]["placed"][cls] if region_raw(regs, *q) < 2)
+            spill = sum(1 for q in S[p]["placed"][cls] if region_raw(regs, *q) < 2)   # diagnostic only
             if spill:
                 S[p]["spill"][cls] = spill
     return {p: (S[p]["g"], S[p]["m"], S[p]["spill"]) for p in PICS}
@@ -433,11 +430,11 @@ def motif_distance(m):
     return dist
 
 
-def pool_histogram(g, fm, halo=HALO):
-    """Plain cells (DML, not a transition carrier) by figure distance 1, 2, 3, 4, 5+, before any sampling; and the
-    eligible ones (carrier distance >= halo)."""
+def pool_histogram(g, halo=HALO):
+    """Plain cells (DML, not a transition carrier) by distance to the nearest non-plain cell, 1 to 5+, before any
+    sampling; and the eligible ones (carrier distance >= halo)."""
     dist = boundary_distance(g)
-    fd = figure_distance(g, fm)
+    fd = nonplain_distance(g)
     R, C = len(g), len(g[0])
     def bucket(d):
         return min(d, 5)
@@ -481,7 +478,10 @@ def main():
     lab = {"s": "star", "p": "pebbles", "k": "streak", "v": "chevron", "c": "curl", "l": "leaf",
            "d": "seedhead", "u": "cloud", "f": "snowflake", "I": "amberwedge", "G": "catchlight",
            "O": "crater", "E": "ambereye", "Y": "dot-eye", "N": "beak/nose"}
-    rep = ["# Motif class counts per picture, v7 (make_motif_maps_v3.py). Class = (motif, base tier); heroes counted",
+    rep = ["# v7 diagnosis: A's M tier is one 396-cell region (hare plus landmass), so a figure-distance gradient needs a",
+           "# separate animal mask from make_targets, not in the v2 tiers. v7 rule: plain cells outside the carrier halo, density",
+           "# by distance to the nearest non-plain cell (10 / 20 / 30%).",
+           "# Motif class counts per picture, v7 (make_motif_maps_v3.py). Class = (motif, base tier); heroes counted",
            "# per code. spill = cells outside the class region (weight < 2).", "",
            f"{'class':<14}{'A hare':>8}{'B owl':>8}{'C swan':>8}{'spread':>8}   spill A/B/C"]
     order = list(SEQ) + [(h, "hero") for h in "IGOEYN"]
@@ -500,20 +500,20 @@ def main():
     if any(tot[p] > MAX_COVER * cells for p in PICS):
         raise SystemExit(f"coverage above {MAX_COVER:.0%}: {tot}")
 
-    rep += ["", "# Density gradient by figure distance: regular motifs per eligible plain cell (DML, carrier distance >= HALO)",
-            "# in each band of figure distance, with the nominal chance of the band"]
-    bands = [(2, 2, "5%"), (3, 4, "10%"), (5, 7, "15-25%"), (8, 999, "30%")]
+    rep += ["", "# Density by distance to the nearest non-plain cell: regular motifs per eligible plain cell",
+            "# (DML, carrier distance >= HALO), with the nominal chance of the band"]
+    bands = [(1, 1, "10%"), (2, 2, "20%"), (3, 999, "30%")]
     for p in PICS:
         g, m, _ = maps[p]
         R, C = len(g), len(g[0])
         dist = boundary_distance(g)
-        fd = figure_distance(g, figure_mask(g, FIG_TIER[p]))
+        fd = nonplain_distance(g)
         parts = []
         for lo, hi, nom in bands:
             elig = [(r, c) for r in range(R) for c in range(C)
                     if g[r][c] in "DML" and dist[r][c] >= HALO and lo <= fd[r][c] <= hi]
             reg = sum(1 for r, c in elig if m[r][c] != "." and not m[r][c].isupper())
-            parts.append(f"fig {lo}{'+' if hi == 999 else ('-' + str(hi) if hi != lo else '')}: "
+            parts.append(f"d {lo}{'+' if hi == 999 else ''}: "
                          f"{reg}/{len(elig)} ({100 * reg / max(len(elig), 1):.0f}%, nominal {nom})")
         rep.append(f"{p}: " + "; ".join(parts))
     rep += ["", "# Plain cells: DML cells with no motif and not a transition carrier; how many lie more than 3 cells from",
@@ -526,6 +526,30 @@ def main():
         plain = [(r, c) for r in range(R) for c in range(C) if m[r][c] == "." and g[r][c] in "DML" and dist[r][c] >= 1]
         far = sum(1 for r, c in plain if md[r][c] is None or md[r][c] > 3)
         rep.append(f"{p}: plain cells {len(plain)}, more than 3 cells from any motif {far}")
+
+    rep += ["", "# Pre-sampling pool: plain DML cells (not a transition carrier) by figure distance 1, 2, 3, 4, 5+"]
+    for p in PICS:
+        g = maps[p][0]
+        plain_h, elig_h = pool_histogram(g)
+        rep.append(f"{p}: plain {plain_h[1:]}; eligible (carrier distance >= HALO) {elig_h[1:]}")
+    rep += ["", "# Maps (27 x 38): . non-plain (transition carrier, S or W), h plain cell in the carrier halo (excluded),",
+            "# 1 / 2 / 3 = plain cell at distance 1 / 2 / 3+ from the nearest non-plain cell (chance 10 / 20 / 30%)"]
+    for p in PICS:
+        g = maps[p][0]
+        R, C = len(g), len(g[0])
+        dist = boundary_distance(g)
+        fd = nonplain_distance(g)
+        rep.append(f"{p}:")
+        for r in range(R):
+            row = ""
+            for c in range(C):
+                if g[r][c] not in "DML" or dist[r][c] == 0:
+                    row += "."
+                elif dist[r][c] < HALO:
+                    row += "h"
+                else:
+                    row += str(min(fd[r][c], 3))
+            rep.append(row)
 
     rep += ["", "# Lattice test: equally spaced triples of one class in a row or column (regular motifs, all classes)",
             "# chance = mean over 300 draws of the same counts placed uniformly under the same spacing rule"]
