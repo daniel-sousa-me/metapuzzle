@@ -13,6 +13,7 @@ from PIL import Image
 
 from .board import ROTATION_DEGREES, square_board
 from .classes import ClassSpec, load_class_spec
+from .connectors import class_summary, format_summary
 from . import scene_metrics
 from .metrics import PAIR_NAMES, gate_line, report
 from .optimize import solve, validate_solution
@@ -116,7 +117,7 @@ def _triptych(paths: Sequence[Path], dest: Path) -> Path:
 
 def _summary_md(
     *, params: dict, rep: dict, errs: list[str], scene_text: str,
-    gate_lines: list[str], missing_classes: list[str], files: list[str],
+    gate_lines: list[str], missing_classes: list[str], files: list[str], connectors_text: str = "",
 ) -> str:
     rows = dict(params)
     rows["valid"] = "yes" if not errs else f"no ({len(errs)} violation(s))"
@@ -145,6 +146,14 @@ def _summary_md(
     lines += ["```text", scene_text, "```"]
     lines += ["", "## Gates", ""]
     lines += [f"- {g}" for g in gate_lines]
+    if connectors_text:
+        lines += [
+            "", "## Connectors", "",
+            "Mating classes: sides forced to share one connector shape (a contact in any solution is an edge). "
+            "The smallest possible class is K(3,3), 6 sides, for tab/blank (K4, 4 sides, for andro). "
+            "False fits are tab-blank pairs inside a class that touch in no solution; ratio = false fits / intended contacts.",
+            "", "```text", connectors_text, "```",
+        ]
     lines += ["", "## Files", ""]
     lines += [f"- `{f}`" for f in files]
     lines.append("- `summary.md` (this file)")
@@ -165,6 +174,8 @@ def run_prototype(
     grid: str = "none",
     labels: bool = False,
     extra_flat: int = 0,
+    mating_weight: float = 0.0,
+    max_shared_fraction: float | None = None,
 ) -> dict:
     """Solve the three class maps and write the prototype outputs into `out_dir`.
 
@@ -195,8 +206,10 @@ def run_prototype(
     _check_cells_fit(maps, boards, pieces)
     missing_classes = sorted(set(maps[0].histogram()) - set(spec.classes))
 
-    sol = solve(boards, pieces, maps, seed=seed, iters=iters)
+    sol = solve(boards, pieces, maps, seed=seed, iters=iters,
+                mating_weight=mating_weight, max_shared_fraction=max_shared_fraction)
     errs = validate_solution(sol)
+    connector_summary = class_summary(sol)
     seams = seam_counts(sol)
     rep = report(sol)
 
@@ -239,6 +252,8 @@ def run_prototype(
         "border": border,
         "rotation": rotation,
         "extra_flat": extra_flat,
+        "mating_weight": mating_weight,
+        "max_shared_fraction": sol.meta.get("max_shared_fraction"),
         "seed": seed,
         "iters": sol.meta.get("iters"),
         "iters_used": sol.meta.get("iters_used"),
@@ -258,7 +273,8 @@ def run_prototype(
     files["summary.md"] = out / "summary.md"
     files["summary.md"].write_text(
         _summary_md(params=params, rep=rep, errs=errs, scene_text=scene_text, gate_lines=gate_lines,
-                    missing_classes=missing_classes, files=sorted(listed)),
+                    missing_classes=missing_classes, files=sorted(listed),
+                    connectors_text=format_summary(connector_summary)),
         encoding="utf-8",
     )
 

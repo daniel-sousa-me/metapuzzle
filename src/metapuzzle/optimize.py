@@ -2,7 +2,8 @@
 
 Energy = shared adjacencies (summed over the pairs AB, AC, BC)
        + cluster_weight * cluster penalty (sizes of shared components with 3+ pieces)
-       + mismatch_weight * side mismatches (touching sides that do not mate, per solution).
+       + mismatch_weight * side mismatches (touching sides that do not mate, per solution)
+       + mating_weight * mating penalty (optional, see connectors.MatingPenalty).
 A returned solution is "valid" when mismatches == 0. Moves keep every piece on a slot it
 fits at slot level (boundary sides flat on a standard board, class map, forced rotation);
 pairwise side mating is handled through the mismatch term.
@@ -17,12 +18,15 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .connectors import DEFAULT_MATING_HOPS, MatingPenalty, mating_penalty, target_block_size
 from .board import PROFILES, SIDE_DELTA, Board, mates, square_board
 from .metrics import PAIR_INDEX, PAIR_NAMES, cluster_penalty, corner_order, shared_adjacencies
 from .pieces import Piece, build_valid_layout, group_placements, piece_from_dict, piece_to_dict, rotations_for_piece
 from .scene import ClassMap, validate_scenes
 
 DEFAULT_ITERS = 300_000
+T_HI, T_LO = 0.6, 0.05  # annealing temperature range
+MATING_T_HI, MATING_T_LO = 2.0, 0.3  # range used when the mating penalty is on (its steps are whole units)
 FLAT = PROFILES.index("flat")
 
 
@@ -137,11 +141,21 @@ def solve(
     cluster_weight: float = 0.25,
     mismatch_weight: float = 1.5,
     distinct_corner_orders: bool = False,
+    mating_weight: float = 0.0,
+    max_shared_fraction: float | None = None,
+    mating_hops: int = DEFAULT_MATING_HOPS,
 ) -> Solution:
     """Find three placements minimizing shared adjacencies.
 
     boards: one Board (used for all three solutions) or three Boards with equal slot
     counts (different aspect ratios allowed). Deterministic given `seed`.
+
+    mating_weight > 0 adds the connector mating penalty (connectors.MatingPenalty: for every
+    non-flat side, the excess of its `mating_hops`-hop ball over 6 sides, or 4 when every side
+    is andro; 3 hops by default, see MatingPenalty) so that mating classes shrink toward K(3,3) / K4. The default 0.0 leaves the
+    solver exactly as it was. With mating on, `max_shared_fraction` (default 0.10) rejects any
+    move that raises a pair's shared adjacencies above that fraction of the smaller board's
+    adjacency count; the guard is off when mating is off unless the argument is given.
     """
     t_start = time.perf_counter()
     bl = _three_boards(boards)
@@ -381,6 +395,92 @@ def solve(
     prim = sum(len(s) for s in S)
     clu = sum(cc)
 
+    # ---- mating penalty (optional) -------------------------------------------------------
+    mating = mating_weight > 0
+    if max_shared_fraction is None and mating:
+        max_shared_fraction = 0.10
+    share_cap = None
+    if max_shared_fraction is not None:
+        share_cap = [int(max_shared_fraction * min(bl[i].n_adjacencies, bl[j].n_adjacencies) + 1e-9) for i, j in PAIR_INDEX]
+    pen = 0
+    mp = None
+    if mating:
+        mp = MatingPenalty(target_block_size(p for pc in pieces for p in pc.sides), mating_hops)
+        scode = sc
+
+        def contacts_at(k: int, slots) -> list:
+            """Side contacts (node = piece * 4 + upright side) incident to `slots`, each adjacency once."""
+            out = []
+            atk, rk = at[k], rot[k]
+            for s_ in slots:
+                a_ = atk[s_]
+                qa = rk[a_]
+                for d_, t_ in nbd[k][s_]:
+                    if t_ < s_ and t_ in slots:
+                        continue
+                    b_ = atk[t_]
+                    sa_ = (d_ - qa) & 3
+                    sb_ = (d_ + 2 - rk[b_]) & 3
+                    if scode[a_][sa_] == FLAT or scode[b_][sb_] == FLAT:
+                        continue
+                    out.append((a_ * 4 + sa_, b_ * 4 + sb_))
+            return out
+
+        all_edges = []
+        for k_ in range(3):
+            all_edges += contacts_at(k_, range(n))
+        pen = mp.build(all_edges)
+
+    if mating:
+        step_dir = {delta: d_ for d_, delta in enumerate(SIDE_DELTA)}
+
+        def merge_pick():
+            """A targeted swap that makes two sides share partners.
+
+            Take an oversized side x, a side y two hops away (a partner of a partner), a partner c of x
+            that y lacks and a partner d of y that x lacks. In a solution where y touches d, put the piece
+            owning c where d's piece sits, turned so that side c faces y, and send d's piece to c's old slot.
+            Returns (solution, slot of c's piece, slot of d's piece, rotation of c's piece) or None.
+            """
+            adj = mp.adj
+            x = mp.bad[randrange(len(mp.bad))]
+            ax = adj[x]
+            a_ = tuple(ax)[randrange(len(ax))]
+            cand = [y_ for y_ in adj[a_] if y_ != x]
+            if not cand:
+                return None
+            y = cand[randrange(len(cand))]
+            py = adj[y]
+            cs = [c_ for c_ in ax if c_ not in py]
+            ds = [d_ for d_ in py if d_ not in ax]
+            if not cs or not ds:
+                return None
+            c = cs[randrange(len(cs))]
+            dn = ds[randrange(len(ds))]
+            iy, idn, ic = y >> 2, dn >> 2, c >> 2
+            if ic == iy or ic == idn:
+                return None
+            order = [0, 1, 2]
+            rng.shuffle(order)
+            for k_ in order:
+                sy, sd = pos[k_][iy], pos[k_][idn]
+                dirn = step_dir.get((X[k_][sy] - X[k_][sd], Y[k_][sy] - Y[k_][sd]))
+                if dirn is None:
+                    continue
+                if (dirn - rot[k_][idn]) & 3 == dn & 3 and (dirn + 2 - rot[k_][iy]) & 3 == y & 3:
+                    return k_, pos[k_][ic], sd, (dirn - (c & 3)) & 3
+            return None
+
+    def share_ok(add_l, rem_l) -> bool:
+        """False when the move would push a pair above the shared-fraction cap (and does not lower it)."""
+        for pi_ in range(3):
+            a_ = sum(1 for x in add_l if x[0] == pi_)
+            if a_:
+                r_ = sum(1 for x in rem_l if x[0] == pi_)
+                if a_ > r_ and len(S[pi_]) + a_ - r_ > share_cap[pi_]:
+                    return False
+        return True
+
     def mism_slot(k: int, s: int, skip: int) -> int:
         a = at[k][s]
         qa = rot[k][a]
@@ -436,7 +536,7 @@ def solve(
 
     def record() -> None:
         nonlocal best_valid, best_any
-        val = prim + cluster_weight * clu
+        val = prim + cluster_weight * clu + mating_weight * pen
         if M == 0 and (best_valid is None or val < best_valid[0]):
             best_valid = (val, snapshot())
         e = val + mismatch_weight * M
@@ -444,12 +544,13 @@ def solve(
             best_any = (e, snapshot())
 
     record()
-    t_hi, t_lo = 0.6, 0.05
+    t_hi, t_lo = (MATING_T_HI, MATING_T_LO) if mating else (T_HI, T_LO)
     ratio = t_lo / t_hi
     T = t_hi
     it = 0
     exp = math.exp
-    done = M == 0 and prim == 0 and clu == 0
+    done = M == 0 and prim == 0 and clu == 0 and pen == 0
+    rot_share = 0.25 if mating else 0.04
     bad_list: list = []
     bad_pieces: set = set()
     last_scan = -999
@@ -526,6 +627,9 @@ def solve(
                 e = tuple(S[pi])[randrange(len(S[pi]))]
                 p = e[randrange(2)]
                 k = PAIR_INDEX[pi][randrange(2)]
+            elif mating and mp.bad and rand() < 0.5:
+                p = mp.bad[randrange(len(mp.bad))] >> 2
+                k = randrange(3)
             else:
                 k = randrange(3)
                 p = at[k][randrange(n)]
@@ -615,12 +719,28 @@ def solve(
                     changes.append((pi, ns, c_))
                     dprim += len(add_pi) - len(rem_pi)
                     dclu += c_ - cc[pi]
-            dE = dprim + cluster_weight * dclu
-            if dE <= 0 or rand() < exp(-dE / T):
+            if share_cap is not None and any(len(ns) > share_cap[pi] and len(ns) > len(S[pi]) for pi, ns, _c in changes):
+                continue
+            dpen = 0
+            if mating:  # apply tentatively; undone below when rejected
+                slots = {posk[p_] for p_, _n, _q in moves} | {ns_ for _p, ns_, _q in moves}
+                mold = contacts_at(k, slots)
+                saved = [(p_, posk[p_], rk[p_]) for p_, _n, _q in moves]
                 for p_, ns_, nq in moves:
                     atk[ns_] = p_
                     posk[p_] = ns_
                     rk[p_] = nq
+                dpen = mp.propose(mold, contacts_at(k, slots))
+            dE = dprim + cluster_weight * dclu + mating_weight * dpen
+            if dE <= 0 or rand() < exp(-dE / T):
+                if mating:
+                    mp.commit()
+                    pen += dpen
+                else:
+                    for p_, ns_, nq in moves:
+                        atk[ns_] = p_
+                        posk[p_] = ns_
+                        rk[p_] = nq
                 E_sol[k].difference_update(removed)
                 E_sol[k].update(added)
                 for pi, ns, c_ in changes:
@@ -628,19 +748,25 @@ def solve(
                     cc[pi] = c_
                     S[pi] = ns
                 prim += dprim
-                if prim == 0 and clu == 0:
+                if prim == 0 and clu == 0 and pen == 0:
                     record()
                     done = True
-                elif best_valid is None or prim + cluster_weight * clu < best_valid[0]:
+                elif best_valid is None or prim + cluster_weight * clu + mating_weight * pen < best_valid[0]:
                     record()
+            elif mating:
+                mp.rollback()
+                for p_, s_, r_ in saved:
+                    atk[s_] = p_
+                    posk[p_] = s_
+                    rk[p_] = r_
         done = True
     while it < iters and not done:
         it += 1
         if not (it & 127):
             T = t_hi * ratio ** (it / iters)
         r0 = rand()
-        k = s = t = -1
-        if multi_rot and r0 < 0.04:
+        k = s = t = fq = -1
+        if multi_rot and r0 < rot_share:
             k = randrange(3)
             s = randrange(n)
             p = at[k][s]
@@ -650,6 +776,33 @@ def solve(
             cur = rot[k][p]
             new = opts[randrange(len(opts))]
             if new == cur:
+                continue
+            if mating:
+                old_c = contacts_at(k, (s,))
+                dm = 0
+                if risky_p[p]:
+                    old_m = mism_slot(k, s, -1)
+                    rot[k][p] = new
+                    dm = mism_slot(k, s, -1) - old_m
+                else:
+                    rot[k][p] = new
+                dpen = mp.propose(old_c, contacts_at(k, (s,)))
+                dE = mismatch_weight * dm + mating_weight * dpen
+                if dE <= 0 or rand() < exp(-dE / T):
+                    mp.commit()
+                    M += dm
+                    pen += dpen
+                    if M == 0:
+                        if prim == 0 and clu == 0 and pen == 0:
+                            record()
+                            done = True
+                        elif best_valid is None or prim + cluster_weight * clu + mating_weight * pen < best_valid[0]:
+                            record()
+                    elif best_valid is None and prim + cluster_weight * clu + mating_weight * pen + mismatch_weight * M < best_any[0]:
+                        record()
+                else:
+                    mp.rollback()
+                    rot[k][p] = cur
                 continue
             if risky_p[p]:
                 old_m = mism_slot(k, s, -1)
@@ -709,6 +862,14 @@ def solve(
             x = e[randrange(2)]
             k = PAIR_INDEX[pi][randrange(2)]
             s = pos[k][x]
+        elif mating and r0 > 0.4 and mp.bad:
+            mv = merge_pick() if rand() < 0.7 else None
+            if mv is not None:
+                k, s, t, fq = mv
+            else:
+                x = mp.bad[randrange(len(mp.bad))] >> 2  # a piece with an oversized block
+                k = randrange(3)
+                s = pos[k][x]
         else:
             k = randrange(3)
             s = randrange(n)
@@ -722,12 +883,16 @@ def solve(
         p, q = atk[s], atk[t]
         if not OPT[k][ptype[q]][s] or not OPT[k][ptype[p]][t]:
             continue
+        if fq >= 0 and fq not in OPT[k][ptype[p]][t]:
+            continue
         rem: list = []
         add: list = []
         scan(k, p, s, t, rem)
         scan(k, q, t, s, rem)
         scan(k, p, t, s, add)
         scan(k, q, s, t, add)
+        if share_cap is not None and (add or rem) and not share_ok(add, rem):
+            continue
         dprim = len(add) - len(rem)
         dclu = 0
         new_cc = None
@@ -746,19 +911,27 @@ def solve(
                 dclu += new_cc[pi][0] - cc[pi]
         rk = rot[k]
         dm = 0
+        dpen = 0
         swapped = False
-        if risky_p[p] or risky_p[q]:
+        if risky_p[p] or risky_p[q] or mating:
+            if mating:
+                mold = contacts_at(k, (s, t))
             old_m = mism_slot(k, s, -1) + mism_slot(k, t, s)
             save = (rk[p], rk[q])
             atk[s], atk[t] = q, p
             pos[k][p], pos[k][q] = t, s
             rk[q] = rk[q] if rk[q] in OPT[k][ptype[q]][s] else OPT[k][ptype[q]][s][0]
-            rk[p] = pick_rot(k, p, t)
+            rk[p] = fq if fq >= 0 else pick_rot(k, p, t)
             rk[q] = pick_rot(k, q, s)
             dm = mism_slot(k, s, -1) + mism_slot(k, t, s) - old_m
             swapped = True
-        dE = dprim + cluster_weight * dclu + mismatch_weight * dm
+            if mating:
+                dpen = mp.propose(mold, contacts_at(k, (s, t)))
+        dE = dprim + cluster_weight * dclu + mismatch_weight * dm + mating_weight * dpen
         if dE <= 0 or rand() < exp(-dE / T):
+            if mating:
+                mp.commit()
+                pen += dpen
             if not swapped:
                 atk[s], atk[t] = q, p
                 pos[k][p], pos[k][q] = t, s
@@ -772,14 +945,16 @@ def solve(
                     cc[pi] = c_
                     S[pi] = ns
             if M == 0:
-                if prim == 0 and clu == 0:
+                if prim == 0 and clu == 0 and pen == 0:
                     record()
                     done = True
-                elif best_valid is None or prim + cluster_weight * clu < best_valid[0]:
+                elif best_valid is None or prim + cluster_weight * clu + mating_weight * pen < best_valid[0]:
                     record()
-            elif best_valid is None and prim + cluster_weight * clu + mismatch_weight * M < best_any[0]:
+            elif best_valid is None and prim + cluster_weight * clu + mating_weight * pen + mismatch_weight * M < best_any[0]:
                 record()
         elif swapped:
+            if mating:
+                mp.rollback()
             atk[s], atk[t] = p, q
             pos[k][p], pos[k][q] = s, t
             rk[p], rk[q] = save
@@ -807,6 +982,10 @@ def solve(
         "valid": mism == 0,
         "violations": mism,
         "distinct_corner_orders": bool(distinct_corner_orders),
+        "mating_weight": mating_weight,
+        "max_shared_fraction": max_shared_fraction,
+        "mating_hops": mating_hops if mating else None,
+        "mating_penalty": mating_penalty(sol, hops=mating_hops) if mating else None,
         "elapsed_s": round(time.perf_counter() - t_start, 3),
     }
     return sol

@@ -30,6 +30,14 @@ def _parse_sizes(text: str) -> list[tuple[int, int]]:
     return out
 
 
+def _mating_args(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--mating-weight", type=float, default=0.0, metavar="W",
+                   help="weight of the connector mating penalty (0 = off; 1 = on): shrinks mating classes "
+                        "toward K(3,3) (tab/blank) or K4 (andro)")
+    p.add_argument("--max-shared-fraction", type=float, default=None, metavar="F",
+                   help="with mating on: reject moves that push a pair's shared fraction above F (default 0.10)")
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="metapuzzle", description="Multi-solution jigsaw arrangement engine.")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -45,6 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--extra-flat", type=int, default=0, help="flat-sided pieces beyond the perimeter")
     s.add_argument("--free-corners", action="store_true", help="corner pieces may rotate even without rotation mode")
     s.add_argument("--distinct-corner-orders", action="store_true", help="three different cyclic corner orders")
+    _mating_args(s)
     s.add_argument("--out", help="write solution JSON here")
     r = sub.add_parser("report", help="print metrics for a solution JSON")
     r.add_argument("path")
@@ -82,6 +91,7 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--iters", type=int, default=None)
     pt.add_argument("--extra-flat", type=int, default=0, metavar="N",
                     help="flat-sided pieces beyond those the frames need; the surplus sits inside as seams")
+    _mating_args(pt)
     pt.add_argument("--cell", type=int, default=48, help="cell size in pixels")
     pt.add_argument("--labels", action="store_true", help="print piece ids in the cells")
     gt = sub.add_parser(
@@ -154,12 +164,17 @@ def _cmd_solve(a: argparse.Namespace) -> int:
         pieces = pieces_from_scenes(boards, maps, a.extra_flat, a.free_corners)
     else:
         pieces = make_inventory(boards, "any", a.extra_flat, a.free_corners)
-    sol = solve(boards, pieces, maps, seed=a.seed, iters=a.iters, distinct_corner_orders=a.distinct_corner_orders)
+    sol = solve(
+        boards, pieces, maps, seed=a.seed, iters=a.iters, distinct_corner_orders=a.distinct_corner_orders,
+        mating_weight=a.mating_weight, max_shared_fraction=a.max_shared_fraction,
+    )
     m = sol.meta
     print(
         f"sizes={sizes} shared AB/AC/BC={m['shared']['AB']}/{m['shared']['AC']}/{m['shared']['BC']} "
         f"valid={m['valid']} iters={m['iters_used']} time={m['elapsed_s']}s"
     )
+    if m.get("mating_penalty") is not None:
+        print(f"mating penalty={m['mating_penalty']} (weight {m['mating_weight']:g}, max shared fraction {m['max_shared_fraction']:g})")
     if a.out:
         sol.save(a.out)
         print(f"wrote {a.out}")
@@ -209,6 +224,7 @@ def _cmd_prototype(a: argparse.Namespace) -> int:
     res = run_prototype(
         a.scenes, a.classes, a.out, sizes=a.sizes, border=a.border, rotation=a.rotation,
         seed=a.seed, iters=a.iters, cell=a.cell, labels=a.labels, extra_flat=a.extra_flat,
+        mating_weight=a.mating_weight, max_shared_fraction=a.max_shared_fraction,
     )
     s = res["shared"]
     print(
