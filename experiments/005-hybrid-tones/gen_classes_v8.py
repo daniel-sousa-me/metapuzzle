@@ -2,10 +2,9 @@
 
 Adds <A><B><C>j for every ordered triple of distinct tiers A, B, C from D, M, L: six classes.
 The base A fills the cell. Mass B is clipped by the named mask p1 (march_mask pattern "tee",
-part 1), and mass C by p2 (part 2). Both masks take one geometry per class (the crc32 of the
-class name): a class spec gives each named mask its own seed, so without a shared geometry
-the two parts would not meet. The parts of one tee therefore always share their boundary, but
-every cell of one class has the same junction outline.
+part 1), and mass C by p2 (part 2). Both masks share the seed group "junction", so they draw
+one set of arms from the piece seed: the two parts meet exactly at the centre, and every piece
+has its own junction outline.
 
 Rotation rule (the allowed rotations are clockwise quarter turns). At rotation 0:
   top side:    B on its left half, C on its right half (the junction side J)
@@ -34,7 +33,6 @@ import copy
 import itertools
 import json
 import sys
-import zlib
 from pathlib import Path
 
 import cairosvg
@@ -67,10 +65,12 @@ DEMO = {
 }
 
 
-def _junction_mask(part: int, geometry: int) -> dict:
-    return {"primitive": "march_mask",
-            "params": {"pattern": "tee", "part": part, "roughness": 0.5, "wobble": 0.12,
-                       "geometry": geometry}}
+JUNCTION_GROUP = "junction"   # both tee parts of a class draw their arms from one seed
+
+
+def _junction_mask(part: int) -> dict:
+    return {"primitive": "march_mask", "seed_group": JUNCTION_GROUP,
+            "params": {"pattern": "tee", "part": part, "roughness": 0.5, "wobble": 0.12}}
 
 
 def build_v8(src: dict) -> dict:
@@ -79,7 +79,6 @@ def build_v8(src: dict) -> dict:
     tiers = {t: classes[t]["layers"] for t in TIERS}
     for a, b, c in itertools.permutations(TIERS):
         name = f"{a}{b}{c}j"
-        geometry = zlib.crc32(name.encode("ascii"))
         layers = copy.deepcopy(tiers[a])
         for part, tier in ((1, b), (2, c)):
             for layer in copy.deepcopy(tiers[tier]):
@@ -89,11 +88,11 @@ def build_v8(src: dict) -> dict:
             "layers": layers,
             "directional": False,
             "allowed_rotations": list(ROTATIONS),
-            "masks": {"p1": _junction_mask(1, geometry), "p2": _junction_mask(2, geometry)},
+            "masks": {"p1": _junction_mask(1), "p2": _junction_mask(2)},
         }
     data["_note"] = ("v8 (005). The v7 class set plus <A><B><C>j tee junctions for every ordered "
                      "triple of D, M, L. Base A fills the cell; mass B under mask p1 (tee part 1), "
-                     "mass C under p2 (tee part 2), both with one geometry per class. Rotation 0: "
+                     "mass C under p2 (tee part 2), both in seed group 'junction'. Rotation 0: "
                      "B on the left half of the top side, C on the right half, A on the bottom. "
                      "See gen_classes_v8.py for the rotation rule.")
     return data

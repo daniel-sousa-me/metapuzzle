@@ -1,5 +1,5 @@
 {
-  "_note": "v8 (005). The v7 class set plus <A><B><C>j tee junctions for every ordered triple of D, M, L. Base A fills the cell; mass B under mask p1 (tee part 1), mass C under p2 (tee part 2), both with one geometry per class. Rotation 0: B on the left half of the top side, C on the right half, A on the bottom. See gen_classes_v8.py for the rotation rule.",
+  "_note": "v8 (005). The v7 class set plus <A><B><C>j tee junctions for every ordered triple of D, M, L. Base A fills the cell; mass B under mask p1 (tee part 1), mass C under p2 (tee part 2), both in seed group 'junction'. Rotation 0: B on the left half of the top side, C on the right half, A on the bottom. See gen_classes_v8.py for the rotation rule.",
   "ref_size": 100,
   "palette": {
     "indigo": "#2b3262",
@@ -7450,22 +7450,22 @@
       "masks": {
         "p1": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 1,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 3168503466
+            "wobble": 0.12
           }
         },
         "p2": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 2,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 3168503466
+            "wobble": 0.12
           }
         }
       }
@@ -7545,22 +7545,22 @@
       "masks": {
         "p1": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 1,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 2751651292
+            "wobble": 0.12
           }
         },
         "p2": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 2,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 2751651292
+            "wobble": 0.12
           }
         }
       }
@@ -7640,22 +7640,22 @@
       "masks": {
         "p1": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 1,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 3456299695
+            "wobble": 0.12
           }
         },
         "p2": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 2,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 3456299695
+            "wobble": 0.12
           }
         }
       }
@@ -7735,22 +7735,22 @@
       "masks": {
         "p1": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 1,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 147335455
+            "wobble": 0.12
           }
         },
         "p2": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 2,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 147335455
+            "wobble": 0.12
           }
         }
       }
@@ -7830,22 +7830,22 @@
       "masks": {
         "p1": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 1,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 1873126539
+            "wobble": 0.12
           }
         },
         "p2": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 2,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 1873126539
+            "wobble": 0.12
           }
         }
       }
@@ -7925,22 +7925,22 @@
       "masks": {
         "p1": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 1,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 2981504077
+            "wobble": 0.12
           }
         },
         "p2": {
           "primitive": "march_mask",
+          "seed_group": "junction",
           "params": {
             "pattern": "tee",
             "part": 2,
             "roughness": 0.5,
-            "wobble": 0.12,
-            "geometry": 2981504077
+            "wobble": 0.12
           }
         }
       }

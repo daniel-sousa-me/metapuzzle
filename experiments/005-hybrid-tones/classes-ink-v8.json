@@ -4717,16 +4717,24 @@
             "black"
           ],
           "params": {
-            "pattern": "tee",
-            "part": 0,
-            "geometry": 3168503466,
-            "roughness": 0.5,
-            "wobble": 0.12,
             "stroke": 0.035
           },
+          "outline_of": "p0",
           "background": false
         }
       ],
+      "masks": {
+        "p0": {
+          "primitive": "march_mask",
+          "seed_group": "junction",
+          "params": {
+            "pattern": "tee",
+            "part": 0,
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      },
       "directional": false,
       "allowed_rotations": [
         0,
@@ -4754,16 +4762,24 @@
             "black"
           ],
           "params": {
-            "pattern": "tee",
-            "part": 0,
-            "geometry": 2751651292,
-            "roughness": 0.5,
-            "wobble": 0.12,
             "stroke": 0.035
           },
+          "outline_of": "p0",
           "background": false
         }
       ],
+      "masks": {
+        "p0": {
+          "primitive": "march_mask",
+          "seed_group": "junction",
+          "params": {
+            "pattern": "tee",
+            "part": 0,
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      },
       "directional": false,
       "allowed_rotations": [
         0,
@@ -4791,16 +4807,24 @@
             "black"
           ],
           "params": {
-            "pattern": "tee",
-            "part": 0,
-            "geometry": 3456299695,
-            "roughness": 0.5,
-            "wobble": 0.12,
             "stroke": 0.035
           },
+          "outline_of": "p0",
           "background": false
         }
       ],
+      "masks": {
+        "p0": {
+          "primitive": "march_mask",
+          "seed_group": "junction",
+          "params": {
+            "pattern": "tee",
+            "part": 0,
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      },
       "directional": false,
       "allowed_rotations": [
         0,
@@ -4828,16 +4852,24 @@
             "black"
           ],
           "params": {
-            "pattern": "tee",
-            "part": 0,
-            "geometry": 147335455,
-            "roughness": 0.5,
-            "wobble": 0.12,
             "stroke": 0.035
           },
+          "outline_of": "p0",
           "background": false
         }
       ],
+      "masks": {
+        "p0": {
+          "primitive": "march_mask",
+          "seed_group": "junction",
+          "params": {
+            "pattern": "tee",
+            "part": 0,
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      },
       "directional": false,
       "allowed_rotations": [
         0,
@@ -4865,16 +4897,24 @@
             "black"
           ],
           "params": {
-            "pattern": "tee",
-            "part": 0,
-            "geometry": 1873126539,
-            "roughness": 0.5,
-            "wobble": 0.12,
             "stroke": 0.035
           },
+          "outline_of": "p0",
           "background": false
         }
       ],
+      "masks": {
+        "p0": {
+          "primitive": "march_mask",
+          "seed_group": "junction",
+          "params": {
+            "pattern": "tee",
+            "part": 0,
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      },
       "directional": false,
       "allowed_rotations": [
         0,
@@ -4902,16 +4942,24 @@
             "black"
           ],
           "params": {
-            "pattern": "tee",
-            "part": 0,
-            "geometry": 2981504077,
-            "roughness": 0.5,
-            "wobble": 0.12,
             "stroke": 0.035
           },
+          "outline_of": "p0",
           "background": false
         }
       ],
+      "masks": {
+        "p0": {
+          "primitive": "march_mask",
+          "seed_group": "junction",
+          "params": {
+            "pattern": "tee",
+            "part": 0,
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      },
       "directional": false,
       "allowed_rotations": [
         0,

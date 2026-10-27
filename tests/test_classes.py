@@ -543,3 +543,93 @@ def test_sample_transition_is_a_named_mask(sample):
     assert frag.count('<clipPath id="clip-blotch_mask-') == 1
     assert frag.count('clip-path="url(#clip-blotch_mask-') == 1
 
+
+
+# ------------------------------------------------------------ seed groups
+
+def _polygon(clip_svg):
+    """The vertices of a march_mask clip polygon, as floats."""
+    pts = re.search(r'<polygon points="([^"]+)"', clip_svg).group(1)
+    return [tuple(map(float, p.split(","))) for p in pts.split()]
+
+
+def _polygon_piece(spec, seed):
+    return spec.drawer()(str(seed), "c", seed, 64.0)
+
+
+def _two_masks_spec(group_a, group_b, pattern="corner"):
+    """One class with two named march masks of identical params, each in its own group."""
+    params = {"pattern": pattern, "roughness": 1.0, "wobble": 0.2}
+    masks = {"a": {"primitive": "march_mask", "params": params},
+             "b": {"primitive": "march_mask", "params": dict(params)}}
+    if group_a is not None:
+        masks["a"]["seed_group"] = group_a
+    if group_b is not None:
+        masks["b"]["seed_group"] = group_b
+    return _load(_spec_dict({"c": {
+        "masks": masks,
+        "layers": [_layer("stipple", ("moss", "pine"), {"density": 20}, mask="a"),
+                   _layer("stipple", ("paper", "pine"), {"density": 20}, mask="b",
+                          background=False)],
+    }}))
+
+
+@pytest.mark.parametrize("seed", [1, 4, 17, 4096])
+def test_masks_in_one_seed_group_share_their_geometry(seed):
+    cls = _two_masks_spec("g", "g").classes["c"]
+    clips = _two_masks_spec("g", "g")._named_clips(cls.layers, cls.masks, seed, 100.0)
+    assert _polygon(clips["a"][0]) == _polygon(clips["b"][0])
+    assert clips["a"][1] == clips["b"][1]        # the same clip, so one <clipPath> in the piece
+    frag = _polygon_piece(_two_masks_spec("g", "g"), seed)
+    assert frag.count(f'<clipPath id="{clips["a"][1]}"') == 1
+
+
+@pytest.mark.parametrize("seed", [1, 4, 17, 4096])
+def test_masks_in_different_seed_groups_differ(seed):
+    spec = _two_masks_spec("g", "h")
+    cls = spec.classes["c"]
+    clips = spec._named_clips(cls.layers, cls.masks, seed, 100.0)
+    assert _polygon(clips["a"][0]) != _polygon(clips["b"][0])
+
+
+def test_seed_group_is_derived_from_the_piece_seed_and_the_group_name():
+    spec = _two_masks_spec("g", None)
+    cls = spec.classes["c"]
+    clips = spec._named_clips(cls.layers, cls.masks, 4, 100.0)
+    _, cid = tx.march_mask(_layer_seed(4, "group:g"), 100.0, (), pattern="corner",
+                           roughness=1.0, wobble=0.2)
+    assert clips["a"][1] == cid
+    # without a group, the mask keeps its own seed (name-based), so it is not the group's
+    assert _polygon(clips["b"][0]) != _polygon(clips["a"][0])
+
+
+def test_tee_parts_in_one_seed_group_meet_at_the_centre_for_every_piece():
+    spec = _two_masks_spec(None, None)
+    tee = {"primitive": "march_mask", "seed_group": "junction",
+           "params": {"pattern": "tee", "roughness": 0.5, "wobble": 0.12}}
+    masks = {"p1": {**tee, "params": {**tee["params"], "part": 1}},
+             "p2": {**tee, "params": {**tee["params"], "part": 2}}}
+    spec = _load(_spec_dict({"t": {"masks": masks, "layers": [
+        _layer("stipple", ("moss", "pine"), {"density": 20}, mask="p1"),
+        _layer("stipple", ("paper", "pine"), {"density": 20}, mask="p2", background=False),
+    ]}}))
+    pc = spec.classes["t"]
+    centre = (50.0, 50.0)
+    for seed in range(1, 9):
+        clips = spec._named_clips(pc.layers, pc.masks, seed, 100.0)
+        one, two = _polygon(clips["p1"][0]), _polygon(clips["p2"][0])
+        assert centre in one and centre in two
+        assert len(set(one) & set(two)) >= 12    # the shared north arm, end to end
+
+
+def test_seed_group_must_be_a_non_empty_string_on_a_named_mask():
+    base = {"primitive": "march_mask", "params": {"pattern": "corner"}}
+    for bad in ("", 3, ["g"]):
+        with pytest.raises(ClassSpecError, match="seed_group must be a non-empty string"):
+            _load(_with_mask("m1", {"m1": {**base, "seed_group": bad}}))
+
+
+def test_seed_group_is_refused_on_an_inline_mask():
+    inline = {"primitive": "blotch_mask", "seed_group": "g"}
+    with pytest.raises(ClassSpecError, match="unknown key 'seed_group'"):
+        _load(_masked(inline))

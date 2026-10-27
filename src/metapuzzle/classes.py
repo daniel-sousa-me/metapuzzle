@@ -31,6 +31,9 @@ Spec format (see ``data/sample_classes.json``)::
   one by name with ``"mask": "name"``. The layers then share one clip region, and its
   ``<clipPath>`` is written once per piece. Example: a mosaic fill and its chips both
   clipped to the same blotch. Every named mask must be used by a layer.
+* A named mask may declare ``"seed_group": "name"``. Every mask of the class with the same
+  seed group draws its geometry from one seed, so two masks that must line up (the parts of
+  a ``tee`` junction) agree on every piece. Without a seed group a named mask has its own seed.
 * ``"outline_of": "name"`` (primitive ``march_line`` only) draws the boundary of a named
   ``march_mask`` instead of clipping to it. The layer takes the mask's geometry
   (pattern, roughness, wobble, inset) and its seed, so the line lies exactly where the
@@ -38,7 +41,8 @@ Spec format (see ``data/sample_classes.json``)::
   (``stroke``, ``color_index``). It is not clipped, and it cannot also have a ``mask``.
 * Layers are drawn in order. Layer ``i`` of a piece with seed ``s`` uses a seed derived
   from ``(s, i)`` through SHA-256 (an inline mask uses ``(s, "i:mask")``, a named mask
-  ``(s, "mask:name")``, and an outline layer the seed of the mask it outlines), so layers
+  ``(s, "mask:name")`` or ``(s, "group:seed_group")``, and an outline layer the seed of the
+  mask it outlines), so layers
   are independent and the output does not depend on ``PYTHONHASHSEED``.
 * Top-level ``ref_size`` (default 100) is the unit the spec is written in. Every piece
   is drawn at that size and the fragment is scaled to the display size, so the artwork
@@ -111,6 +115,7 @@ class ClassSpecError(ValueError):
 class Mask:
     primitive: str
     params: dict
+    seed_group: str | None = None    # named masks only: the group whose masks share a seed
 
 
 @dataclass(frozen=True)
@@ -147,17 +152,21 @@ def _check_keys(d: Mapping, allowed: set[str], where: str, required: Sequence[st
             raise ClassSpecError(f"{where}: missing required key {key!r}")
 
 
-def _parse_mask(where: str, raw: Any) -> Mask:
+def _parse_mask(where: str, raw: Any, *, named: bool = False) -> Mask:
     if not isinstance(raw, Mapping):
         raise ClassSpecError(f"{where}: mask must be an object")
-    _check_keys(raw, {"primitive", "params"}, f"{where} mask", ("primitive",))
+    allowed = {"primitive", "params", "seed_group"} if named else {"primitive", "params"}
+    _check_keys(raw, allowed, f"{where} mask", ("primitive",))
     prim = raw["primitive"]
     if not isinstance(prim, str):
         raise ClassSpecError(f"{where}: mask primitive must be a string")
     params = raw.get("params", {})
     if not isinstance(params, Mapping):
         raise ClassSpecError(f"{where}: mask params must be an object")
-    return Mask(prim, dict(params))
+    group = raw.get("seed_group")
+    if group is not None and (not isinstance(group, str) or not group):
+        raise ClassSpecError(f"{where}: seed_group must be a non-empty string")
+    return Mask(prim, dict(params), group)
 
 
 def _parse_layer(where: str, index: int, raw: Any) -> Layer:
@@ -208,7 +217,7 @@ def _parse_class(name: str, raw: Any) -> PieceClass:
     if not isinstance(masks_raw, Mapping):
         raise ClassSpecError(f"{where}: masks must be an object")
     masks = {
-        mname: _parse_mask(f"{where} mask {mname!r}", m)
+        mname: _parse_mask(f"{where} mask {mname!r}", m, named=True)
         for mname, m in masks_raw.items()
         if not str(mname).startswith("_")
     }
@@ -254,6 +263,11 @@ def _resolve_outline(layer: Layer, masks: Mapping[str, Mask]) -> Layer:
 def _layer_seed(piece_seed: int, tag: int | str) -> int:
     digest = hashlib.sha256(f"{int(piece_seed)}:{tag}".encode("utf-8")).digest()
     return int.from_bytes(digest[:8], "big")
+
+
+def _mask_tag(name: str, mask: Mask) -> str:
+    """The seed tag of a named mask: its seed group when it has one, else its own name."""
+    return f"group:{mask.seed_group}" if mask.seed_group is not None else f"mask:{name}"
 
 
 # ------------------------------------------------------------------ spec
@@ -390,16 +404,17 @@ class ClassSpec:
         used = {layer.mask for layer in layers if isinstance(layer.mask, str)}
         return {
             name: MASK_PRIMITIVES[mask.primitive](
-                _layer_seed(piece_seed, f"mask:{name}"), size, (), **mask.params,
+                _layer_seed(piece_seed, _mask_tag(name, mask)), size, (), **mask.params,
             )
             for name, mask in masks.items() if name in used
         }
 
     def _layer_fragment(self, layer: Layer, index: int, piece_seed: int, size: float,
-                        clips: Mapping[str, tuple[str, str]]) -> str:
+                        clips: Mapping[str, tuple[str, str]], masks: Mapping[str, Mask]) -> str:
         palette = self._resolve(layer.palette)
         # An outline layer shares the seed of the mask it outlines, so its line is that edge.
-        tag = index if layer.outline_of is None else f"mask:{layer.outline_of}"
+        tag = index if layer.outline_of is None else _mask_tag(layer.outline_of,
+                                                                masks[layer.outline_of])
         body = PRIMITIVES[layer.primitive](
             _layer_seed(piece_seed, tag), size, palette,
             background=layer.background, **layer.params,
@@ -440,10 +455,11 @@ class ClassSpec:
             else:
                 layers, masks = pc.layers, pc.masks
             clips = self._named_clips(layers, masks, rng_seed, ref)
-            defs = "".join(clip for clip, _ in clips.values())
+            # Masks with the same geometry (a shared seed group and params) write one clip.
+            defs = "".join({cid: clip for clip, cid in clips.values()}.values())
             inner = tx.compose(
                 f"<defs>{defs}</defs>" if defs else "",
-                *(self._layer_fragment(layer, i, rng_seed, ref, clips)
+                *(self._layer_fragment(layer, i, rng_seed, ref, clips, masks)
                   for i, layer in enumerate(layers)),
             )
             return f'<g transform="scale({float(size) / ref:.6g})">{inner}</g>'

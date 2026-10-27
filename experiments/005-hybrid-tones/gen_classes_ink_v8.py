@@ -27,17 +27,22 @@ STROKE = 0.035   # the stroke width of the v7 outlines
 
 
 def junction_ink(src: dict) -> dict:
-    """White base, and the junction's internal outline as one black march_line."""
-    mask = src["masks"]["p1"]["params"]
-    line = {"pattern": mask["pattern"], "part": 0, "geometry": mask["geometry"],
-            "roughness": mask["roughness"], "wobble": mask["wobble"], "stroke": STROKE}
+    """White base, and the junction's internal outline as one black march_line.
+
+    The line outlines a part-0 mask (all three arms) that shares the seed group of the tee
+    parts, so for every piece it lies exactly on the boundaries of the painted masks.
+    """
+    tee = src["masks"]["p1"]
+    params = {**tee["params"], "part": 0}
     return {
         "layers": [
             {"primitive": "stipple", "palette": ["white"], "params": {"density": 0},
              "background": True},
-            {"primitive": "march_line", "palette": ["white", "black"], "params": line,
-             "background": False},
+            {"primitive": "march_line", "palette": ["white", "black"],
+             "params": {"stroke": STROKE}, "outline_of": "p0", "background": False},
         ],
+        "masks": {"p0": {"primitive": "march_mask", "seed_group": tee["seed_group"],
+                         "params": params}},
         "directional": False,
         "allowed_rotations": list(src["allowed_rotations"]),
     }
