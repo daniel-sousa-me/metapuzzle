@@ -26,7 +26,7 @@ Conventions
 Public API
 ----------
 stipple, dabs, mosaic, hatch_multi, scatter_shapes, blotch, blotch_mask, march_mask,
-motif, compose, cell_svg
+march_line, motif, compose, cell_svg
 """
 
 from __future__ import annotations
@@ -45,6 +45,7 @@ __all__ = [
     "blotch",
     "blotch_mask",
     "march_mask",
+    "march_line",
     "motif",
     "MOTIF_KINDS",
     "compose",
@@ -694,6 +695,42 @@ def _march_blob(rng: random.Random, n: int, size: float, roughness: float,
     return [(cx + x, cy + y) for x, y in rel]
 
 
+def _check_march_args(pattern: str, roughness: float, wobble: float, inset: float) -> None:
+    if pattern not in _MARCH_PATTERNS:
+        raise ValueError(f"pattern must be one of {_MARCH_PATTERNS}, not {pattern!r}")
+    if not 0.0 <= roughness <= 1.0:
+        raise ValueError("roughness must be in [0, 1]")
+    if not 0.0 <= wobble <= _MARCH_MAX_WOBBLE:
+        raise ValueError(f"wobble must be in [0, {_MARCH_MAX_WOBBLE:g}]")
+    if not 0.0 <= inset < 0.5:
+        raise ValueError("inset must be in [0, 0.5)")
+
+
+def _march_boundary(seed: int, size: float, pattern: str, roughness: float,
+                    wobble: float, inset: float) -> tuple[list[tuple[float, float]], bool]:
+    """The boundary of one march tile: ``(points, closed)``.
+
+    An edge pattern gives its open path, from the first edge midpoint to the last
+    (``closed`` is False). "dot" gives the blob outline (``closed`` is True). ``march_mask``
+    and ``march_line`` both call this, so their boundaries are the same. The draws come from
+    ``Random(seed)`` in a fixed order: the point count first, then the geometry."""
+    rng = random.Random(seed)
+    n = rng.randint(12, 20)
+    if pattern == "dot":
+        return _march_blob(rng, n, size, roughness, inset), True
+    return _march_path(rng, n, size, pattern, roughness, wobble), False
+
+
+def _march_close(pattern: str, size: float) -> list[tuple[float, float]]:
+    """Corners that close an edge pattern's mass polygon, after its path."""
+    return {
+        "straight": [(size, 0.0), (0.0, 0.0)],
+        "cap": [(size, 0.0), (0.0, 0.0)],
+        "corner": [(size, size), (size, 0.0), (0.0, 0.0)],
+        "corner_in": [(0.0, 0.0)],
+    }[pattern]
+
+
 def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
                pattern: str = "straight", roughness: float = 0.5, wobble: float = 0.12,
                inset: float = 0.0, **_) -> tuple[str, str]:
@@ -736,28 +773,46 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
     """
     params = _key_args(locals())
     params.pop("_", None)
-    if pattern not in _MARCH_PATTERNS:
-        raise ValueError(f"pattern must be one of {_MARCH_PATTERNS}, not {pattern!r}")
-    if not 0.0 <= roughness <= 1.0:
-        raise ValueError("roughness must be in [0, 1]")
-    if not 0.0 <= wobble <= _MARCH_MAX_WOBBLE:
-        raise ValueError(f"wobble must be in [0, {_MARCH_MAX_WOBBLE:g}]")
-    if not 0.0 <= inset < 0.5:
-        raise ValueError("inset must be in [0, 0.5)")
-    rng = random.Random(seed)
-    n = rng.randint(12, 20)
-    if pattern == "dot":
-        pts = _march_blob(rng, n, size, roughness, inset)
-    else:
-        pts = _march_path(rng, n, size, pattern, roughness, wobble)
-        pts += {
-            "straight": [(size, 0.0), (0.0, 0.0)],
-            "cap": [(size, 0.0), (0.0, 0.0)],
-            "corner": [(size, size), (size, 0.0), (0.0, 0.0)],
-            "corner_in": [(0.0, 0.0)],
-        }[pattern]
+    _check_march_args(pattern, roughness, wobble, inset)
+    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset)
+    if not closed:
+        pts += _march_close(pattern, size)
     cid = _clip_id("march_mask", seed, size, palette or (), params)
     return f'<clipPath id="{cid}"><polygon points="{_points(pts)}"/></clipPath>', cid
+
+
+def march_line(seed: int, size: float, palette: Sequence[str],
+               pattern: str = "straight", roughness: float = 0.5, wobble: float = 0.12,
+               stroke: float = 0.035, color_index: int = 1, inset: float = 0.0, **_) -> str:
+    """The boundary of a ``march_mask`` tile, drawn as a stroke with no fill.
+
+    It takes the same seed and parameters as ``march_mask`` and draws the same
+    geometry, so an ink render and a full render of one scene have the same boundaries.
+    An edge pattern is an open polyline between its two edge midpoints. "dot" is its
+    closed blob outline. The cell clip is applied, so a stroke that runs past an edge is
+    cut there and the neighbouring tile carries on from it.
+
+    stroke: stroke width as a fraction of size (default 0.035).
+    color_index: palette index of the stroke colour (default: palette[1]). palette[0] is
+        not drawn, so the background is left to another layer.
+    Other parameters have the same meaning as in ``march_mask``. ``inset`` is used only
+    by "dot". Extra keywords are ignored.
+    """
+    params = _key_args(locals())
+    params.pop("_", None)
+    _check_march_args(pattern, roughness, wobble, inset)
+    if not stroke > 0.0:
+        raise ValueError("stroke must be positive")
+    if not 0 <= color_index < len(palette):
+        raise ValueError("color_index is out of range for palette")
+    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset)
+    attrs = (f'fill="none" stroke="{palette[color_index]}" '
+             f'stroke-width="{_f(size * stroke)}" stroke-linejoin="round"')
+    if closed:
+        body = f'<polygon points="{_points(pts)}" {attrs}/>'
+    else:
+        body = f'<polyline points="{_points(pts)}" stroke-linecap="round" {attrs}/>'
+    return _wrap("march_line", seed, size, palette, params, body)
 
 
 MOTIF_KINDS = ("disc", "ring", "silhouette_bird", "leaf", "fish", "boat",

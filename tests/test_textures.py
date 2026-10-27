@@ -727,3 +727,79 @@ def test_march_mask_class_spec_layer_renders():
     frag = spec.drawer()("p1", "edge", 3, 64.0)
     assert 'clipPath id="clip-march_mask-' in frag
     ET.fromstring(tx.cell_svg(frag, 64.0))
+
+
+# ------------------------------------------------------------------ march_line
+
+def _line_pts(svg: str) -> tuple[list[tuple[float, float]], str]:
+    """Points and element name of the stroked boundary in a march_line fragment."""
+    m = re.search(r'<(polyline|polygon) points="([^"]+)"', svg.split("</clipPath>")[-1])
+    assert m, svg[:200]
+    return [tuple(map(float, p.split(","))) for p in m.group(2).split()], m.group(1)
+
+
+@pytest.mark.parametrize("roughness", [0.0, 0.5, 1.0])
+@pytest.mark.parametrize("pattern", MARCH_EDGE + ("dot",))
+def test_march_line_path_points_equal_the_march_mask_polygon(pattern, roughness):
+    # The ink line and the mask are the same geometry: the line's points are the mask's
+    # polygon points, without the corners that close the mass (none for "dot").
+    for seed in range(10):
+        clip, _ = tx.march_mask(seed, 100.0, None, pattern=pattern, roughness=roughness)
+        line = tx.march_line(seed, 100.0, PALETTE, pattern=pattern, roughness=roughness)
+        pts, kind = _line_pts(line)
+        mask_pts = _march_pts(clip)
+        if pattern == "dot":
+            assert kind == "polygon" and pts == mask_pts, (pattern, seed)
+        else:
+            k = len(MARCH_TAIL[pattern])
+            assert kind == "polyline" and pts == mask_pts[:-k], (pattern, seed)
+            assert (pts[0], pts[-1]) == MARCH_ENDS[pattern], (pattern, seed)
+
+
+def test_march_line_is_a_stroke_with_no_fill_and_round_joins():
+    svg = tx.march_line(5, 64.0, PALETTE, stroke=0.05, color_index=2)
+    body = svg.split("</clipPath>")[-1]
+    assert 'fill="none"' in body
+    assert 'stroke="#2f4f4f"' in body                      # palette[color_index]
+    assert 'stroke-width="3.2"' in body                    # stroke * size = 0.05 * 64
+    assert 'stroke-linejoin="round"' in body and 'stroke-linecap="round"' in body
+    assert "fill=" not in body.replace('fill="none"', "")  # the only fill is none
+    assert "<rect" not in body                             # no background is painted
+    ET.fromstring(tx.cell_svg(svg, 64.0))
+
+
+def test_march_line_draws_no_background_whatever_the_background_keyword():
+    a = tx.march_line(2, 100.0, PALETTE)
+    assert tx.march_line(2, 100.0, PALETTE, background=True) == a
+    assert tx.march_line(2, 100.0, PALETTE, unused=1) == a   # extra keywords are not keyed
+
+
+def test_march_line_is_deterministic_and_seed_dependent():
+    for pattern in MARCH_EDGE + ("dot",):
+        a = tx.march_line(7, 100.0, PALETTE, pattern=pattern)
+        assert tx.march_line(7, 100.0, PALETTE, pattern=pattern) == a
+        assert tx.march_line(8, 100.0, PALETTE, pattern=pattern) != a
+
+
+def test_march_line_scales_with_size_and_points_follow_the_mask():
+    small, _ = _line_pts(tx.march_line(3, 50.0, PALETTE, pattern="cap"))
+    big, _ = _line_pts(tx.march_line(3, 100.0, PALETTE, pattern="cap"))
+    assert all(abs(2 * x - X) < 1e-2 and abs(2 * y - Y) < 1e-2
+               for (x, y), (X, Y) in zip(small, big))
+
+
+def test_march_line_rejects_bad_arguments():
+    with pytest.raises(ValueError, match="pattern must be one of"):
+        tx.march_line(1, 100.0, PALETTE, pattern="spiral")
+    with pytest.raises(ValueError, match="stroke must be positive"):
+        tx.march_line(1, 100.0, PALETTE, stroke=0.0)
+    with pytest.raises(ValueError, match="color_index is out of range"):
+        tx.march_line(1, 100.0, ["#ffffff"])
+    with pytest.raises(ValueError, match="roughness must be in"):
+        tx.march_line(1, 100.0, PALETTE, roughness=2.0)
+
+
+def test_march_line_is_registered_and_exported():
+    assert classes.PRIMITIVES["march_line"] is tx.march_line
+    assert "march_line" in tx.__all__
+    assert "march_line" not in classes.MASK_PRIMITIVES

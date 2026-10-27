@@ -19,7 +19,7 @@ Spec format (see ``data/sample_classes.json``)::
     }
 
 * ``primitive`` is one of the keys of ``PRIMITIVES`` (stipple, dabs, mosaic,
-  hatch_multi, scatter_shapes, blotch, motif).
+  hatch_multi, scatter_shapes, blotch, motif, march_line).
 * ``palette`` entries are names from the top-level palette or raw ``#rgb``/``#rrggbb``.
 * ``background`` defaults to true for the first layer and false for the others.
 * ``mask`` is optional. ``{"primitive": "blotch_mask", "params": {...}}`` clips the
@@ -31,10 +31,15 @@ Spec format (see ``data/sample_classes.json``)::
   one by name with ``"mask": "name"``. The layers then share one clip region, and its
   ``<clipPath>`` is written once per piece. Example: a mosaic fill and its chips both
   clipped to the same blotch. Every named mask must be used by a layer.
+* ``"outline_of": "name"`` (primitive ``march_line`` only) draws the boundary of a named
+  ``march_mask`` instead of clipping to it. The layer takes the mask's geometry
+  (pattern, roughness, wobble, inset) and its seed, so the line lies exactly where the
+  mask's edge lies in the full drawing. Its own params hold only the ink options
+  (``stroke``, ``color_index``). It is not clipped, and it cannot also have a ``mask``.
 * Layers are drawn in order. Layer ``i`` of a piece with seed ``s`` uses a seed derived
   from ``(s, i)`` through SHA-256 (an inline mask uses ``(s, "i:mask")``, a named mask
-  ``(s, "mask:name")``), so layers are independent and the output does not depend on
-  ``PYTHONHASHSEED``.
+  ``(s, "mask:name")``, and an outline layer the seed of the mask it outlines), so layers
+  are independent and the output does not depend on ``PYTHONHASHSEED``.
 * Top-level ``ref_size`` (default 100) is the unit the spec is written in. Every piece
   is drawn at that size and the fragment is scaled to the display size, so the artwork
   is the same at every render size; only the resolution changes.
@@ -44,6 +49,7 @@ Spec format (see ``data/sample_classes.json``)::
 """
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import inspect
 import json
@@ -78,6 +84,7 @@ PRIMITIVES = {
     "scatter_shapes": tx.scatter_shapes,
     "blotch": tx.blotch,
     "motif": tx.motif,
+    "march_line": tx.march_line,
 }
 # Mask primitives return (clip_svg, clip_id) instead of a painted fragment.
 MASK_PRIMITIVES = {
@@ -89,6 +96,8 @@ DEFAULT_REF_SIZE = 100.0
 SAMPLE_SPEC_PATH = Path(__file__).resolve().parent / "data" / "sample_classes.json"
 
 _RESERVED_PARAMS = frozenset({"seed", "size", "palette", "background"})
+_OUTLINE_PRIMITIVES = frozenset({"march_line"})          # primitives that take "outline_of"
+_OUTLINE_GEOMETRY = ("pattern", "roughness", "wobble", "inset")   # taken from the mask
 _HEX = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
 _TEST_SEED = 1
 _TEST_SIZE = 64.0
@@ -111,6 +120,7 @@ class Layer:
     params: dict
     background: bool
     mask: Mask | str | None = None   # an inline Mask, or the name of a class mask
+    outline_of: str | None = None    # the name of a class mask whose boundary is drawn
 
 
 @dataclass(frozen=True)
@@ -154,7 +164,7 @@ def _parse_layer(where: str, index: int, raw: Any) -> Layer:
     if not isinstance(raw, Mapping):
         raise ClassSpecError(f"{where} layer {index}: must be an object")
     w = f"{where} layer {index}"
-    _check_keys(raw, {"primitive", "palette", "params", "background", "mask"}, w,
+    _check_keys(raw, {"primitive", "palette", "params", "background", "mask", "outline_of"}, w,
                 ("primitive", "palette"))
     prim = raw["primitive"]
     if not isinstance(prim, str):
@@ -175,7 +185,18 @@ def _parse_layer(where: str, index: int, raw: Any) -> Layer:
         mask = raw_mask                    # a named mask of this class, checked in _parse_class
     else:
         mask = _parse_mask(w, raw_mask)
-    return Layer(prim, tuple(names), dict(params), background, mask)
+    outline_of = raw.get("outline_of")
+    if outline_of is not None:
+        if not isinstance(outline_of, str):
+            raise ClassSpecError(f"{w}: outline_of must be the name of a mask")
+        if prim not in _OUTLINE_PRIMITIVES:
+            raise ClassSpecError(f"{w}: outline_of applies only to {sorted(_OUTLINE_PRIMITIVES)}")
+        if mask is not None:
+            raise ClassSpecError(f"{w}: outline_of and mask cannot both be set")
+        geometry = [k for k in _OUTLINE_GEOMETRY if k in params]
+        if geometry:
+            raise ClassSpecError(f"{w}: {geometry} come from the mask {outline_of!r}; remove them")
+    return Layer(prim, tuple(names), dict(params), background, mask, outline_of)
 
 
 def _parse_class(name: str, raw: Any) -> PieceClass:
@@ -202,6 +223,15 @@ def _parse_class(name: str, raw: Any) -> PieceClass:
                 raise ClassSpecError(f"{where} layer {i}: unknown mask {layer.mask!r}; "
                                      f"define it under 'masks'")
             used.add(layer.mask)
+        if layer.outline_of is not None:
+            if layer.outline_of not in masks:
+                raise ClassSpecError(f"{where} layer {i}: unknown mask {layer.outline_of!r}; "
+                                     f"define it under 'masks'")
+            if masks[layer.outline_of].primitive != "march_mask":
+                raise ClassSpecError(f"{where} layer {i}: outline_of needs a march_mask")
+            used.add(layer.outline_of)
+    layers = tuple(_resolve_outline(layer, masks) if layer.outline_of else layer
+                   for layer in layers)
     unused = sorted(set(masks) - used)
     if unused:
         raise ClassSpecError(f"{where}: mask(s) {unused} defined but not used by any layer")
@@ -213,6 +243,12 @@ def _parse_class(name: str, raw: Any) -> PieceClass:
     if not isinstance(rots, list):
         raise ClassSpecError(f"{where}: allowed_rotations must be a list")
     return PieceClass(layers, directional, tuple(rots), masks)
+
+
+def _resolve_outline(layer: Layer, masks: Mapping[str, Mask]) -> Layer:
+    """An outline layer with its mask's geometry merged into its params."""
+    geometry = masks[layer.outline_of].params
+    return dataclasses.replace(layer, params={**geometry, **layer.params})
 
 
 def _layer_seed(piece_seed: int, tag: int | str) -> int:
@@ -274,7 +310,10 @@ class ClassSpec:
         bad = reserved & set(params)
         if bad:
             raise ClassSpecError(f"params may not set {sorted(bad)}; 'background' is a layer key")
-        accepted = set(inspect.signature(fn).parameters) - _RESERVED_PARAMS
+        accepted = {
+            k for k, p in inspect.signature(fn).parameters.items()
+            if p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+        } - _RESERVED_PARAMS
         unknown = set(params) - accepted
         if unknown:
             raise ClassSpecError(f"{name} has no parameter(s) {sorted(unknown)}; "
@@ -359,8 +398,10 @@ class ClassSpec:
     def _layer_fragment(self, layer: Layer, index: int, piece_seed: int, size: float,
                         clips: Mapping[str, tuple[str, str]]) -> str:
         palette = self._resolve(layer.palette)
+        # An outline layer shares the seed of the mask it outlines, so its line is that edge.
+        tag = index if layer.outline_of is None else f"mask:{layer.outline_of}"
         body = PRIMITIVES[layer.primitive](
-            _layer_seed(piece_seed, index), size, palette,
+            _layer_seed(piece_seed, tag), size, palette,
             background=layer.background, **layer.params,
         )
         if layer.mask is None:
