@@ -1,0 +1,27 @@
+maps (cols x rows): A 25x30, B 25x30, C 25x30
+class histograms:
+  A: L=448 M=115 D=53 DLs=35 DMs=29 MLs=18 LDc=13 DLc=11 LMc=9 MLc=8 DMc=4 MDc=4 MLp=2 DLp=1
+  B: L=448 M=115 D=53 DLs=35 DMs=29 MLs=18 LDc=13 DLc=11 LMc=9 MLc=8 DMc=4 MDc=4 MLp=2 DLp=1
+  C: L=448 M=115 D=53 DLs=35 DMs=29 MLs=18 LDc=13 DLc=11 LMc=9 MLc=8 DMc=4 MDc=4 MLp=2 DLp=1
+largest same-class blob per class:
+  A: L=441 M=115 D=52 MLs=8 DLs=6 DMs=4 DLc=3 DMc=2 LDc=2 MDc=2 DLp=1 LMc=1 MLc=1 MLp=1
+  B: L=447 M=75 D=52 DMs=19 DLs=17 MLs=3 DLc=1 DLp=1 DMc=1 LDc=1 LMc=1 MDc=1 MLc=1 MLp=1
+  C: L=448 M=60 D=52 DMs=13 MLs=9 DLs=7 DLc=1 DLp=1 DMc=1 LDc=1 LMc=1 MDc=1 MLc=1 MLp=1
+same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+pairs (window reuse shown as plain/rotated, window = rows x cols):
+  A-B: same position 445 (59.3%)
+    same position excl. dominant L (covers 59.7% of cells, gated): 81 (37.2%)
+    weighted overlap: 12.5%
+    window reuse: 1x2 0.91/0.95  2x1 0.92/0.96  2x2 0.64/0.74  3x3 0.39/0.47
+    transferable blob: 364 cells (48.5% of A)
+  A-C: same position 496 (66.1%)
+    same position excl. dominant L (covers 59.7% of cells, gated): 117 (50.2%)
+    weighted overlap: 17.5%
+    window reuse: 1x2 0.95/0.97  2x1 0.96/0.97  2x2 0.86/0.89  3x3 0.58/0.61
+    transferable blob: 372 cells (49.6% of A)
+  B-C: same position 438 (58.4%)
+    same position excl. dominant L (covers 59.7% of cells, gated): 71 (32.1%)
+    weighted overlap: 12.0%
+    window reuse: 1x2 0.90/0.94  2x1 0.92/0.96  2x2 0.72/0.88  3x3 0.44/0.54
+    transferable blob: 367 cells (48.9% of B)
+scene gates: FAIL (A-B same-position excl. L 37.2% ≥ 25%; A-B 2x2 window reuse 64.1% ≥ 30%; A-B transferable blob 48.5% ≥ 10% of cells; A-C same-position excl. L 50.2% ≥ 25%; A-C 2x2 window reuse 86.5% ≥ 30%; A-C transferable blob 49.6% ≥ 10% of cells; B-C same-position excl. L 32.1% ≥ 25%; B-C 2x2 window reuse 72.0% ≥ 30%; B-C transferable blob 48.9% ≥ 10% of cells)

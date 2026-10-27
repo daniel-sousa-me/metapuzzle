@@ -1,0 +1,12 @@
+containers: ['corner', 'edge', 'interior']
+skeleton: {'corner': {'L': 2, 'M': 2}, 'edge': {'D': 1, 'L': 54, 'M': 27}, 'interior': {'D': 22, 'DLc': 10, 'DLp': 2, 'DLs': 27, 'DMc': 4, 'DMs': 23, 'L': 232, 'LDc': 8, 'LMc': 6, 'M': 55, 'MDc': 2, 'MLc': 7, 'MLp': 1, 'MLs': 15}}
+restart 0: objective 962.33
+restart 1: objective 964.33
+restart 2: objective 963.33
+restart 3: objective 959.33
+restart 4: objective 961.33
+restart 5: objective 962.33
+restart 6: objective 964.33
+restart 7: objective 963.33
+best restart 3 (objective 959.33); wrote /home/user/metapuzzle/experiments/013-scale/g20x25/scenes.txt
+all three maps match target_counts; validate_scenes passed

@@ -1,0 +1,63 @@
+1. tier counts from the majority-vote tier labels (D / M / L):
+   cat        84 / 117 / 299
+   sailboat   84 / 114 / 302
+   tree       84 / 108 / 308
+2. equalized tier target (D / M / L): 84 / 113 / 303
+   cat       cells moved across a threshold: 6
+   sailboat  cells moved across a threshold: 3
+   tree      cells moved across a threshold: 7
+2b. frame and corner shifts, cell (row,col) from -> to, closest to threshold first:
+   cat       4 cells: (19,0) L->M, (20,0) M->D, (7,5) D->M, (19,4) M->L
+   sailboat  2 cells: (20,0) M->D, (4,9) D->M
+   tree      2 cells: (24,9) D->M, (19,8) M->D
+   cat       frame D/M/L [1, 29, 56]  corner D/M/L [0, 2, 2]
+   sailboat  frame D/M/L [1, 29, 56]  corner D/M/L [0, 2, 2]
+   tree      frame D/M/L [1, 29, 56]  corner D/M/L [0, 2, 2]
+2c. frame boundaries on cuts (frame cells with a different-tier neighbour, now plain): cat 6, sailboat 6, tree 7
+3. transition cells (own tier differs from a neighbour) and cells with 2+ different sides:
+   cat       transitions 114  multi-sided  43
+   sailboat  transitions 146  multi-sided  34
+   tree      transitions 122  multi-sided  32
+4. rotation-equivalent class histogram before equalization:
+   class         D      M      L     DM     DL     MD     ML     LD     LM
+   cat          40     94    252      6     38      8     11     41     10
+   sailboat     27     68    259     27     30     27     18     31     13
+   tree         40     85    253     14     30     13     15     31     19
+   target       36     82    255     16     32     16     15     34     14
+   pairwise L1 (cat-sailboat, cat-tree, sailboat-tree): 114, 54, 72  (sum 240)
+5. equalization (rule i: side swaps with tone difference >= 0.1):
+   cat       side swaps  1  histogram D=40 M=94 L=252 DM=6 DL=38 MD=8 ML=11 LD=40 LM=11
+   sailboat  side swaps  0  histogram D=27 M=68 L=259 DM=27 DL=30 MD=27 ML=18 LD=31 LM=13
+   tree      side swaps  0  histogram D=40 M=85 L=253 DM=14 DL=30 MD=13 ML=15 LD=31 LM=19
+   residual L1 to target per image: cat 56, sailboat 58, tree 24
+   pairwise L1 after: cat-sailboat 112, cat-tree 52, sailboat-tree 72
+6. directional histogram (class@side) after equalization, for information (rotation (ii) pools these):
+   D          40   27   40
+   DL@B        1    0    4
+   DL@L       16   13   10
+   DL@R       18    3   11
+   DL@T        3   14    5
+   DM@B        4   12    0
+   DM@L        2    2    6
+   DM@R        0   13    6
+   DM@T        0    0    2
+   L         252  259  253
+   LD@B        4   15    5
+   LD@L       19    3   10
+   LD@R       16   13   10
+   LD@T        1    0    6
+   LM@B       10    1   16
+   LM@L        0   11    1
+   LM@R        1    1    2
+   M          94   68   85
+   MD@B        0    0    2
+   MD@L        1   11    5
+   MD@R        1    2    6
+   MD@T        6   14    0
+   ML@B        0    4    0
+   ML@L        1    1    0
+   ML@R        0   11    0
+   ML@T       10    2   15
+   (columns: cat, sailboat, tree)
+   max directional difference: 26
+wrote scenes-v2.txt, quantized-v2/*.npy, quantized-preview-v2.png

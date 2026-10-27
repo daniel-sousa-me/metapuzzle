@@ -1,0 +1,35 @@
+# Boundary budgets (v5), experiment 005. Merged classes per unordered pair (darker tier first).
+# max = per-class max over the three images; surplus = max - own (cells that must be added
+# in near roles). A = cat, B = sailboat, C = tree.
+
+Pair D-M
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DMc  corner-P DMc          3        5        1     5        2        0        4
+DMs  straight              7       27       16    27       20        0       11
+MDc  corner-Q MDc          3        4        4     4        1        0        0
+total                     13       36       21    36       23        0       15
+approx strip             0        1        0
+approx s+diag            0        1        1
+
+Pair D-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DLc  corner-P DLc         15        2       10    15        0       13        5
+DLp  cap-P DLp             2        1        0     2        0        1        2
+DLs  straight             42       45       35    45        3        0       10
+LDc  corner-Q LDc         14        2       12    14        0       12        2
+total                     73       50       57    76        3       26       19
+approx strip             4        0        0
+approx s+diag            5        0        0
+approx c+diag            3        0        0
+approx i+multi           1        0        0
+
+Pair M-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+MLc  corner-P MLc          3       11        6    11        8        0        5
+MLp  cap-P MLp             0        0        1     1        1        1        0
+MLs  straight             17       16       19    19        2        3        0
+LMc  corner-Q LMc          2        9        3     9        7        0        6
+total                     22       36       29    40       18        4       11
+approx i+multi           0        0        1
+
+Transition cells per image: cat 108, sailboat 122, tree 107; surplus to place (all pairs): cat 44, sailboat 30, tree 45

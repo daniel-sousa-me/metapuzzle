@@ -1,0 +1,8 @@
+make_targets 85.0 s
+quantize 0.4 s
+quantize_v5 0.2 s
+make_roles 2.2 s
+build_scenes 0.2 s
+prototype_full 33.3 s
+prototype_ink 3.1 s
+done 25x30

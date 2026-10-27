@@ -1,0 +1,27 @@
+maps (cols x rows): A 27x38, B 27x38, C 27x38
+class histograms:
+  A: L=619 M=177 D=78 DLs=45 DMs=27 MLs=19 DLc=15 LDc=14 MLc=11 LMc=9 DMc=5 MDc=4 DLp=2 MLp=1
+  B: L=619 M=177 D=78 DLs=45 DMs=27 MLs=19 DLc=15 LDc=14 MLc=11 LMc=9 DMc=5 MDc=4 DLp=2 MLp=1
+  C: L=619 M=177 D=78 DLs=45 DMs=27 MLs=19 DLc=15 LDc=14 MLc=11 LMc=9 DMc=5 MDc=4 DLp=2 MLp=1
+largest same-class blob per class:
+  A: L=610 M=177 D=77 MLs=9 DLs=7 DMs=4 DLc=3 LDc=2 DLp=1 DMc=1 LMc=1 MDc=1 MLc=1 MLp=1
+  B: L=619 M=123 D=77 DLs=22 DMs=19 MLs=6 LDc=2 MLc=2 DLc=1 DLp=1 DMc=1 LMc=1 MDc=1 MLp=1
+  C: L=619 M=89 D=71 MLs=10 DLs=9 DMs=9 DLc=1 DLp=1 DMc=1 LDc=1 LMc=1 MDc=1 MLc=1 MLp=1
+same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+pairs (window reuse shown as plain/rotated, window = rows x cols):
+  A-B: same position 636 (62.0%)
+    same position excl. dominant L (covers 60.3% of cells, gated): 124 (41.3%)
+    weighted overlap: 12.3%
+    window reuse: 1x2 0.92/0.96  2x1 0.91/0.97  2x2 0.72/0.78  3x3 0.44/0.51
+    transferable blob: 510 cells (49.7% of A)
+  A-C: same position 716 (69.8%)
+    same position excl. dominant L (covers 60.3% of cells, gated): 185 (58.0%)
+    weighted overlap: 17.4%
+    window reuse: 1x2 0.97/0.99  2x1 0.97/0.98  2x2 0.90/0.93  3x3 0.68/0.71
+    transferable blob: 522 cells (50.9% of A)
+  B-C: same position 641 (62.5%)
+    same position excl. dominant L (covers 60.3% of cells, gated): 120 (38.8%)
+    weighted overlap: 13.2%
+    window reuse: 1x2 0.93/0.96  2x1 0.95/0.98  2x2 0.82/0.92  3x3 0.58/0.69
+    transferable blob: 521 cells (50.8% of B)
+scene gates: FAIL (A-B same-position excl. L 41.3% ≥ 25%; A-B 2x2 window reuse 71.5% ≥ 30%; A-B transferable blob 49.7% ≥ 10% of cells; A-C same-position excl. L 58.0% ≥ 25%; A-C 2x2 window reuse 90.2% ≥ 30%; A-C transferable blob 50.9% ≥ 10% of cells; B-C same-position excl. L 38.8% ≥ 25%; B-C 2x2 window reuse 81.6% ≥ 30%; B-C transferable blob 50.8% ≥ 10% of cells)

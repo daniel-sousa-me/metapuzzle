@@ -1,0 +1,4 @@
+cat (s=0.82, floor_top=19.60): dark 125  mid 152  light 473
+sailboat (h=19.60, hw=9.25, hh=3.60, mw=1.00): dark 125  mid 160  light 465
+tree (r=4.40, g=19.00, tw=2.40): dark 132  mid 154  light 464
+target window x2; dark spread 7, mid spread 8 (limit 13.5)

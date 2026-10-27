@@ -1,0 +1,69 @@
+1. tiers (equalized, identical to quantized-v2). D / M / L totals per image:
+   cat       plain D/M/L  31/ 99/303   transition cells own D/M/L  53/ 14/  0   tier totals D/M/L 84/113/303
+   sailboat  plain D/M/L  23/ 89/303   transition cells own D/M/L  61/ 24/  0   tier totals D/M/L 84/113/303
+   tree      plain D/M/L  33/ 93/303   transition cells own D/M/L  51/ 20/  0   tier totals D/M/L 84/113/303
+   target D/M/L 84 / 113 / 303; FLIP_LIGHT_STRAIGHTS = True
+   check: D cells touching M but no L (4-neighbours; all cells / excluding frame):
+     cat         7 /   6
+     sailboat   28 /  27
+     tree       15 /  14
+2. merged class histogram per image (transition classes; rotation dropped):
+   class      DMc   DMs   DLc   DLp   DLs   MDc   MLc   MLp   MLs   LDc   LMc
+   cat          2     5    10     2    24     2     2     0    10     8     2
+   sailboat     4    23     3     0    27     2     7     0    11     2     6
+   tree         2    12     8     0    21     0     4     1    15     8     0
+   pairwise L1 (cat-sailboat, cat-tree, sailboat-tree): 48, 26, 46
+   per-class max over images: DMc=4  DMs=23  DLc=10  DLp=2  DLs=27  MDc=2  MLc=7  MLp=1  MLs=15  LDc=8  LMc=6
+3. approximations per image (pattern kept, detail dropped):
+   strip     cat=5  sailboat=0  tree=0
+   s+diag    cat=1  sailboat=0  tree=1
+   c+diag    cat=3  sailboat=0  tree=0
+   i+multi   cat=3  sailboat=0  tree=1
+5. edge check: shared edges whose halves disagree, from the rotated pieces' own profiles.
+   categories: frame, approx (v4 approximations), junction (three-tier corner), cap, other (must be 0)
+   step 6a: v4 hosts, flip off
+     cat       shared edges 955  frame 9  approx 29  junction 26  cap 11  other 71
+     sailboat  shared edges 955  frame 10  approx 0  junction 45  cap 0  other 78
+     tree      shared edges 955  frame 11  approx 3  junction 34  cap 0  other 74
+     total: frame 30  approx 32  junction 105  cap 11  other 223
+   v4 hosts, flip on
+     cat       shared edges 955  frame 9  approx 32  junction 29  cap 13  other 31
+     sailboat  shared edges 955  frame 9  approx 0  junction 51  cap 0  other 55
+     tree      shared edges 955  frame 11  approx 4  junction 46  cap 0  other 49
+     total: frame 29  approx 36  junction 126  cap 13  other 135
+   step 6b: darker host, flip on
+     cat       shared edges 955  frame 7  approx 19  junction 9  cap 4  other 0
+     sailboat  shared edges 955  frame 7  approx 0  junction 10  cap 0  other 0
+     tree      shared edges 955  frame 7  approx 3  junction 14  cap 2  other 0
+     total: frame 21  approx 22  junction 33  cap 6  other 0
+   unexplained mismatches (other, must be 0): 0
+4. Pair D-M
+   class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+   DMc  corner-P DMc          2        4        2     4        2        0        2
+   DMs  straight              5       23       12    23       18        0       11
+   MDc  corner-Q MDc          2        2        0     2        0        0        2
+   total                      9       29       14    29       20        0       15
+   approx s+diag            0        0        1
+
+4. Pair D-L
+   class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+   DLc  corner-P DLc         10        3        8    10        0        7        2
+   DLp  cap-P DLp             2        0        0     2        0        2        2
+   DLs  straight             24       27       21    27        3        0        6
+   LDc  corner-Q LDc          8        2        8     8        0        6        0
+   total                     44       32       37    47        3       15       10
+   approx strip             5        0        0
+   approx s+diag            1        0        0
+   approx c+diag            3        0        0
+   approx i+multi           3        0        1
+
+4. Pair M-L
+   class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+   MLc  corner-P MLc          2        7        4     7        5        0        3
+   MLp  cap-P MLp             0        0        1     1        1        1        0
+   MLs  straight             10       11       15    15        5        4        0
+   LMc  corner-Q LMc          2        6        0     6        4        0        6
+   total                     14       24       20    29       15        5        9
+
+Transition cells per image: cat 67, sailboat 85, tree 71; surplus to place (all pairs): cat 38, sailboat 20, tree 34
+wrote /home/user/metapuzzle/experiments/013-scale/g20x25/boundary-budgets.txt and /home/user/metapuzzle/experiments/013-scale/g20x25/quantized-codes.txt

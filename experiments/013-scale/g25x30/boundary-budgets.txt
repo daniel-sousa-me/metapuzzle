@@ -1,0 +1,34 @@
+# Boundary budgets (v5), experiment 005. Merged classes per unordered pair (darker tier first).
+# max = per-class max over the three images; surplus = max - own (cells that must be added
+# in near roles). A = cat, B = sailboat, C = tree.
+
+Pair D-M
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DMc  corner-P DMc          4        2        1     4        0        2        3
+DMs  straight              8       29       12    29       21        0       17
+MDc  corner-Q MDc          4        2        3     4        0        2        1
+total                     16       33       16    37       21        4       21
+approx s+diag            0        0        1
+approx i+multi           0        1        0
+
+Pair D-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DLc  corner-P DLc          9        1       11    11        2       10        0
+DLp  cap-P DLp             1        1        0     1        0        0        1
+DLs  straight             35       33       24    35        0        2       11
+LDc  corner-Q LDc          9        1       13    13        4       12        0
+total                     54       36       48    60        6       24       12
+approx strip             5        2        0
+approx s+diag            4        2        0
+approx c+diag            3        0        0
+approx i+multi           1        1        1
+
+Pair M-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+MLc  corner-P MLc          4        8        5     8        4        0        3
+MLp  cap-P MLp             2        0        1     2        0        2        1
+MLs  straight             16       11       18    18        2        7        0
+LMc  corner-Q LMc          2        9        2     9        7        0        7
+total                     24       28       26    37       13        9       11
+
+Transition cells per image: cat 94, sailboat 97, tree 90; surplus to place (all pairs): cat 40, sailboat 37, tree 44
