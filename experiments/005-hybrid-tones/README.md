@@ -150,3 +150,13 @@ Categories: other = unexplained (must be 0); junction = three-tier corner, where
 - **Surplus:** cat 47, sailboat 39, tree 58 (v5: 41 / 33 / 44).
 - **Scene gates** still fail. Same position excluding L: 41.5 / 40.6 / 35.2% (v5 40.3 / 39.6 / 36.9%).
 - **Visual:** the tree octagon edges are diagonal in the ink render; the sail hypotenuse is still a staircase.
+
+## Step 7: automatic budget equalization
+
+**Script.** `equalize_budgets_v5.py` anneals the D/M/L maps before quantization (`tiers-v5eq.txt`, `quantized-v5eq/`). A move flips a boundary cell to a neighbouring tier (D-M or M-L), singly or as a domino, paired so each image keeps 76/123/301. Cells stay within one cell of the original boundary; at most 24 change per image. Objective: class spread (max minus min) + 0.1 per change + penalty for protrusions, isolated cells and diagonal contacts. Three seeds.
+
+**Surplus** (cat / sailboat / tree): before 41 / 33 / 44, after 0 / 1 / 0. Changed cells 24 / 24 / 24. Transition cells 101 / 100 / 101 (was 86 / 94 / 83).
+
+**Checks.** Edge check: 0 unexplained. Gates still fail: same position excl. L 44 / 51 / 46% (was 40 / 40 / 37); 2x2 reuse 84 / 85 / 84% (was 73 / 80 / 80); blob 51 / 51 / 52% (was 47 / 46 / 47). Matching budgets makes the maps more alike locally, so overlap rises.
+
+**Visual.** Full colour (`run-full-v5eq/triptych.png`): the stray navy and olive squares are mostly gone; silhouettes hold, but the cat head is softer and the tree crown more angular. Ink (`run-ink-v5eq/triptych.png`): fewer stray fragments; the tree crown is rougher and the sail edge breaks on the right.

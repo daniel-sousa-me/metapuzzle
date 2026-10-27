@@ -1,0 +1,85 @@
+# Step 6 role maps (merged classes), experiment 005 (v5). A = cat, B = sailboat, C = tree.
+# x_frame: frame cell. x_near: plain cell next to a transition. x_far: plain cell away from transitions.
+# x_slot: far cell for surplus (isolated). x_nslot: near fallback. x_xslot: residue, non-isolated far cell.
+# edge_<class>@deg: transition.
+
+# A
+l_frame m_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_far l_slot l_far l_far l_slot l_far l_far l_far l_slot l_far l_far l_far l_far l_far l_far l_far l_far l_slot l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_slot l_far l_far l_far l_slot l_far l_slot l_far l_far l_slot l_far l_far l_frame
+l_frame l_slot l_far l_slot l_far l_slot l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_near l_near l_near l_slot l_near l_near l_near l_slot l_far l_far l_slot l_far l_far l_slot l_frame
+l_frame l_far l_slot l_far l_near edge_mlc@270 edge_mlc@0 l_near l_far l_near edge_mlp@0 l_near l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near edge_dls@270 edge_dms@0 l_near l_near l_near edge_mls@90 l_near l_near l_far l_slot l_far l_far l_far l_slot l_frame
+l_frame l_slot l_far l_slot l_near edge_dls@270 edge_dms@90 edge_mlc@0 l_near edge_mlc@270 edge_lmc@90 edge_mlc@0 l_near l_far l_far l_far l_slot l_far l_far l_frame
+l_frame l_far l_far l_far l_near edge_dls@270 edge_mdc@180 edge_dms@0 l_near edge_dmc@0 m_near edge_mls@90 l_near l_far l_slot l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_slot l_near edge_dls@270 d_near edge_dms@90 edge_mls@0 edge_dms@270 edge_dms@0 edge_dls@90 l_near l_far l_far l_far l_slot l_far l_slot l_frame
+l_frame l_slot l_far l_far l_near edge_dls@270 edge_mdc@0 edge_mdc@180 edge_dms@0 edge_mdc@90 d_near edge_dls@90 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_slot l_near edge_mls@270 edge_dms@270 d_near d_near d_near d_near edge_dls@90 l_near l_far l_slot l_far l_slot l_far l_slot l_frame
+l_frame l_slot l_far l_near l_near edge_mls@270 edge_dms@270 edge_mdc@270 edge_dms@180 edge_mdc@0 d_near edge_dls@90 l_near l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_near edge_mlp@270 edge_mls@180 edge_dms@270 edge_dms@90 m_near edge_dms@270 edge_mdc@270 edge_dms@180 l_near l_near l_near l_far l_slot l_far l_slot l_frame
+l_frame l_far l_slot l_near l_near l_near edge_dms@180 edge_dmc@90 m_near edge_dms@270 edge_dms@90 edge_lmc@180 edge_mls@0 edge_dlc@0 l_near l_near l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_slot l_near edge_mlc@180 edge_lmc@0 m_near edge_dms@270 edge_mdc@180 edge_dmc@0 edge_mls@180 edge_dls@180 edge_dlc@0 l_near l_far l_far l_far l_frame
+l_frame l_far l_slot l_far l_far l_near l_near edge_dms@0 edge_dms@0 edge_mdc@90 d_near edge_dls@90 l_near l_near edge_dls@270 l_near l_far l_slot l_far l_frame
+l_frame l_far l_far l_far l_slot l_far l_near edge_dls@270 d_near d_near d_near edge_dls@90 l_near edge_mlc@270 edge_dls@90 l_near l_far l_far l_far l_frame
+l_frame l_far l_slot l_far l_far l_far l_near edge_dlc@180 edge_ldc@0 edge_mdc@270 edge_dms@180 edge_dls@90 l_near edge_mls@270 edge_dmc@180 l_near l_near l_far l_slot l_frame
+l_frame l_near l_near l_near l_near l_near l_near l_near edge_dms@180 edge_dms@90 m_near edge_dms@270 edge_dmc@90 edge_lmc@90 edge_lmc@180 edge_mlc@0 l_near l_near l_near l_frame
+d_frame l_near edge_mlc@270 edge_mls@0 edge_mls@0 edge_mls@0 edge_mls@0 edge_mls@0 edge_lmc@90 edge_dms@90 m_near edge_dmp@180 m_near m_near m_near edge_lmc@180 edge_mls@0 edge_mls@0 edge_mls@0 m_frame
+m_frame edge_mls@0 edge_lmc@90 m_near m_near m_near m_near m_near m_near edge_dms@90 m_near m_near m_near m_far m_near m_near m_near m_near m_near m_frame
+m_frame m_near m_near m_near m_slot m_far m_far m_slot m_near edge_dmc@180 edge_dmp@90 m_near m_slot m_far m_far m_far m_far m_far m_far m_frame
+m_frame m_slot m_far m_far m_far m_far m_far m_far m_near m_near m_near m_near m_far m_far m_far m_slot m_far m_slot m_far m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
+
+# B
+l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_far l_far l_slot l_far l_far l_far l_slot l_far l_far l_far l_far l_slot l_frame
+l_frame l_far l_slot l_far l_slot l_far l_slot l_far l_far l_far l_far l_slot l_far l_far l_far l_far l_slot l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_far l_near l_near l_near l_near l_far l_far l_slot l_far l_far l_far l_far l_frame
+l_frame l_slot l_far l_slot l_far l_slot l_far l_far l_near edge_dlc@270 edge_dlc@0 l_near l_slot l_far l_far l_far l_far l_far l_slot l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_slot l_near edge_dls@270 edge_dls@90 l_near l_near l_near l_far l_far l_slot l_far l_far l_frame
+l_frame l_slot l_far l_slot l_far l_slot l_far l_far l_near edge_dls@270 edge_dms@90 edge_mls@0 edge_mlc@0 l_near l_slot l_far l_far l_far l_slot l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_slot l_near edge_dls@270 edge_dms@90 edge_mls@180 edge_mlc@90 l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_slot l_far l_far l_slot l_far l_far l_near edge_dls@270 edge_mdc@180 l_near l_near l_near l_slot l_far l_far l_slot l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_slot l_near edge_dls@270 edge_dmc@90 edge_mls@0 edge_mlc@0 l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_slot l_far l_slot l_far l_far l_far l_far l_near edge_dls@270 m_near m_near edge_mls@90 l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_slot l_far l_near edge_dls@270 m_near m_near edge_mls@90 l_near l_slot l_far l_slot l_far l_slot l_frame
+l_frame l_slot l_far l_far l_slot l_far l_far l_far l_near edge_dls@270 edge_dmc@0 edge_mls@180 edge_mls@90 l_near l_near l_near l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_slot l_near edge_dls@270 edge_mdc@180 l_near edge_mls@270 edge_mls@0 edge_mlc@0 l_near l_far l_slot l_far l_frame
+l_frame l_slot l_far l_far l_far l_slot l_far l_far l_near edge_dls@270 edge_dms@90 edge_mls@0 edge_lmc@90 m_near edge_mls@90 l_near l_near l_far l_far l_frame
+l_frame l_far l_far l_slot l_near l_near l_near l_slot l_near edge_dls@270 edge_dms@90 m_near m_near m_near edge_lmc@180 edge_mlc@0 l_near l_far l_slot l_frame
+l_frame l_slot l_far l_far l_near edge_mlp@0 l_near l_near l_near edge_dls@270 edge_dms@90 m_near m_far m_near m_near edge_mls@90 l_near l_near l_far l_frame
+l_frame l_near l_near l_near l_near edge_mls@270 edge_mlc@0 l_near l_near edge_dls@270 edge_dms@90 m_near m_slot m_near edge_lmc@270 edge_mls@180 edge_mlc@0 l_near l_near l_frame
+l_frame l_near edge_dlc@270 edge_dls@0 edge_dms@90 edge_lmc@90 edge_lmc@180 edge_mls@0 edge_dls@0 edge_ldc@90 edge_dms@90 m_near m_near m_near edge_mls@90 l_near edge_mls@270 edge_mlc@0 l_near l_frame
+m_frame l_near edge_dms@180 edge_mdc@0 edge_mdc@180 edge_dms@0 edge_dms@0 edge_dms@0 edge_mdc@90 d_near edge_mdc@180 edge_dms@0 edge_dms@0 edge_dms@0 edge_dms@0 edge_mdc@90 edge_dmc@0 edge_lmc@180 edge_mlc@0 l_frame
+d_frame edge_mls@0 edge_lmc@90 edge_dmc@180 edge_mdc@0 d_near d_near d_near d_near d_near d_near d_near d_near d_near d_near edge_mdc@270 edge_dms@180 edge_dmp@90 edge_lmc@180 m_frame
+m_frame m_near m_near m_near edge_dmc@180 edge_dms@180 edge_dms@180 edge_mdc@270 edge_dms@180 edge_dms@180 edge_dms@180 edge_dms@180 edge_dms@180 edge_dms@180 edge_dms@180 edge_dmc@90 m_near m_near m_near m_frame
+m_frame m_far m_slot m_near m_near m_near m_near edge_dmp@180 m_near m_near m_near m_near m_near m_near m_near m_near m_near m_far m_slot m_frame
+m_frame m_far m_far m_far m_far m_slot m_near m_near m_near m_slot m_far m_far m_slot m_far m_slot m_far m_slot m_far m_far m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame
+
+# C
+l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame l_frame
+l_frame l_slot l_far l_far l_far l_far l_far l_far l_far l_far l_slot l_far l_far l_slot l_far l_far l_slot l_far l_slot l_frame
+l_frame l_far l_far l_slot l_far l_slot l_far l_slot l_far l_near l_near l_near l_far l_far l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_far l_near l_near edge_mlp@0 l_near l_far l_slot l_far l_slot l_far l_far l_slot l_frame
+l_frame l_slot l_far l_slot l_far l_slot l_near l_near l_near edge_mlc@270 edge_mls@90 l_near l_near l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_near l_near l_near edge_mlc@270 edge_dms@270 edge_dms@0 edge_dms@0 edge_dms@90 edge_mlc@0 l_near l_near l_far l_far l_far l_slot l_frame
+l_frame l_far l_far l_far l_near edge_mlp@270 edge_mls@0 edge_lmc@90 edge_dmc@180 edge_mdc@0 d_near edge_mdc@180 edge_dmc@0 edge_mlc@0 l_near l_far l_slot l_far l_far l_frame
+l_frame l_far l_slot l_far l_near l_near edge_dms@180 edge_dmc@0 m_near edge_dms@270 d_near d_near edge_mdc@180 edge_dls@90 l_near l_far l_far l_far l_slot l_frame
+l_frame l_far l_far l_far l_near edge_mlc@270 edge_lmc@90 edge_dms@270 edge_dms@0 edge_mdc@90 d_near d_near d_near edge_dls@90 l_near l_slot l_far l_far l_far l_frame
+l_frame l_slot l_far l_far l_near edge_mlc@180 edge_lmc@0 edge_dms@270 d_near d_near d_near d_near d_near edge_dls@90 l_near l_far l_far l_far l_slot l_frame
+l_frame l_far l_far l_slot l_near l_near edge_dms@0 edge_mdc@90 edge_dms@180 edge_mdc@270 edge_dms@180 edge_dms@180 edge_dms@180 edge_dls@90 l_near l_far l_far l_far l_far l_frame
+l_frame l_slot l_far l_far l_far l_near edge_dlc@180 edge_dls@180 edge_lmc@0 edge_dms@90 m_near m_near edge_lmc@270 edge_dlc@90 l_near l_slot l_far l_slot l_far l_frame
+l_frame l_far l_far l_far l_slot l_near l_near l_near edge_dls@270 edge_mdc@90 edge_dms@0 edge_dmc@0 edge_mls@90 l_near l_near l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_near edge_dlc@180 edge_ldc@0 edge_mdc@270 edge_dmc@90 edge_mlc@90 l_near l_far l_slot l_far l_slot l_far l_frame
+l_frame l_far l_slot l_far l_far l_slot l_far l_near l_near edge_dls@270 edge_dms@90 edge_mlc@90 l_near l_near l_far l_far l_far l_far l_far l_frame
+l_frame l_far l_far l_far l_far l_far l_far l_far l_near edge_dls@270 edge_dls@90 l_near l_near l_far l_far l_far l_far l_far l_slot l_frame
+l_frame l_slot l_far l_far l_far l_slot l_far l_slot l_near edge_dls@270 edge_dls@90 l_near l_far l_far l_slot l_far l_slot l_far l_far l_frame
+l_frame l_far l_far l_slot l_far l_far l_far l_far l_near edge_dls@270 edge_dls@90 l_near l_slot l_far l_far l_far l_far l_far l_slot l_frame
+l_frame l_near l_near l_near l_near l_near l_near l_near l_near edge_dls@270 edge_dls@90 l_near l_near l_near l_near l_near l_near l_near l_near l_frame
+l_frame edge_mlc@270 edge_mls@0 edge_mls@0 edge_mls@0 edge_mls@0 edge_dms@270 edge_dls@0 edge_dms@180 edge_mdc@0 edge_dms@90 edge_mls@0 edge_mls@0 edge_mls@0 edge_mls@180 edge_mls@0 edge_mls@0 edge_mls@0 edge_mls@0 m_frame
+m_frame edge_lmc@90 m_near m_near m_near m_near edge_dmp@180 m_near m_near edge_dms@270 edge_dms@90 m_near m_near edge_mls@90 l_near edge_mls@270 m_near m_near m_near m_frame
+m_frame m_near m_near m_far m_far m_near m_near m_near m_near edge_dms@270 edge_dms@90 m_near m_near edge_lmc@180 edge_mls@0 edge_lmc@90 m_near m_far m_far m_frame
+m_frame m_far m_far m_far m_slot m_far m_far m_near edge_dmp@270 edge_mdc@90 edge_dms@90 m_near m_near m_near m_near m_near m_near m_far m_slot m_frame
+m_frame m_far m_slot m_far m_far m_far m_slot m_near m_near edge_dmc@180 edge_dms@90 m_near m_far m_slot m_far m_slot m_far m_far m_far m_frame
+m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame d_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame m_frame

@@ -1,0 +1,39 @@
+# Boundary budgets (v5), experiment 005. Merged classes per unordered pair (darker tier first).
+# max = per-class max over the three images; surplus = max - own (cells that must be added
+# in near roles). A = cat, B = sailboat, C = tree.
+
+Pair D-M
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DMc  corner-P DMc          6        6        6     6        0        0        0
+DMp  cap-P DMp             2        2        2     2        0        0        0
+DMs  straight             26       26       26    26        0        0        0
+MDc  corner-Q MDc         10       10       10    10        0        0        0
+total                     44       44       44    44        0        0        0
+approx strip             2        0        2
+approx s+diag            6        1        5
+approx c+diag            2        0        1
+approx i+multi           0        4        4
+
+Pair D-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DLc  corner-P DLc          3        3        3     3        0        0        0
+DLs  straight             16       16       16    16        0        0        0
+LDc  corner-Q LDc          1        1        1     1        0        0        0
+total                     20       20       20    20        0        0        0
+approx strip             1        0        0
+approx s+diag            2        0        0
+approx c+diag            1        0        0
+
+Pair M-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+MLc  corner-P MLc          9        9        9     9        0        0        0
+MLp  cap-P MLp             2        1        2     2        0        1        0
+MLs  straight             18       18       18    18        0        0        0
+LMc  corner-Q LMc          8        8        8     8        0        0        0
+total                     37       36       37    37        0        1        0
+approx strip             1        0        1
+approx s+diag            1        5        4
+approx c+diag            0        1        0
+approx i+multi           1        0        0
+
+Transition cells per image: cat 101, sailboat 100, tree 101; surplus to place (all pairs): cat 0, sailboat 1, tree 0
