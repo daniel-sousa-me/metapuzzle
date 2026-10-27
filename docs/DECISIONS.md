@@ -58,3 +58,7 @@ Decision: plan for distinct conventional cuts; keep reporting the scene-level me
 ## 2026-10-27 — Piece count is free; working grid moves to about 1000 pieces (owner)
 
 The 500-piece target was a guess that smaller would be easier; renders show the opposite (coarse silhouettes, rare tile cases, thick transition bands). The owner has freed the piece count and said computation time is not a constraint. Decision: the working grid for subject design becomes about 1000 pieces (e.g. 27×38, or per-picture frames of about 1000 cells since mixed frames are supported); 500 is kept as a comparison point; 1500–2000 may be tried if resolution still limits recognizability. Solver and render runs may take minutes without concern.
+
+## 2026-10-27 — Working grid: 27×38 (1026 pieces)
+
+The scale study (experiment 013) ran the same three placeholders at 500, 750, 1026 and 1536 pieces. Recognition improves clearly from 750 up (ears, tail, sail become unambiguous), solve and render times stay trivial (under a minute at 1536), and surplus grows with perimeter unless equalized. 27×38 is adopted as the working grid; the subject set "Field, Wood and Water" is built at that size. 1536 remains an option if the owner wants a larger product.
