@@ -59,3 +59,28 @@ corner and edge pools the same way. Figures and locked cells are unchanged; 44, 
 Class surplus 193 to 107 (51/26/30): the target under 30 is not met. Frame edge surplus 330 to 258,
 corners 15 unchanged: the owl's frame has no D and D is not a background tier for the owl. Tier totals
 are not exact (D 285/287/286). Log: `27x38-v3/budgets.txt`.
+
+## v4 to v7: solvability layers on the v2 tiers
+
+All on `27x38-v2`, tray border, quarter rotation, cell 21; full and ink renders each.
+
+- **v4, chip sub-classes** (`pipeline/run_from_tiers_v4.py`, `gen_classes_v10.py`): Lr/Lb/Lo/Lx and
+  Mr/Mb/Mc per picture. Shared 0/1/0; T9 stays 2/5 (`ambiguity-v4.md`): sub-classes do not make the
+  plain fields solvable.
+- **v5, motif layer** (`run_from_tiers_v5.py`, `gen_classes_v11.py`, `motifs/make_motif_maps.py`):
+  31% of pieces carry motifs; scene gates pass for the first time but blind recognition halves
+  (`evaluation-v5.md`, FINDINGS 36).
+- **v6, sparse motifs** (`run_from_tiers_v6.py`, `gen_classes_v12.py`, `motifs/make_motif_maps_v2.py`):
+  14% coverage, organic clusters, 2-cell halo on the carrier side, per-piece jitter. Shared 1/1/0,
+  gates pass, T9 3/5; blind readers see "top-down maps" (`evaluation-v6.md`, FINDINGS 37). Current best.
+- **v7, density gradient** (`run_from_tiers_v7.py`, `motifs/make_motif_maps_v3.py`): placement by
+  distance from the figure was not computable (the figure tier merges the hare with its landmass; no
+  animal mask in the tiers), and the fallback (carrier halo plus 10/20/30% by distance from any
+  non-plain cell) reached only 5.2% coverage. Shared 2/1/0; piece gates pass; scene gate B-C 31.3%.
+  Fields read as nearly bare. Negative result; v6 stays the baseline (FINDINGS 38). The counts file
+  `27x38-v2/pipeline-out-v7/motif-counts-v7.txt` holds the pool histograms and ASCII distance maps.
+- **Standard border with cross-class seams** (`border-check/round2/run-standard`, pipeline-out-v5
+  scenes, classes-v11): valid, 0 mismatches, shared 0/1/1, piece and scene gates pass; 68 seams per
+  board, 41 to 56 of them joining two classes; 256 flat-sided pieces, 130 inside each picture, 12
+  added by padding. Seams are invisible in the render (no cut lines); they would show as straight cuts
+  in the physical puzzle. Supersedes the round-1 result (FINDINGS 29).

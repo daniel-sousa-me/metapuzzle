@@ -1,0 +1,185 @@
+# v7 diagnosis: A's M tier is one 396-cell region (hare plus landmass), so a figure-distance gradient needs a
+# separate animal mask from make_targets, not in the v2 tiers. v7 rule: plain cells outside the carrier halo, density
+# by distance to the nearest non-plain cell (10 / 20 / 30%).
+# Motif class counts per picture, v7 (make_motif_maps_v3.py). Class = (motif, base tier); heroes counted
+# per code. spill = cells outside the class region (weight < 2).
+
+class           A hare   B owl  C swan  spread   spill A/B/C
+streak D             1       1       1       0   1/1/1
+chevron D            2       2       2       0   2/1/2
+pebbles D            1       1       1       0   1/1/0
+star D               3       3       3       0   0/2/0
+seedhead M           8       8       8       0   5/7/1
+leaf M               5       5       5       0   1/4/2
+curl M               6       6       6       0   4/2/3
+star M               7       7       7       0   7/3/6
+pebbles L            3       3       3       0   0/3/3
+chevron L            3       3       3       0   2/1/1
+cloud L              1       1       1       0   1/1/0
+snowflake L          4       4       4       0   4/0/3
+amberwedge hero       2       2       2       0   -
+catchlight hero       2       2       2       0   -
+crater hero          2       2       2       0   -
+ambereye hero        1       1       1       0   -
+dot-eye hero         1       1       1       0   -
+beak/nose hero       1       1       1       0   -
+all motifs          53      53      53
+coverage %         5.2     5.2     5.2   (cap 25%)
+# hero piece classes (same in A, B, C): I on L/L, G on DLc/DLc, O on L/L, E on DMd, Y on DLd, N on M
+
+# Density by distance to the nearest non-plain cell: regular motifs per eligible plain cell
+# (DML, carrier distance >= HALO), with the nominal chance of the band
+A: d 1: 0/0 (0%, nominal 10%); d 2: 22/165 (13%, nominal 20%); d 3+: 22/100 (22%, nominal 30%)
+B: d 1: 0/0 (0%, nominal 10%); d 2: 24/163 (15%, nominal 20%); d 3+: 20/88 (23%, nominal 30%)
+C: d 1: 0/0 (0%, nominal 10%); d 2: 19/156 (12%, nominal 20%); d 3+: 25/68 (37%, nominal 30%)
+
+# Plain cells: DML cells with no motif and not a transition carrier; how many lie more than 3 cells from
+# any motif (heroes included)
+A: plain cells 635, more than 3 cells from any motif 140
+B: plain cells 632, more than 3 cells from any motif 110
+C: plain cells 613, more than 3 cells from any motif 141
+
+# Pre-sampling pool: plain DML cells (not a transition carrier) by figure distance 1, 2, 3, 4, 5+
+A: plain [419, 165, 65, 32, 3]; eligible (carrier distance >= HALO) [0, 165, 65, 32, 3]
+B: plain [430, 163, 62, 21, 5]; eligible (carrier distance >= HALO) [0, 163, 62, 21, 5]
+C: plain [438, 156, 47, 20, 1]; eligible (carrier distance >= HALO) [0, 156, 47, 20, 1]
+
+# Maps (27 x 38): . non-plain (transition carrier, S or W), h plain cell in the carrier halo (excluded),
+# 1 / 2 / 3 = plain cell at distance 1 / 2 / 3+ from the nearest non-plain cell (chance 10 / 20 / 30%)
+A:
+222222333333322222hhhhhh233
+2hhhh222223322hhhhh....h233
+hh..hhhhh2232hh..hh....h233
+h...hh..hh222h....hhhhhh233
+h...hh...hh22h.hh.h2hhh2222
+h...hh....hh2h.hh.hhh.hhhhh
+h...hhh.h..h2h.hh..hhhhh..h
+h...hhh.hh.hhh.hhh.h2hhh...
+h....hh.hh..hh.h2h.h2h...hh
+hh...hh..hh.hh.h2h.hhh..hh2
+2h...hhh..h....h2h..hhh..hh
+hhhhhh2hh.hhhhhhhhh.hhhh...
+..hh2222h.hh2222h.h..hhh..h
+h..hh222h..h2222hhhh..hh..h
+hh..hh22hh.hhh2222hhh.hh..h
+2hh..hh22h...h22hhh...hh...
+22hh..hh2hhh.h22h...hhh..hh
+322hh..hh2hh.h22h.hhhhh.hh2
+3322hh..hhh..h22h.hhhh..h22
+33322hh..hh.hh22h..hh..hhhh
+22222hhh....h222hh........h
+hhhh2h...hhhh2322hhh...hh.h
+...hhh.hhh222233222hh..hh.h
+hh.....h222333333322h.....h
+2h..hhhh233333333322h.h....
+hh..h22223333333332hh.h.hh.
+....h23333333333332h..h.hh.
+hh..h23333333333332h.hh.hh.
+...hh23333333222222h.......
+.hhh2233332222hhhh2h..hh.hh
+.hhh2333332hhhh..h2h..hh.hh
+...h2233332h.....hhh.......
+hh.hh233332h......hh.hh.hh.
+hh..h222222h......hh..h.hh.
+....hhhhhhhh......hhh.h.hh.
+hh.................hh.h....
+2h..hhh...............hhhhh
+2hh.h2hh...........hhhh2222
+B:
+333332hhh.........hhh233333
+333322h.............h223333
+33222hh.hh.......hh.hh22333
+322hhh..hhh......hh..hh2233
+22hh...hh2hhhhhhhhhh..hh223
+2hh..hhhhhhhhhhhh22hh..hh22
+hh..hh2h........hh22hh..hh2
+h..hhhhh.hhhhhh..hhhhhh..h2
+h.hhh....hhhhhhh....h2hh.hh
+h.hhh.h.....hh......hhhh..h
+..hh....hhh.h..hhh....hhh.h
+.hhh...hhhh...hhhh....h2h.h
+.hhh..hh..hh..hh..hh..hhh.h
+......hh..hh..hh..hh..hh..h
+hhhh..hhhh......hhh...hh.hh
+h.hh....hh..hh..hh.......h2
+hhhhh.h.....hh.....h.hhhhh2
+2h....hhhhh.hh.hhhhh.hhhh22
+2h....h222h....h222h....h23
+2h....h232hhhhhh222h....h23
+2h....h2222222222hhh....h23
+2h....hhh22333322h......h23
+2h......hh233332hh.h....h23
+2hhhhhh..h233332h..hhhhhh23
+222222hh.h233332h.hh2222223
+333222hh.h222222h.hhhh23333
+3332hhh..hhhhhhhh....h23333
+2222h.......h........h23333
+hhhhh...hhh...hhhhhhhh22222
+...hhhhhh2hhhhhhhhhhhhhhhhh
+hh.h....hhhhh......h.......
+2h...hh.......hhhh...hhh..h
+2hhhhhhhhhhhhhh22h..hh2hhhh
+22222222hhhh22222hhhh222222
+33332hhhh..h2hhhhhhh222hhh2
+33332h.....h2h.....h232h.h2
+33332h.....h2h.....h232hhh2
+33332hhhhhhh2h.....h2322222
+C:
+h.......h22222222hh......hh
+..hhhhh.hhhhhhhhhh..hhhh..h
+hhh22hh.hh.....hh..hh22hh..
+hhhhhh.....hhh..h.hh2222hh.
+.......h.hhhhhh.h.hh22222h.
+hhhh.....hh.h2h....hhh22hh.
+222h.hhhhhhhh2hh.h...hhhh..
+2hhh.hhhhhhh222h...h..hh..h
+2h.........hhhhhhh.hh....hh
+2h.hh.hhhh....hh2h.hhhhhhh2
+2h.hh.h.....h..h2h.hhhhhhhh
+2h....h.hhh.h..h2h.hh......
+2hhhhhh.hhh.h.hhhh.hh......
+hhhh..........h2h..h.......
+.....hhh.....hhhh..........
+hhhhhh2hhhh.hh2h..hhhhhhhhh
+2222222hh...h2hh...........
+333222hh..hhh2h...hhh..hhh.
+3322hhh..hh222h..hh2hhhh2h.
+332hh...hh2222hhhhhhhh222h.
+332h..hhh22hhhhhhhh..h232h.
+332h.hh2222h.........h222h.
+332h.h22332h.........h22hh.
+332h.h22232hh.......hh2hh..
+332h.hhh2222hhhhhhhhh2hh..h
+332h...hhh22222hhhhhhhh..hh
+332hhh...hhhhhhh........hh2
+33222h................hhh22
+33332h................hhhhh
+33332hhh.........hhhhh....h
+3332222hhhhhhhhhhhhhhh.hh.h
+3332hhh22222222h.......hh.h
+3332h.h23333332h.hhhh.....h
+2222hhh23333332h.hhhh....hh
+hhhh22223333332h..hh..hh.hh
+h..hhh222233222hh.....hh.h.
+.....hhhh2332hhh..hhh......
+hhhh....h2332h....h2hhhh.hh
+
+# Lattice test: equally spaced triples of one class in a row or column (regular motifs, all classes)
+# chance = mean over 300 draws of the same counts placed uniformly under the same spacing rule
+A: actual 0 triples, chance mean 0.1 (share of draws at or below actual 0.90); ratio 0.00
+B: actual 0 triples, chance mean 0.1 (share of draws at or below actual 0.93); ratio 0.00
+C: actual 0 triples, chance mean 0.1 (share of draws at or below actual 0.88); ratio 0.00
+
+# Band (B cream top band, one motif type per 3 x 3 window): pairs of different types within Chebyshev 2
+A: 0 pairs (no band in this picture)
+B: 0 pairs
+C: 0 pairs (no band in this picture)
+
+# Halo and spacing (all pictures): regular motif cells closer than HALO to a tier boundary cell,
+# pairs of motif cells closer than CHEB_MIN, and the mean boundary distance of motifs vs plain cells
+A: regular motifs 44, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 21; mean boundary distance motifs 2.61 vs open D/M/L cells 1.06
+   heroes (boundary distance): O3,11:2, Y5,21:0, G6,24:0, G6,25:0, I11,0:1, I11,1:1, E12,17:0, N14,20:1, O25,24:1
+B: regular motifs 44, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 16; mean boundary distance motifs 2.73 vs open D/M/L cells 1.02
+   heroes (boundary distance): O4,15:1, O5,9:1, I12,7:1, G12,8:0, I12,15:1, G12,16:0, E15,1:0, N16,12:1, Y35,24:0
+C: regular motifs 44, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 21; mean boundary distance motifs 2.84 vs open D/M/L cells 0.93
+   heroes (boundary distance): G1,19:0, G1,24:0, O3,21:2, Y5,11:0, O5,23:2, I6,5:1, I7,5:1, N16,5:2, E32,5:0

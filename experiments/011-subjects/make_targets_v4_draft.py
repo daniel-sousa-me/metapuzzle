@@ -72,9 +72,9 @@ DDDDDDDDDMMMMMMMMMMMMMDDDDD
 ..DDDDDDDDMMMMMMMMMMMMDDDDD
 ......DDDDDMMMMMMMMMMMDDDDD
 ......DDDDDDMMMMMMMMMDDDDDD
-......DDDDDDMMMMMM...DDDDDD
-.......wwwMMMMMMMM.........
-.......wwwMMMMMMMMM........
+......DDDDDDMMMMMMwwwDDDDDD
+.......wwwMMMMMMMMwww......
+.......wwwMMMMMMMMMww......
 DDDD.....MMMMMMMMMMMDDDDDDD
 DDDD.....MMMMMMMMMMMDDDDDDD
 .......MMMMMddMMMMMMMwwwwww
@@ -100,8 +100,8 @@ wwwwwww..............MMMMMM
 wwwwww................MMMMM
 MMMM.....SSSSS.........MMMM
 MMMM.....SSSSS.........MMMM
-MMMM....................MMM
-MMMM....................MMM
+wwwwwww.................MMM
+wwwwwww.................MMM
 MMMM....................MMM
 MMMM....................MMM
 MMMMDD................DDMMM
@@ -148,7 +148,7 @@ ddddd.......DDDDD..........
 DDDDDD.....DDDDDDD........D
 DDDDDDD....DDDDDDDD......DD
 D..DDDDD....DDDDDDDDDDDDDDD
-D..DDDDDD....DDmmmmDDDDDDDD
+D..DDDDDD....DDmmmmDDDwwwww
 DDDDDDDDD....DDmmmmDDDwwwww
 DDDDDDDDD....DDDDDDDDDwwwww
 mmmmmDDDD....DDDDDDDDDDDDDD

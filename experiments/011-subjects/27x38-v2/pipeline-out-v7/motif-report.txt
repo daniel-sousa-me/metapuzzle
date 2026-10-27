@@ -1,0 +1,11 @@
+# Motif and hero cells, experiment 011 v7 (A hare, B owl, C swan). moves = motif displaced from a cell
+# that had to host a surplus piece, to the nearest plain cell of its tier.
+
+A hare: D_k_a 1, D_p_a 1, D_s_a 1, D_s_b 1, D_s_c 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 2, L_f_b 1, L_f_c 1, L_p_a 1, L_p_b 1, L_p_c 1, L_u_a 1, L_v_a 1, L_v_b 1, L_v_c 1, M_c_a 2, M_c_b 2, M_c_c 2, M_d_a 3, M_d_b 3, M_d_c 2, M_l_a 2, M_l_b 2, M_l_c 1, M_s_a 3, M_s_b 2, M_s_c 2
+   displaced 1: (2, 19)->(2, 21) D_v_b (D, HALO BREACH)
+B owl: D_k_a 1, D_p_a 1, D_s_a 1, D_s_b 1, D_s_c 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 2, L_f_b 1, L_f_c 1, L_p_a 1, L_p_b 1, L_p_c 1, L_u_a 1, L_v_a 1, L_v_b 1, L_v_c 1, M_c_a 2, M_c_b 2, M_c_c 2, M_d_a 3, M_d_b 3, M_d_c 2, M_l_a 2, M_l_b 2, M_l_c 1, M_s_a 3, M_s_b 2, M_s_c 2
+   displaced 0: none
+C swan: D_k_a 1, D_p_a 1, D_s_a 1, D_s_b 1, D_s_c 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 2, L_f_b 1, L_f_c 1, L_p_a 1, L_p_b 1, L_p_c 1, L_u_a 1, L_v_a 1, L_v_b 1, L_v_c 1, M_c_a 2, M_c_b 2, M_c_c 2, M_d_a 3, M_d_b 3, M_d_c 2, M_l_a 2, M_l_b 2, M_l_c 1, M_s_a 3, M_s_b 2, M_s_c 2
+   displaced 0: none
+class counts identical across A, B, C: yes (checked)
+plain motif cells per tier (identical): 7/0/27/0/15; plain remainder 104/5/252/16/265

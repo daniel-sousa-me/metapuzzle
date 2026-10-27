@@ -80,3 +80,20 @@ Research (experiment 012, docs/design/09): exact minimal mating classes (every t
 ## 2026-10-27 — Product form: tray (frameless) border for the subject set
 
 With value inversion, the three pictures' frames have different tone mixes (the owl's frame has no dark cells at all), so a conventional flat-edged border would need identical frame inventories that the design cannot provide without distorting the pictures. Decision: the puzzle sits in a tray; all pieces are interior-shaped (the "frame tray" idea from docs/IDEAS.md). Revisit only if cross-class interior seams are implemented in the engine.
+
+## 2026-10-27 (14:30 UTC): standard border is feasible again; tray stays the default for now
+
+Cross-class seams in the engine (`pieces.py` SeamPlanner, `scene.py` padding and seam report,
+`optimize.py` role-swap move; `docs/engine-spec.md`) make the standard border valid for the
+subject set with 0 mismatches (`experiments/011-subjects/border-check/round2/run-standard`),
+which supersedes the 2026-10-27 tray decision's premise. Decision: keep the tray as the working
+default until the v4 tiers land, then render both borders once on the same scenes and choose by
+the grid review (straight interior seams are a grid tell in the physical puzzle) and by piece
+distinctiveness (the 130 interior flat-sided pieces per picture are a new solvability aid).
+
+## 2026-10-27 (14:30 UTC): figure-aware motif placement needs an animal mask
+
+Pipeline v7 showed that a motif halo or gradient measured from the figure cannot be derived from
+the tone tiers (FINDINGS 38). The design pass exports a per-picture animal mask
+(`<tiers>-animal.txt`) from v4 onward; motif placement rules may use it. v7's fallback rule is
+retired; v6 remains the motif baseline.
