@@ -1,0 +1,531 @@
+{
+  "_note": "Experiment 011 v2 roles (merged classes incl. S-L; S and W as tiers). target_counts = per-class max over images for transitions, common plain targets. Frame and edge roles fixed.",
+  "roles": {
+    "d_frame": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_near": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_far": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_slot": {
+      "classes": [
+        "D",
+        "DMc",
+        "DMs",
+        "DLc",
+        "DLs",
+        "MDc",
+        "LDc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "d_nslot": {
+      "classes": [
+        "D",
+        "DMc",
+        "DMs",
+        "DLc",
+        "DLs",
+        "MDc",
+        "LDc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "d_xslot": {
+      "classes": [
+        "D",
+        "DMc",
+        "DMs",
+        "DLc",
+        "DLs",
+        "MDc",
+        "LDc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "s_frame": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_near": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_far": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_slot": {
+      "classes": [
+        "S",
+        "SLc",
+        "SLs",
+        "LSc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "s_nslot": {
+      "classes": [
+        "S",
+        "SLc",
+        "SLs",
+        "LSc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "s_xslot": {
+      "classes": [
+        "S",
+        "SLc",
+        "SLs",
+        "LSc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "m_frame": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_near": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_far": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_slot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMs",
+        "MDc",
+        "MWc",
+        "MWs",
+        "MLc",
+        "MLs",
+        "WMc",
+        "LMc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "m_nslot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMs",
+        "MDc",
+        "MWc",
+        "MWs",
+        "MLc",
+        "MLs",
+        "WMc",
+        "LMc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "m_xslot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMs",
+        "MDc",
+        "MWc",
+        "MWs",
+        "MLc",
+        "MLs",
+        "WMc",
+        "LMc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "w_frame": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_near": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_far": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_slot": {
+      "classes": [
+        "W",
+        "MWc",
+        "MWs",
+        "WMc",
+        "WLc",
+        "WLs",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "w_nslot": {
+      "classes": [
+        "W",
+        "MWc",
+        "MWs",
+        "WMc",
+        "WLc",
+        "WLs",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "w_xslot": {
+      "classes": [
+        "W",
+        "MWc",
+        "MWs",
+        "WMc",
+        "WLc",
+        "WLs",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "l_frame": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_near": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_far": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_slot": {
+      "classes": [
+        "L",
+        "DLc",
+        "DLs",
+        "SLc",
+        "SLs",
+        "MLc",
+        "MLs",
+        "WLc",
+        "WLs",
+        "LDc",
+        "LSc",
+        "LMc",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "l_nslot": {
+      "classes": [
+        "L",
+        "DLc",
+        "DLs",
+        "SLc",
+        "SLs",
+        "MLc",
+        "MLs",
+        "WLc",
+        "WLs",
+        "LDc",
+        "LSc",
+        "LMc",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "l_xslot": {
+      "classes": [
+        "L",
+        "DLc",
+        "DLs",
+        "SLc",
+        "SLs",
+        "MLc",
+        "MLs",
+        "WLc",
+        "WLs",
+        "LDc",
+        "LSc",
+        "LMc",
+        "LWc"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "edge_dmc": {
+      "classes": [
+        "DMc"
+      ]
+    },
+    "edge_dms": {
+      "classes": [
+        "DMs"
+      ]
+    },
+    "edge_dlc": {
+      "classes": [
+        "DLc"
+      ]
+    },
+    "edge_dls": {
+      "classes": [
+        "DLs"
+      ]
+    },
+    "edge_slc": {
+      "classes": [
+        "SLc"
+      ]
+    },
+    "edge_sls": {
+      "classes": [
+        "SLs"
+      ]
+    },
+    "edge_mdc": {
+      "classes": [
+        "MDc"
+      ]
+    },
+    "edge_mwc": {
+      "classes": [
+        "MWc"
+      ]
+    },
+    "edge_mws": {
+      "classes": [
+        "MWs"
+      ]
+    },
+    "edge_mlc": {
+      "classes": [
+        "MLc"
+      ]
+    },
+    "edge_mls": {
+      "classes": [
+        "MLs"
+      ]
+    },
+    "edge_wmc": {
+      "classes": [
+        "WMc"
+      ]
+    },
+    "edge_wlc": {
+      "classes": [
+        "WLc"
+      ]
+    },
+    "edge_wls": {
+      "classes": [
+        "WLs"
+      ]
+    },
+    "edge_ldc": {
+      "classes": [
+        "LDc"
+      ]
+    },
+    "edge_lsc": {
+      "classes": [
+        "LSc"
+      ]
+    },
+    "edge_lmc": {
+      "classes": [
+        "LMc"
+      ]
+    },
+    "edge_lwc": {
+      "classes": [
+        "LWc"
+      ]
+    }
+  },
+  "target_counts": {
+    "D": 175,
+    "DLc": 15,
+    "DLs": 46,
+    "DMc": 13,
+    "DMs": 35,
+    "L": 292,
+    "LDc": 20,
+    "LMc": 22,
+    "LSc": 3,
+    "LWc": 2,
+    "M": 228,
+    "MDc": 14,
+    "MLc": 20,
+    "MLs": 39,
+    "MWc": 1,
+    "MWs": 17,
+    "S": 23,
+    "SLc": 7,
+    "SLs": 16,
+    "W": 29,
+    "WLc": 3,
+    "WLs": 5,
+    "WMc": 1
+  }
+}
