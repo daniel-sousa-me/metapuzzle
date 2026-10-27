@@ -16,7 +16,7 @@ status, the pipeline, the working method and a file map. Then read `docs/DECISIO
 
 ## Where we are
 
-Status as of 2026-10-27, 10:10 UTC. Sources are given in each item.
+Status as of 2026-10-27, 13:00 UTC. Sources are given in each item.
 
 - **Working grid: 27x38 (1026 pieces), tray border.** Adopted 2026-10-27 after experiment
   013 (`docs/DECISIONS.md`). The tray (no flat-edged frame) follows from the value-inversion
@@ -33,15 +33,23 @@ Status as of 2026-10-27, 10:10 UTC. Sources are given in each item.
   solvable: T9 scored 2/5 on v2 and v4, with about 70% of pieces interchangeable
   (`docs/FINDINGS.md`, entries 25 and 26). The next layer is legible motifs assigned by
   region: 9 regular motifs and 6 heroes (`docs/design/10-motif-vocabulary.md`).
+- **Motif layer, v5 and v6.** Pipeline v5 put motifs on 31% of pieces: the scene gates pass, but
+  blind recognition halved (owl 2/5, swan 2/5), so v6 (14% coverage, organic clusters, silhouette
+  halo) is in evaluation (`docs/design/10-motif-vocabulary.md`, `experiments/011-subjects/evaluation-v5.md`).
+  T9 is still 2/5 across v2, v4 and v5, because plain fields are the hard part; motif pieces are
+  placeable against the box image, which shows them faithfully.
 - **Owner steers (2026-10-27).** Lines first (ink before the full render). Each image must
   have a unique solution with few wrong local ones. Shared adjacency per pair is below about
   10%, with no transferable cluster larger than 3 pieces; zero is a stretch.
-- **Current best.** 011 `27x38-v2/run-full` and `run-ink`: shared adjacency AB/AC/BC 0/0/1
-  (one contact). T9 on v2 is 65 to 75% interchangeable.
-- **In progress (10:10 UTC, not evaluated).** Pipeline v5 (`pipeline/run_from_tiers_v5.py`,
-  motif classes). `27x38-v2/run-ink-v5` reports shared 0/1/1, piece gates PASS and scene gates
-  PASS (larger-of 2x2 reuse 17 to 22%, same position 1 to 3%). `run-full-v5` is still being written. `make_targets_v4.py`
-  is drawing the v4 tiers into `27x38-v4/`.
+- **Current best.** 011 `27x38-v2/run-full-v6` and `run-ink-v6` (pipeline v6, sparse motifs,
+  14% coverage): shared adjacency AB/AC/BC 1/1/0, piece and scene gates pass, T9 3/5
+  (`evaluation-v6.md`). Recognition is limited by figure detail and scene cues, not by motifs
+  (`docs/FINDINGS.md`, entry 37): blind readers of v6 see "top-down maps".
+- **In progress (13:00 UTC).** A design pass (`make_targets_v4_draft.py` -> `27x38-v4-draft/`:
+  owl cues, hare background, swan water and internal lines); matcher v4
+  (`make_targets_v4.py` -> `27x38-v4/`, figure-edge nudges, surplus under 30); pipeline v7
+  (motif density gradient by distance from the figures); cross-class seams in the engine so a
+  standard border can be re-tested; per-piece seeded parameter ranges in class specs.
 - **Open items:**
   - **Solvability.** T9 is 2/5 for the plain fields. The v5 motif render needs a full render,
     blind tests and T9 before it counts.
@@ -67,7 +75,8 @@ The current pipeline is in `experiments/011-subjects`. Stage numbers match `docs
 3. **Chip sub-classes.** `pipeline/run_from_tiers_v4.py` and `gen_classes_v10.py`: Lr, Lb, Lo,
    Lx on light ground and Mr, Mb, Mc on mid ground, each with a per-picture pattern.
 4. **Motif classes.** `pipeline/run_from_tiers_v5.py`, `gen_classes_v11.py` (writes
-   `classes-v11.json` and `classes-ink-v11.json`) and `motifs/make_motif_maps.py`. The v5 stage is in progress.
+   `classes-v11.json` and `classes-ink-v11.json`) and `motifs/make_motif_maps.py`; v6 (`run_from_tiers_v6.py`,
+   `gen_classes_v12.py`, `motifs/make_motif_maps_v2.py`) lowers coverage to 14% with a silhouette halo.
 5. **Scenes.** `metapuzzle roles-to-scenes` turns the role grids into three class maps with one common histogram.
 6. **Prototype.** `metapuzzle prototype --rotation quarter --border tray --cell 21`, once with the
    ink spec and once with the full spec. Annealing minimizes shared adjacencies, clusters and side mismatches.
@@ -145,13 +154,15 @@ One folder per experiment under `experiments/`, each with a README (003 has a st
 - **008 mixed-frames**: 480 pieces on 20x24, 30x16 and 40x12 boards. Round 1 invalid; round 2 valid with 0/0/0 (quarter) and 2/0/0 (none). Scene gates fail; not evaluated.
 - **009 grid-metric-calibration**: the automatic grid score does not reproduce the human ranking. Not used as a gate.
 - **010 connector-classes**: current solutions are far from minimal mating classes (largest class 46 to 91% of sides). The connector minimum is no longer a gate.
-- **011 subjects**: "Field, Wood and Water" (hare, owl, swan) in value inversion on a tray border with quarter rotation. The 27x38-v2 renders have shared 0/0/1; T9 is 2/5 on v2 and v4; the v5 motif render is in progress.
+- **011 subjects**: "Field, Wood and Water" (hare, owl, swan) in value inversion on a tray border with quarter rotation. The 27x38-v2 renders have shared 0/0/1 (v2) and 1/1/0 (v6); T9 is 2/5 on v2, v4 and v5 and 3/5 on v6.
 - **012 constructive-placements**: algebraic minimal mating classes (K(3,3), K4) and SAT searches. Exact classes need both dimensions = 1 (mod 3) with no rotation and force B and C to be shuffles of A.
 - **013 scale**: the 005 pipeline at 500, 750, 1026 and 1536 pieces. Recognition improves from 750 up, so 27x38 became the working grid. A blind test at 27x38 names the boat 5/5 but not the cat.
 
 ## Status
 
 The piece-level gate passes for every 27x38 render. The scene-level gates fail for every
-render up to v4, by design (difficulty indicators, DECISIONS 2026-10-26); the unverified v5
-ink render passes them. Evaluated so far: T1 on 27x38 v1 and v2, grid reviews on v2, and T9
-on v2 and v4. T8 fails on every run measured so far, and the grid metric is not calibrated (009).
+render up to v4, by design (difficulty indicators, DECISIONS 2026-10-26); the v5 and v6
+renders pass them. Evaluated so far: T1 on 27x38 v1, v2, v5 and v6 (full and ink), grid
+reviews on v2, and T9 on v2, v4, v5 and v6. T8 fails on every run measured so far, and the
+grid metric is not calibrated (009). Next milestone: v4 tiers (design pass plus matcher) through
+pipeline v6 or v7, blind tests passing for all three animals, surplus under 30, T9 at least 3/5.
