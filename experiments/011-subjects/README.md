@@ -88,3 +88,31 @@ All on `27x38-v2`, tray border, quarter rotation, cell 21; full and ink renders 
   re-rendered from the saved solution): 68 interior flat seams per board; straight runs of 3 or more
   seams: A 1 (one vertical run of 3), B 0, C 0. The seams are scattered as dominoes, L-trominoes and
   2x2 blocks, so the physical grid tell from seams is small. Andro profiles draw as outward bumps.
+
+## v4 draft (27x38-v4-draft)
+
+`python3 make_targets_v4_draft.py` (about 7 min on 4 cores) is a copy of v2 with redrawn animals and
+scene cues, following blind-test-v2.md and evaluation-v6.md. The method is unchanged, except that the
+annealer may move cells within 2 of a drawn line (SOFT_RADIUS 2), and `~` in a sketch now marks a locked
+W cell. Internal lines are bands at least 2 cells wide, because 1-cell strips are anomalies.
+- **Owl (B):** slanted ear tufts, 7-wide round eyes with single-cell pupils (dot pieces), a 4-4-2
+  pointed M beak, two stepped W wing lines (the W chest read as a mouth, so it was dropped), and legs
+  gripping a branch that lies on the snow. The moon disc is behind the head, with a crater band (S).
+- **Hare (A):** the dark tier is a hedge band with a crown skyline above it, long shadow stripes across
+  a sunlit meadow, and a foreground shadow band. Mist (W) lies beside the hare. The hare has a dark
+  ear tip, haunch, shoulder and leg lines (D), a white tail (L) and the dot eye. It is cropped at row 29.
+- **Swan (C):** redrawn facing left, with an S neck, an olive M beak, a dot eye, a raised wing bump, a
+  pointed tail and an S wing line. It floats in a 2–3-row W water band with a reflection drip.
+- **S set:** one 2 × 5 band per picture: starlings (A), moon craters (B), wing line (C).
+- **Dots:** per picture, two D-on-L dots (crows; pupils; eye and a duck on a glint) and one D-on-M
+  dot (hare eye; bat; duck).
+- **Budgets:** counts D/M/W/L/S are 362/271/91/292/10, with a spread of 1 or less. Edge spreads are
+  D-M 6, W-L 5 and 4 or less for every other pair; corner spreads are 4 or less. S-L is 14/8 in every
+  picture. There are no caps, strips or pinches.
+- **Animal masks:** `tiers-X-animal.txt` (A = animal). Each is the figure with its holes (eyes, beak,
+  lines), plus the locked lines touching it (hare ear tip, leg line and tail; swan beak). The owl's
+  mask excludes the branch and the sky between its legs.
+- **Risks:** the annealer moved 121/64/134 cells and roughens the background shapes: the hedge is
+  ragged, the owl's moon is a wide cap rather than a round disc, and the swan's moon is scalloped.
+  Straight runs are up to 19 (the locked branch), 45° runs in D-L are 37/64/37, and there are 72–83
+  junction cells. Not yet blind-tested.

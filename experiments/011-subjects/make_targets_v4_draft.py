@@ -54,7 +54,7 @@ SOFT_RADIUS = 2   # v4 draft: 2 = cells on a drawn boundary and their neighbours
 SKETCHES = {}  # filled below
 
 # Hand-drawn 27 x 38 sketches, rows top to bottom. D M S as themselves, '.' = L, 'w' = W.
-# Lower case 'd' / 'm' / ',' = D / M / L locked: a drawn feature the balancer must not touch
+# Lower case 'd' / 'm' / ',' / '~' = D / M / L / W locked (v4 draft adds '~'): a drawn feature the balancer must not touch
 # (the hare's tree, the swan's clouds, the dots and their neighbours). The figure and S are always
 # locked.
 SKETCHES["A"] = """
@@ -70,20 +70,20 @@ wwwwww....,d,..............
 .DDDD..MMMMM..MMMMMDDDDDDDD
 DDDDDDDDMMMMMMMMMMMMDDDDDDD
 DDDDDDDDDMMMMMMMMMMMDDDDDDD
-DDDDDDDDDMMMMMMMMdMMMDDDDDD
-DDDDDDDDDMMMMMMMMMMMMMDDDDD
-..DDDDDDDDMMMMMMMMMMMMDDDDD
+DDDDDDDddMMMMMMMMdMMMDDDDDD
+DDDDDDDddMMMMMMMMMMMMMDDDDD
+..DDDDDDddMMMMMMMMMMMMDDDDD
 ......DDDDDMMMMMMMMMMMDDDDD
 ......DDDDDDMMMMMMMMMDDDDDD
 ......DDDDDDMMMMMMwwwDDDDDD
 .......wwwMMMMMMMMwww......
-.......wwwMMMMMMMMMww......
-DDDD.....MMMMMMMMMMMDDDDDDD
-DDDD.....MMMMMMMMMMMDDDDDDD
-.......MMMMMddMMMMMMMwwwwww
-......MMMMMMddMMMMMMMwwwwww
-DDD..MMMMMMddMMMMMMMMwwwwww
-DDD..MMMMMMddMMMMMMMMwwwwww
+.......wwwMMMMMddMMww......
+DDDD..wwwMMMMMMddMMMDDDDDDD
+DDDD..wwwMMMMMMddMMMDDDDDDD
+.....wwMMMMMddMMMMMMMwwwwww
+....wwMMMMMMddMMMMMMMwwwwww
+DDDwwMMMMMMddMMMMMMMMwwwwww
+DDDwwMMMMMMddMMMMMMMMwwwwww
 wwww,,MMMMddMMMddMMMMwwwwww
 wwww,,MMMMddMMMddMMMwwwwwww
 wwwMMMMMMMMMMMMddMMMwwwwwww
@@ -99,14 +99,14 @@ DDDDDDDDDDDDDDDDDDDDDDDDDDD
 """
 
 SKETCHES["B"] = """
-wwwwwww..............mmmmmm
-wwwwww................mmmmm
-mmmm.....SSSSS.........mmmm
-mmmm.....SSSSS.........mmmm
-wwwwwww.................mmm
-wwwwwww.................mmm
-mmmm....................mmm
-mmmm....................mmm
+wwwwwww..............MMMMMM
+wwwwww................MMMMM
+MMMM.....SSSSS.........MMMM
+MMMM.....SSSSS.........MMMM
+wwwwwww.................MMM
+wwwwwww.................MMM
+MMMM....................MMM
+MMMM....................MMM
 MMMMDD................DDMMM
 MMMMDDD..............DDDMMM
 MMMMDDDD............DDDDMMM
@@ -140,16 +140,16 @@ DDDDDDDDDDDDDDDDDDDwwwwwwww
 """
 
 SKETCHES["C"] = """
-wwwDDDDDDDDDDDDDDDD,,,,,,DD
-wwwDDDD.....DDDDDD,,,,,,,,D
-DDDDDD......DDDDD,,,,,,,,,,
-DDDDD....d..DDDDD,,,,,,,,,,
-ddddd.......DDDDD,,,,,,,,,,
-dmmm........DDDDD,,,,,,,,,,
-dmmm........DDDDD,,,,,,,,,,
-ddddd.......DDDDD,,,,,,,,,,
-DDDDDD.....DDDDDDD,,,,,,,,D
-DDDDDDD....DDDDDDDD,,,,,,DD
+wwwDDDDDDDDDDDDDDDDD....DDD
+wwwDDDD.....DDDDDDD.......D
+DDDDDD......DDDDDD.........
+DDDDD....d..DDDDDD.........
+ddddd.......DDDDD..........
+dmmm........DDDDD..........
+dmmm........DDDDDD.........
+ddddd.......DDDDDD........D
+DDDDDD.....DDDDDDDD.......D
+DDDDDDD....DDDDDDDDDD...DDD
 D..DDDDD....DDDDDDDDDDDDDDD
 D..DDDDDD....DDmmmmDDDDDDDD
 DDDDDDDDD....DDmmmmDDDwwwww
@@ -191,7 +191,7 @@ for i, (a, b) in enumerate(PAIRS + FORBIDDEN):
     PAIR_ID[CODE[a], CODE[b]] = PAIR_ID[CODE[b], CODE[a]] = i
 NP = len(PAIRS) + len(FORBIDDEN)
 SKETCH_ROWS, SKETCH_COLS = 38, 27   # native size of the sketches
-SKETCH_CHAR = {".": "L", ",": "L", "d": "D", "m": "M", "w": "W", "D": "D", "M": "M", "S": "S"}
+SKETCH_CHAR = {".": "L", ",": "L", "d": "D", "m": "M", "w": "W", "~": "W", "D": "D", "M": "M", "S": "S"}
 
 
 def parse(text):
@@ -199,7 +199,7 @@ def parse(text):
     rows = [r.strip() for r in text.strip().splitlines()]
     assert len(rows) == SKETCH_ROWS and all(len(r) == SKETCH_COLS for r in rows), [len(r) for r in rows]
     t = np.array([[CODE[SKETCH_CHAR[ch]] for ch in r] for r in rows], np.int8)
-    locked = np.array([[ch in "dm," for ch in r] for r in rows])
+    locked = np.array([[ch in "dm,~" for ch in r] for r in rows])   # v4 draft: "~" = locked W
     return t, locked
 
 
