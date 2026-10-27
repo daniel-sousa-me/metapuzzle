@@ -1,0 +1,4 @@
+false fits 1518724 (connectors.py: 1518724), intended 2865, ratio 530.1
+class-plausible false fits 1181784, ratio 412.5 (78% of false fits)
+largest contributors: L|L 104.3, L|M 66.7, L|LD 35.4, L|LM 35.4, L|ML 23.6
+class pairs that are neighbours somewhere: 36 of 45

@@ -1,0 +1,20 @@
+## full classes (9), 20x25 (500 cells)
+same class at the same cell in A, B, C: 218 (43.6%)
+random trajectories (expected): 54.1 (10.8%)
+cyclic-scheme bound: 263 (52.6%)  [constant 218 + rotation orbits 45]
+checkerboard bound (best parity): 236 (47.2%)
+group family, tray 21x24 (crop + pad), best of 22 x 504^2 schemes: 102 / 504 (20.2%); random 13.1%; params ((7, 8), (7, 8), (0, 0), (20, 0))
+product family, standard 19x25 (crop): construction 112 / 475 (23.6%); any row/column permutations (upper bound, annealed): 266 (56.0%); random 9.8%
+repaint group 21x24 by majority vote: cells changed A/B/C = 13%/51%/53%
+repaint product 19x25 by majority vote: cells changed A/B/C = 12%/49%/57%
+
+## tiers L/M/D, 20x25 (500 cells)
+same class at the same cell in A, B, C: 342 (68.4%)
+random trajectories (expected): 117.4 (23.5%)
+cyclic-scheme bound: 435 (87.0%)  [constant 342 + rotation orbits 93]
+checkerboard bound (best parity): 389 (77.8%)
+group family, tray 21x24 (crop + pad), best of 22 x 504^2 schemes: 175 / 504 (34.7%); random 26.8%; params ((7, 8), (7, 8), (14, 15), (8, 7))
+product family, standard 19x25 (crop): construction 192 / 475 (40.4%); any row/column permutations (upper bound, annealed): 366 (77.1%); random 22.6%
+repaint group 21x24 by majority vote: cells changed A/B/C = 16%/31%/30%
+repaint product 19x25 by majority vote: cells changed A/B/C = 20%/22%/27%
+

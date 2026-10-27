@@ -1,0 +1,20 @@
+| construction | displaced f | largest class | sides in complete K(3,3) | false-fit ratio | shared adjacencies (sum of pairs) |
+|---|---|---|---|---|---|
+| product 19x25 standard none | 0.00 | 0.3% | 100% | 0.00 | 0 |
+| product 19x25 standard none | 0.01 | 1.5% | 92% | 0.28 | 2 |
+| product 19x25 standard none | 0.02 | 4.0% | 82% | 1.12 | 0 |
+| product 19x25 standard none | 0.05 | 19.6% | 58% | 21.70 | 5 |
+| product 19x25 standard none | 0.10 | 31.6% | 32% | 58.24 | 7 |
+| product 19x25 standard none | 0.20 | 43.2% | 8% | 106.74 | 21 |
+| product 19x25 standard none | 0.50 | 45.7% | 0% | 123.65 | 35 |
+| product 19x25 standard none | 0.76 | 45.7% | 0% | 123.65 | 46 |
+| product 19x25 standard none | 1.00 | 45.7% | 0% | 123.65 | 47 |
+| group 21x24 tray none | 0.00 | 0.3% | 87% | 0.03 | 0 |
+| group 21x24 tray none | 0.01 | 2.0% | 78% | 0.53 | 0 |
+| group 21x24 tray none | 0.02 | 4.9% | 68% | 1.83 | 2 |
+| group 21x24 tray none | 0.05 | 24.3% | 44% | 40.19 | 4 |
+| group 21x24 tray none | 0.10 | 35.6% | 26% | 83.40 | 7 |
+| group 21x24 tray none | 0.20 | 45.9% | 8% | 142.01 | 5 |
+| group 21x24 tray none | 0.50 | 50.0% | 0% | 173.35 | 20 |
+| group 21x24 tray none | 0.76 | 50.0% | 0% | 173.75 | 23 |
+| group 21x24 tray none | 1.00 | 50.0% | 0% | 174.50 | 18 |
