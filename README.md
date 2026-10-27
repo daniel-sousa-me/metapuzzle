@@ -12,14 +12,16 @@ starts at roughly 60 to 100 pieces and scales toward 500.
 
 ## Where we are
 
-- **Grammar.** The carry-forward grammar is the hybrid tone-field. Each subject is a bold three-tier tone map (dark, mid, light), and every tier boundary lies inside a marching-tile transition piece, so no colour step lands on a cut.
-- **Texture.** Scatter (S) and wave (W) tiers and motif pieces carry the texture inside a tier. The frame cells are still plain (an engine limit).
-- **Lines first.** Ink mode (black contours on white) is the first render of every scene, used to judge shape and piece mapping before fills.
-- **Role maps.** Each subject is authored as a role grid; the class solver (`roles-to-scenes`) gives the three class maps one histogram and matching border counts.
-- **Boundary budgets.** Each tier pair needs as many transition pieces as the subject has boundary edges of that pair. The budgets are a shared inventory across the three subjects.
-- **Connectors.** Each side should fall into a minimal mating class (3 tabs and 3 blanks, or 4 sides when symmetric). This is not met yet; see Status.
-- **Owner steers (2026-10-27).** Lines first. Each image must have a unique solution with few wrong local ones. Piece-level shared adjacency is relaxed to below 10% per pair, with no transferable cluster larger than 3 pieces; zero is a stretch.
-- **Best result.** Experiment 005, carry-forward run (`run-quarter`, 20x25 at 500 pieces): 0/0/0 shared adjacencies, distinctiveness 4/5, tree recognized blind. The cat and boat were not named.
+- **Working grid: 27x38 (1026 pieces).** Adopted 2026-10-27 (`docs/DECISIONS.md`) after experiment 013: recognition improves clearly from about 750 pieces up, and solve and render times stay small.
+- **Subject set: "Field, Wood and Water"** (`experiments/011-subjects`): a hare at dawn, an owl at dusk and a swan at midnight, in value inversion. Status: all three animals are readable in the latest render (`27x38-v2`); blind tests are pending.
+- **Pipeline** (`experiments/011-subjects/pipeline`): tiers (`make_targets.py`) → class-level quantize with marching tiles, including junctions and the S and W tiers → budget equalizer → roles with the surplus placement policy → scenes → ink and full renders. Entry point `run_from_tiers_v3.py`; `run_from_tiers_v4.py` adds chip sub-classes and is in progress.
+- **Uniqueness: from artwork, not connector algebra.** Experiment 012 showed that exact minimal mating classes need both board dimensions ≡ 1 (mod 3) with no rotation, and they force pictures B and C to be fixed shuffles of A. Uniqueness therefore rests on distinct cuts and visually distinguishing artwork (chip sub-classes, motifs, marks), judged by the visual-ambiguity test (T9) rather than the false-fit ratio (`docs/DECISIONS.md`, 2026-10-27).
+- **Owner steers (2026-10-27).** Lines first (ink before the full render). Each image must have a unique solution with few wrong local ones. Shared adjacency per pair is below about 10%, with no transferable cluster larger than 3 pieces; zero is a stretch.
+- **Current best.** 011 `27x38-v2` (`run-full` and `run-ink`): shared adjacency 0/0/1, blind tests pending. The first 011 render (`27x38/run-full`) scored distinctiveness 4/5 in colour and 5/5 in ink.
+- **Open items:**
+  - **Surplus.** Transition pieces left over after equalization still show as stray blocks (21 to 29 per picture in the first 011 render; `docs/FINDINGS.md` entry 23). Eliminate them by class-level matching, so each picture uses exactly its budget.
+  - **Standard border.** The 27x38 runs use a tray border. A standard frame needs a board that admits an exact border; 28x37 would (`docs/DECISIONS.md`, 2026-10-27).
+  - **Chip sub-classes for solvability.** Chip sub-classes give the roles solver more classes for plain cells. They are in progress in `run_from_tiers_v4.py`; its first renders (`27x38-v2/run-full-v4`, `run-ink-v4`) are not yet in the gallery or evaluated.
 
 ## Pipeline
 
@@ -104,7 +106,9 @@ One folder per experiment under `experiments/`, each with a README unless noted.
 - **008 mixed-frames**: 480 pieces on 20x24, 30x16 and 40x12 boards. Round-2 runs are valid with 0/0/0 (quarter) and 2/0/0 (none); scene gates fail; not yet evaluated.
 - **009 grid-metric-calibration**: the automatic grid score does not reproduce the human ranking (it puts 004 last, humans first). Not used as a gate.
 - **010 connector-classes**: current solutions are far from minimal mating classes. The largest class holds 46 to 91% of sides, with a false-fit ratio of 60 to 530.
-- **011 subjects**: hare, owl and whale tone maps on a tray border with quarter rotation. Valid, 0/0/0 shared at 20x25. No README.
+- **011 subjects**: "Field, Wood and Water" (hare at dawn, owl at dusk, swan at midnight) in value inversion on a tray border with quarter rotation. The 27x38 runs have 0/0/0 shared adjacency (`27x38-v2`: 0/0/1), with chips and wave tiers. The current best full and ink renders are 27x38-v2.
+- **012 constructive-placements**: algebraic constructions of minimal mating classes (K(3,3) and K4) and SAT searches. Exact classes need both board dimensions ≡ 1 (mod 3) with no rotation and force B and C to be shuffles of A, so uniqueness is left to the artwork.
+- **013 scale**: the 005 pipeline at 500, 750, 1026 and 1536 pieces with placeholder scenes. Recognition improves clearly from 750 up, and surplus grows with perimeter. Its result is the 27x38 working grid.
 
 ## Status
 

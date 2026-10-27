@@ -1,6 +1,6 @@
 # Prototype gallery
 
-**Current direction.** The working grammar is the hybrid tone-field: three tiers per cell, with every tier boundary inside a transition piece, and the boundaries drawn as marching tiles (ink mode shows them as black strokes). The working grid is 27x38 (1026 pieces), adopted in `docs/DECISIONS.md`. The subject set "Field, Wood and Water" (`experiments/011-subjects`) is in progress with no renders yet, so 005 `run-ink-v5` stays the best ink render until the 011 renders exist.
+**Current direction.** The working grammar is the hybrid tone-field: three tiers per cell, with every tier boundary inside a transition piece, and the boundaries drawn as marching tiles (ink mode shows them as black strokes). The working grid is 27x38 (1026 pieces), adopted in `docs/DECISIONS.md`. The subject set "Field, Wood and Water" (`experiments/011-subjects`) is a hare at dawn, an owl at dusk and a swan at midnight, drawn in value inversion. Uniqueness comes from the artwork, not from connector algebra (`docs/DECISIONS.md`, last entries). The current best full render is 011 `27x38-v2/run-full` and the current best ink render is 011 `27x38-v2/run-ink`; their blind tests are pending.
 
 Visual index of the `experiments/` runs that produced a `triptych.png`. Figures come from each run's `summary.md` and the experiment README. Distinctiveness and grid scores come from the latest `blind-test-*.md` in the folder. A dash means not recorded. Folders 001, 003 and 007 have no triptych and are not listed. 003 also has no README.
 
@@ -20,7 +20,7 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 005 | run-quarter-v3b | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-ink-v3b (black contour) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-full-v5 | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 3 / 3 / 3 |
-| 005 | **run-ink-v5** (black contour, current best ink render) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | - |
+| 005 | run-ink-v5 (black contour) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | - |
 | 005 | run-full-v5eq (budget-equalized) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-ink-v5eq (budget-equalized, black contour) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-full-v5eq2 (equalizer v2) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 4 / 4 / 3 |
@@ -33,14 +33,22 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 008 | run-flat | 20x24 / 30x16 / 40x12 | none | 0 / 0 / 0 | PASS (invalid) | FAIL | not evaluated; runs invalid | not evaluated; runs invalid |
 | 008 | run-quarter-v2 (round 2, valid) | 20x24 / 30x16 / 40x12 | quarter | 0 / 0 / 0 | PASS | FAIL | not evaluated | not evaluated |
 | 008 | run-flat-v2 (round 2, valid) | 20x24 / 30x16 / 40x12 | none | 2 / 0 / 0 | PASS | FAIL | not evaluated | not evaluated |
-| 011 | run-quarter | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 011 | prev-attempt/run-quarter (hare, owl, whale) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 011 | 27x38/run-full (v1) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 3 / 3 / 3 |
+| 011 | 27x38/run-ink (v1) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | 5/5 | - |
+| 011 | 27x38/run-full-v2 (S-L transitions) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 011 | 27x38/run-ink-v2 (S-L transitions) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 011 | 27x38/run-full-v3 (surplus placement) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 011 | 27x38/run-ink-v3 (surplus placement) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 011 | **27x38-v2/run-full** (current best full render) | 27x38 | quarter | 0 / 0 / 1 | PASS | FAIL | - | - |
+| 011 | **27x38-v2/run-ink** (current best ink render) | 27x38 | quarter | 0 / 0 / 1 | PASS | FAIL | - | - |
 | 013 | g20x25 run-full / run-ink | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 013 | g25x30 run-full / run-ink | 25x30 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
-| 013 | **g27x38 run-full** (current best full render) / run-ink | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 013 | g27x38 run-full / run-ink | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 013 | g32x48 run-full / run-ink | 32x48 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 
 - Shared counts are piece-level adjacencies: pieces touching in both solutions of the pair.
-- Blind tests cover these runs: 002 `blind-test-2`, 004 `blind-test-1`, 005 `blind-test-1` (run-quarter), 005 `blind-test-2` (run-full-v5), 005 `blind-test-3` (run-full-v5eq2) and 005 `blind-test-ink-1` (run-ink-v5). All other runs, including the 005 v3b, v5eq, v6 and run-ink-v5eq2 renders and every 013 render, have no evaluation of their own.
+- Blind tests cover these runs: 002 `blind-test-2`, 004 `blind-test-1`, 005 `blind-test-1` (run-quarter), 005 `blind-test-2` (run-full-v5), 005 `blind-test-3` (run-full-v5eq2) and 005 `blind-test-ink-1` (run-ink-v5), and 011 `blind-test-full-1` and `blind-test-ink-1` (27x38/run-full and run-ink). All other runs, including the 005 v3b, v5eq, v6 and run-ink-v5eq2 renders, the 011 v2 and v3 renders, 27x38-v2 and every other 013 render, have no evaluation of their own.
 - 008 round 1 runs are invalid (see its section), so their piece and scene gates are indicative only. Round 2 runs are valid.
 - \* 002 run-none's `summary.md` has no Gates section. Its gate values come from the round 2 table in `experiments/002-direction-a/README.md`.
 
@@ -236,13 +244,23 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 - Changed: round 2, now valid; feasibility demonstration of mixed frames and interior seams. Seams A / B / C: 82 / 80 / 74.
 - Piece shared: AB 2 (0.22%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, 2x2 window reuse 60.6 / 71.6 / 73.6% (limit 30%).
 
-## 011: Subjects on a tray board
+## 011: Subjects, "Field, Wood and Water"
 
-No blind test. Method from 005 with hare (A), owl (B) and whale (C) on a tray border, the earlier attempt kept in `prev-attempt/`. The README now describes a hare, owl and swan set, not yet rendered.
+**Goal:** a hare at dawn (A), an owl at dusk (B) and a swan at midnight (C) on a tray border with quarter rotation, in value inversion: D = field / owl / night sky, M = hare / dusk sky / lake, L = sky / moon and snow / swan, with S chips and W cloud or swell tiers. Design in `experiments/011-subjects/README.md`. The earlier hare, owl and whale attempt is kept in `prev-attempt/` (20x25, 2x2 reuse 64.7 / 64.9 / 66.2%, scene gates FAIL):
 
-![011 run-quarter triptych](../experiments/011-subjects/prev-attempt/run-quarter/triptych.png)
+![011 prev-attempt run-quarter triptych](../experiments/011-subjects/prev-attempt/run-quarter/triptych.png)
 
-- Piece shared: AB 0, AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, 2x2 window reuse 64.7 / 64.9 / 66.2% (limit 30%).
+**Latest blind tests** (first 27x38 run, `blind-test-full-1.md` and `blind-test-ink-1.md`). Colour: distinctiveness 4/5, grid 3 / 3 / 3; the owl is recognized (4/5), the hare reads as a creature (2/5) and the swan is partly read (2/5). Ink: distinctiveness 5/5; hare ears 4/5, owl face 4/5, swan 2/5. No blind test covers 27x38-v2 yet.
+
+Scene gates below are 2x2 window reuse for A-B / A-C / B-C (limit 30%). Left triptych full, right ink.
+
+**27x38 v1, resampled 20x25 sketches.** Shared 0/0/0 in both, piece gates PASS, scene gates FAIL (80.8 / 81.1 / 82.0%). ![011 27x38 full](../experiments/011-subjects/27x38/run-full/triptych.png) ![011 27x38 ink](../experiments/011-subjects/27x38/run-ink/triptych.png)
+
+**27x38 v2, S-L transitions.** The pipeline adds transitions between the S chips and L. Shared 0/0/0 in both, piece gates PASS, scene gates FAIL (79.9 / 77.9 / 78.9%). ![011 27x38-v2-pipeline full](../experiments/011-subjects/27x38/run-full-v2/triptych.png) ![011 27x38-v2-pipeline ink](../experiments/011-subjects/27x38/run-ink-v2/triptych.png)
+
+**27x38 v3, surplus placement policy.** The pipeline adds the surplus placement policy. Shared 0/0/0 in both, piece gates PASS, scene gates FAIL (79.7 / 78.2 / 79.7%). ![011 27x38 v3 full](../experiments/011-subjects/27x38/run-full-v3/triptych.png) ![011 27x38 v3 ink](../experiments/011-subjects/27x38/run-ink-v3/triptych.png)
+
+**27x38-v2, all three animals redrawn natively.** The hare, owl and swan are drawn at 27x38 rather than resampled, with the W and S budgets matched. Shared 0/0/1 (one BC pair, cluster 2), piece gates PASS, scene gates FAIL (71.3 / 64.3 / 68.3%; transferable blob 10.3% and 11.5% of A for A-B and A-C). **Current best full render** (`run-full`) and **current best ink render** (`run-ink`). ![011 27x38-v2 full](../experiments/011-subjects/27x38-v2/run-full/triptych.png) ![011 27x38-v2 ink](../experiments/011-subjects/27x38-v2/run-ink/triptych.png)
 
 ## 013: Scale study, 500 to 1536 pieces
 
@@ -252,6 +270,6 @@ Seed 0, one run per size, the same placeholder scenes (cat, sailboat, tree), no 
 
 **25x30 (750 pieces).** Mean surplus 43%, 2x2 reuse A-C 86.5%. Visual read: cat recognisable, tail reads as a boxy loop. ![013 g25x30 full](../experiments/013-scale/g25x30/run-full/triptych.png) ![013 g25x30 ink](../experiments/013-scale/g25x30/run-ink/triptych.png)
 
-**27x38 (1026 pieces), working grid.** Current best full render (`run-full`), adopted in `docs/DECISIONS.md`. Mean surplus 36%, the lowest of the four; 2x2 reuse A-C 90.2%; pipeline 162 s. Visual read: cat recognisable with ears and tail, sail steps finer. ![013 g27x38 full](../experiments/013-scale/g27x38/run-full/triptych.png) ![013 g27x38 ink](../experiments/013-scale/g27x38/run-ink/triptych.png)
+**27x38 (1026 pieces), working grid.** Placeholder scenes; the working grid adopted in `docs/DECISIONS.md`. The best full render is now 011 `27x38-v2/run-full`. Mean surplus 36%, the lowest of the four; 2x2 reuse A-C 90.2%; pipeline 162 s. Visual read: cat recognisable with ears and tail, sail steps finer. ![013 g27x38 full](../experiments/013-scale/g27x38/run-full/triptych.png) ![013 g27x38 ink](../experiments/013-scale/g27x38/run-ink/triptych.png)
 
 **32x48 (1536 pieces).** Mean surplus 45%, 2x2 reuse A-C 88.3%; pipeline 256 s. Visual read: cat broken, tail a thin line; surplus does not shrink relative to the figure. ![013 g32x48 full](../experiments/013-scale/g32x48/run-full/triptych.png) ![013 g32x48 ink](../experiments/013-scale/g32x48/run-ink/triptych.png)
