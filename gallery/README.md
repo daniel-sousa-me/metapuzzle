@@ -14,10 +14,15 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 005 | run-quarter (carry-forward) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 4 / 4 / 3 |
 | 005 | run-quarter-v2 | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-quarter-v3 | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 005 | run-ink-v3 (black contour, pre-fix) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-quarter-v3b | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-ink-v3b (black contour) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | **run-full-v5** (current best full render) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 3 / 3 / 3 |
 | 005 | **run-ink-v5** (black contour, current best ink render) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | - |
+| 005 | run-full-v5eq (budget-equalized) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 005 | run-ink-v5eq (budget-equalized, black contour) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 005 | run-full-v6 (diagonal tiles) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 005 | run-ink-v6 (diagonal tiles, black contour) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 006 | run-none | 8x10 | none | 7 / 2 / 4 | PASS | PASS | - | - |
 | 006 | run-quarter | 8x10 | quarter | 1 / 0 / 0 | PASS | PASS | - | - |
 | 008 | run-quarter | 20x24 / 30x16 / 40x12 | quarter | 0 / 0 / 0 | PASS (invalid) | FAIL | not evaluated; runs invalid | not evaluated; runs invalid |
@@ -27,7 +32,7 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 011 | run-quarter | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 
 - Shared counts are piece-level adjacencies: pieces touching in both solutions of the pair.
-- Blind tests cover one run each: 002 `blind-test-2`, 004 `blind-test-1`, 005 `blind-test-1` (run-quarter), 005 `blind-test-2` (run-full-v5) and 005 `blind-test-ink-1` (run-ink-v5). The two v3b runs have no evaluation of their own.
+- Blind tests cover one run each: 002 `blind-test-2`, 004 `blind-test-1`, 005 `blind-test-1` (run-quarter), 005 `blind-test-2` (run-full-v5) and 005 `blind-test-ink-1` (run-ink-v5). All other 005 runs, including the v3b, v5eq and v6 renders, have no evaluation of their own.
 - 008 round 1 runs are invalid (see its section), so their piece and scene gates are indicative only. Round 2 runs are valid.
 - \* 002 run-none's `summary.md` has no Gates section. Its gate values come from the round 2 table in `experiments/002-direction-a/README.md`.
 
@@ -109,6 +114,11 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 - Changed: minimal, localized surplus (README Step 4); histogram identical across maps, scene gates still fail.
 - Piece shared: AB 0 (0.00%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, 2x2 window reuse 67.3 / 75.7 / 76.1% (limit 30%).
 
+### run-ink-v3
+
+![005 run-ink-v3 triptych](../experiments/005-hybrid-tones/run-ink-v3/triptych.png)
+- Changed: black-line render of the run-quarter-v3 scenes, before the orientation fix (`docs/FINDINGS.md` entry 15); re-solved as run-ink-v3b. Piece shared: AB 0 (0.00%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, identical to run-quarter-v3b. No evaluation of this run.
+
 ### run-quarter-v3b
 
 ![005 run-quarter-v3b triptych](../experiments/005-hybrid-tones/run-quarter-v3b/triptych.png)
@@ -134,6 +144,26 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 
 - Changed (Steps 6 and 6b): black-line contour render (`classes-ink.json`) of the run-full-v5 scenes. Piece shared: AB 0 (0.00%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, identical to run-full-v5.
 - Evaluation (`blind-test-ink-1`): distinctiveness 4/5, no grid score. Sailboat 3/5 (mast 4/5, hull 3/5), tree 4/5, cat not named. Contour about 70 / 90 / 60% continuous for A / B / C.
+
+### run-full-v5eq
+
+![005 run-full-v5eq triptych](../experiments/005-hybrid-tones/run-full-v5eq/triptych.png)
+- Changed (Step 7): `equalize_budgets_v5.py` flips up to 24 boundary cells per image, so the surplus falls from 41 / 33 / 44 to 0 / 1 / 0. Olive bites now show in the dark figures, because flips were D-M and M-L only (`docs/FINDINGS.md` entry 20). Piece shared: AB 0 (0.00%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, same-position excl. L 44.5 / 50.9 / 45.6%, 2x2 reuse 70.8 / 78.3 / 75.7%, transferable blob 51.0 / 51.4 / 52.2%. No evaluation of this run.
+
+### run-ink-v5eq
+
+![005 run-ink-v5eq triptych](../experiments/005-hybrid-tones/run-ink-v5eq/triptych.png)
+- Changed (Step 7): black-line render of the run-full-v5eq scenes (`classes-ink.json`), with fewer stray fragments; the tree crown is rougher and the sail edge breaks on the right. Piece shared: AB 0 (0.00%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, identical to run-full-v5eq. No evaluation of this run.
+
+### run-full-v6
+
+![005 run-full-v6 triptych](../experiments/005-hybrid-tones/run-full-v6/triptych.png)
+- Changed (Step 8): a 2-2 tie goes to the lighter tier, 14 diagonal tiles sit in the tree canopy, and the render uses 110 classes (`classes-v7.json`). Diagonals help only at exactly 45 degrees, so the sail's 2.5:1 edge stays a staircase (`docs/FINDINGS.md` entry 19). Piece shared: AB 0 (0.00%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, same-position excl. L 41.5 / 40.6 / 35.2%, 2x2 reuse 62.1 / 73.7 / 69.5%, transferable blob 46.6 / 46.4 / 46.6%. No evaluation of this run.
+
+### run-ink-v6
+
+![005 run-ink-v6 triptych](../experiments/005-hybrid-tones/run-ink-v6/triptych.png)
+- Changed (Step 8): black-line render of the run-full-v6 scenes (`classes-ink-v7.json`); the tree octagon edges now read as clean diagonals, while the sail hypotenuse stays a staircase. Piece shared: AB 0 (0.00%), AC 0, BC 0. Piece gates: PASS. Scene gates: FAIL, identical to run-full-v6. No evaluation of this run.
 
 ## 006: Direction B (Garden Terrazzo)
 
