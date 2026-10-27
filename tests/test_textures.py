@@ -952,3 +952,189 @@ def test_march_new_arguments_are_checked():
         tx.march_mask(1, 100.0, None, pattern="bump", amplitude=0.4)
     with pytest.raises(ValueError, match="amplitude must be in"):
         tx.march_line(1, 100.0, PALETTE, pattern="notch", amplitude=-0.1)
+
+
+# ------------------------------------------------------- march_mask: junctions
+
+JUNCTION_PARTS = {"tee": (1, 2), "tee_side": (1, 2), "quad": (1, 2, 3)}
+JUNCTION_ARGS = {"roughness": 1.0, "wobble": 0.2}      # the largest ragged offset
+_GRID = [(1.25 + 2.5 * i, 1.25 + 2.5 * j) for i in range(40) for j in range(40)]  # inside the cell
+
+
+def _inside(poly: list[tuple[float, float]], x: float, y: float) -> bool:
+    """Even-odd point-in-polygon test."""
+    inside = False
+    for i in range(len(poly)):
+        (x1, y1), (x2, y2) = poly[i], poly[(i + 1) % len(poly)]
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            inside = not inside
+    return inside
+
+
+def _polylines(svg: str) -> list[list[tuple[float, float]]]:
+    """Every polyline of a march_line fragment, after its clip."""
+    out = []
+    for m in re.finditer(r'<polyline points="([^"]+)"', svg.split("</clipPath>")[-1]):
+        out.append([tuple(map(float, p.split(","))) for p in m.group(1).split()])
+    assert out, svg[:200]
+    return out
+
+
+def _mass(pattern: str, seed: int, part: int) -> list[tuple[float, float]]:
+    return _march_pts(tx.march_mask(seed, 100.0, None, pattern=pattern, part=part,
+                                    **JUNCTION_ARGS)[0])
+
+
+@pytest.mark.parametrize("pattern", list(JUNCTION_PARTS))
+def test_junction_parts_are_disjoint_and_their_union_is_part_zero(pattern):
+    for seed in range(12):
+        polys = {p: _mass(pattern, seed, p) for p in (0,) + JUNCTION_PARTS[pattern]}
+        for x, y in _GRID:
+            hits = [p for p in JUNCTION_PARTS[pattern] if _inside(polys[p], x, y)]
+            assert len(hits) <= 1, (pattern, seed, x, y)
+            assert _inside(polys[0], x, y) == bool(hits), (pattern, seed, x, y)
+
+
+def test_tee_parts_together_cover_the_top_half_and_split_it_left_from_right():
+    for seed in range(12):
+        m1, m2 = _mass("tee", seed, 1), _mass("tee", seed, 2)
+        for x, y in _GRID:
+            if y < 20:      # above every base boundary (the arms stay in 30..70)
+                assert _inside(m1, x, y) != _inside(m2, x, y), (seed, x, y)
+            if y > 80:      # the base only
+                assert not _inside(m1, x, y) and not _inside(m2, x, y), (seed, x, y)
+            if y < 20 and x < 20:
+                assert _inside(m1, x, y), (seed, x, y)
+            if y < 20 and x > 80:
+                assert _inside(m2, x, y), (seed, x, y)
+
+
+def test_quad_parts_fill_three_quadrants_and_leave_the_base_corner():
+    for seed in range(12):
+        m1, m2, m3 = (_mass("quad", seed, p) for p in (1, 2, 3))
+        for x, y in _GRID:
+            if x < 20 and y > 80:               # bottom-left: the base
+                assert not any(_inside(m, x, y) for m in (m1, m2, m3)), (seed, x, y)
+            if x < 20 and y < 20:
+                assert _inside(m1, x, y), (seed, x, y)
+            if x > 80 and y < 20:
+                assert _inside(m2, x, y), (seed, x, y)
+            if x > 80 and y > 80:
+                assert _inside(m3, x, y), (seed, x, y)
+
+
+@pytest.mark.parametrize("pattern", list(JUNCTION_PARTS))
+def test_junction_arms_are_pinned_at_midpoints_and_the_centre(pattern):
+    # Every arm runs between two pinned points: an edge midpoint or the centre (50, 50).
+    centre = (50.0, 50.0)
+    arms = {"west": (0.0, 50.0), "east": (100.0, 50.0), "north": (50.0, 0.0), "south": (50.0, 100.0)}
+    names = {"tee": ("west", "east", "north"), "tee_side": ("north", "south", "east"),
+             "quad": ("west", "east", "north", "south")}[pattern]
+    expected = {frozenset({arms[n], centre}) for n in names}
+    for seed in range(10):
+        lines = _polylines(tx.march_line(seed, 100.0, PALETTE, pattern=pattern, part=0,
+                                         **JUNCTION_ARGS))
+        assert {frozenset({pl[0], pl[-1]}) for pl in lines} == expected, (pattern, seed)
+        for p in JUNCTION_PARTS[pattern]:
+            mass = _mass(pattern, seed, p)
+            assert (50.0, 50.0) in mass, (pattern, seed, p)
+
+
+@pytest.mark.parametrize("pattern", list(JUNCTION_PARTS))
+def test_junction_arms_stay_inside_the_cell_at_the_largest_wobble(pattern):
+    for seed in range(20):
+        for pl in _polylines(tx.march_line(seed, 100.0, PALETTE, pattern=pattern, part=0,
+                                           **JUNCTION_ARGS)):
+            for x, y in pl[1:-1]:
+                assert 0.0 < x < 100.0 and 0.0 < y < 100.0, (pattern, seed, x, y)
+
+
+@pytest.mark.parametrize("pattern", list(JUNCTION_PARTS))
+def test_junction_ink_lines_run_along_the_mask_boundaries(pattern):
+    # The stroke of each part is made of mask vertices: the same geometry as the mask.
+    for seed in range(8):
+        for part in (0,) + JUNCTION_PARTS[pattern]:
+            # Part 0 is the union, so its arms between two masses are interior: they
+            # must lie on the outline of the masses together.
+            parts = JUNCTION_PARTS[pattern] if part == 0 else (part,)
+            mask_pts = set().union(*(_mass(pattern, seed, q) for q in parts))
+            line = tx.march_line(seed, 100.0, PALETTE, pattern=pattern, part=part,
+                                 **JUNCTION_ARGS)
+            for pl in _polylines(line):
+                assert all(p in mask_pts for p in pl), (pattern, seed, part)
+
+
+def test_tee_side_is_tee_turned_a_quarter_turn_clockwise():
+    for seed in range(6):
+        for part in (0, 1, 2):
+            tee = _mass("tee", seed, part)
+            side = _mass("tee_side", seed, part)
+            assert len(side) == len(tee)
+            for (x, y), (u, v) in zip(tee, side):
+                assert abs(u - (100.0 - y)) < 0.01 and abs(v - x) < 0.01, (seed, part)
+
+
+@pytest.mark.parametrize("pattern", list(JUNCTION_PARTS))
+def test_junction_parts_are_deterministic_and_seed_dependent(pattern):
+    for part in JUNCTION_PARTS[pattern]:
+        a = tx.march_mask(7, 100.0, None, pattern=pattern, part=part)
+        assert tx.march_mask(7, 100.0, None, pattern=pattern, part=part) == a
+        assert tx.march_mask(8, 100.0, None, pattern=pattern, part=part) != a
+        other = next(p for p in JUNCTION_PARTS[pattern] if p != part)
+        assert tx.march_mask(7, 100.0, None, pattern=pattern, part=other)[1] != a[1]
+
+
+def test_geometry_gives_two_masks_one_boundary_whatever_their_seeds():
+    # Parts 1 and 2 of one junction, given a shared geometry but different seeds, still
+    # tile the top half, as they would from one seed.
+    for g in range(4):
+        for seed in range(4):
+            m1 = _mass_geom(seed, 1, g)
+            m2 = _mass_geom(seed + 50, 2, g)
+            assert m1 == _mass_geom(g, 1, None) and m2 == _mass_geom(g, 2, None)
+            for x, y in _GRID:
+                if y < 20:
+                    assert _inside(m1, x, y) != _inside(m2, x, y), (g, seed, x, y)
+
+
+def _mass_geom(seed: int, part: int, geometry: int | None) -> list[tuple[float, float]]:
+    return _march_pts(tx.march_mask(seed, 100.0, None, pattern="tee", part=part,
+                                    geometry=geometry, **JUNCTION_ARGS)[0])
+
+
+def test_junction_part_and_geometry_arguments_are_checked():
+    with pytest.raises(ValueError, match="part must be 0 or one of"):
+        tx.march_mask(1, 100.0, None, pattern="tee", part=3)
+    with pytest.raises(ValueError, match="part must be 0 or one of"):
+        tx.march_mask(1, 100.0, None, pattern="quad", part=4)
+    with pytest.raises(ValueError, match="part is used only"):
+        tx.march_mask(1, 100.0, None, pattern="straight", part=1)
+    with pytest.raises(ValueError, match="part is used only"):
+        tx.march_line(1, 100.0, PALETTE, pattern="corner", part=2)
+    with pytest.raises(ValueError, match="geometry must be"):
+        tx.march_mask(1, 100.0, None, pattern="tee", part=1, geometry=1.5)
+    with pytest.raises(ValueError, match="geometry must be"):
+        tx.march_line(1, 100.0, PALETTE, pattern="tee", geometry=True)
+
+
+def test_junction_class_spec_draws_each_mass_under_its_own_named_clip():
+    spec = classes.ClassSpec.from_dict({
+        "palette": {"paper": "#e8dcc4", "ink": "#2f4f4f", "moss": "#5b7f5b"},
+        "classes": {"tee": {
+            "layers": [
+                {"primitive": "stipple", "palette": ["paper", "ink"]},
+                {"primitive": "stipple", "palette": ["ink", "paper"], "mask": "p1"},
+                {"primitive": "stipple", "palette": ["moss", "paper"], "mask": "p2"},
+            ],
+            "masks": {
+                "p1": {"primitive": "march_mask", "params": {"pattern": "tee", "part": 1,
+                                                             "geometry": 5}},
+                "p2": {"primitive": "march_mask", "params": {"pattern": "tee", "part": 2,
+                                                             "geometry": 5}},
+            },
+        }},
+    })
+    spec.validate()
+    frag = spec.drawer()("p1", "tee", 3, 64.0)
+    assert frag.count('<clipPath id="clip-march_mask-') == 2
+    ET.fromstring(tx.cell_svg(frag, 64.0))

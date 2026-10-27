@@ -608,7 +608,10 @@ def blotch_mask(seed: int, size: float, palette: Sequence[str], *,
 
 # ------------------------------------------------------------- march_mask
 
-_MARCH_PATTERNS = ("straight", "corner", "corner_in", "cap", "dot", "diag", "tip", "bump", "notch")
+_MARCH_PATTERNS = ("straight", "corner", "corner_in", "cap", "dot", "diag", "tip", "bump", "notch",
+                   "tee", "tee_side", "quad")
+_MARCH_JUNCTIONS = {"tee": (1, 2), "tee_side": (1, 2), "quad": (1, 2, 3)}  # the mass parts of each
+_MARCH_ARM_POINTS = (12, 20)  # points per junction arm, endpoints included (as an open path)
 _MARCH_DIP = 0.76           # cap: the deepest point of the dip, as a fraction of size
 _MARCH_DOT_RADIUS = 0.275   # dot: nominal radius as a fraction of size (diameter 55%)
 _MARCH_MAX_WOBBLE = 0.2     # above this a diagonal path can leave the cell
@@ -780,9 +783,110 @@ def _march_close(pattern: str, size: float) -> list[tuple[float, float]]:
     }[pattern]
 
 
+# ------------------------------------------------ march: three-tier junctions
+#
+# A junction cell holds three or four regions: one base and two or three masses. Its
+# boundaries are arms, ragged paths between pinned points. Every arm ends at an edge
+# midpoint or at the centre C, and the arms share C, so the regions share their
+# boundaries exactly, and a junction joins its neighbours at the same midpoints as the
+# two-region patterns.
+#   tee       base in the bottom half. part 1 is the top-left quadrant, part 2 the
+#             top-right one. Arms: left-mid to C and C to right-mid (the base boundary),
+#             and C to top-mid (between the two masses).
+#   tee_side  tee turned a quarter turn clockwise: the base is the left half, part 1 the
+#             top-right quadrant and part 2 the bottom-right one.
+#   quad      four quadrants. The base is bottom-left; parts 1, 2 and 3 are top-left,
+#             top-right and bottom-right. Four arms run from C to the four midpoints.
+# Part 0 is every mass together, the whole non-base area.
+
+
+def _check_junction_args(pattern: str, part: int, geometry: int | None) -> None:
+    parts = _MARCH_JUNCTIONS.get(pattern)
+    if parts is None:
+        if part != 0:
+            raise ValueError("part is used only by the junction patterns (tee, tee_side, quad)")
+    elif part != 0 and part not in parts:
+        raise ValueError(f"part must be 0 or one of {parts} for {pattern}, not {part!r}")
+    if geometry is not None and (isinstance(geometry, bool) or not isinstance(geometry, int)):
+        raise ValueError("geometry must be an int, or None to use the seed")
+
+
+def _arm(rng: random.Random, size: float, start: tuple[float, float],
+         end: tuple[float, float], roughness: float,
+         wobble: float) -> list[tuple[float, float]]:
+    """A ragged path from ``start`` to ``end``: the straight line, offset along its normal
+    by ``_march_noise``. Both ends are exact."""
+    n = rng.randint(*_MARCH_ARM_POINTS)
+    off = _march_noise(rng, n, size, roughness, wobble)
+    dx, dy = end[0] - start[0], end[1] - start[1]
+    length = math.hypot(dx, dy)
+    nx, ny = -dy / length, dx / length
+    pts = [(start[0] + i / (n - 1) * dx + off[i] * nx, start[1] + i / (n - 1) * dy + off[i] * ny)
+           for i in range(n)]
+    pts[0], pts[-1] = start, end
+    return pts
+
+
+def _junction_arms(pattern: str, rng: random.Random, size: float, roughness: float,
+                   wobble: float) -> dict[str, list[tuple[float, float]]]:
+    """The arms of tee or quad in the rotation-0 frame, drawn in a fixed order."""
+    h = size / 2.0
+    c = (h, h)
+    ends = {"west": ((0.0, h), c), "north": (c, (h, 0.0)), "east": (c, (size, h))}
+    if pattern == "quad":
+        ends["south"] = (c, (h, size))
+    return {name: _arm(rng, size, a, b, roughness, wobble) for name, (a, b) in ends.items()}
+
+
+def _junction_regions(pattern: str, size: float,
+                      a: dict) -> dict[int, list[tuple[float, float]]]:
+    """Mass polygon of each part (part 0 is the union), from the arms of tee or quad."""
+    s = size
+    if pattern == "quad":
+        w, n, e, so = a["west"], a["north"], a["east"], a["south"]
+        return {
+            0: w + so[1:] + [(s, s), (s, 0.0), (0.0, 0.0)],
+            1: w + n[1:] + [(0.0, 0.0)],
+            2: list(reversed(n))[:-1] + e + [(s, 0.0)],
+            3: list(reversed(e))[:-1] + so + [(s, s)],
+        }
+    w, n, e = a["west"], a["north"], a["east"]
+    return {
+        0: w + e[1:] + [(s, 0.0), (0.0, 0.0)],
+        1: w + n[1:] + [(0.0, 0.0)],
+        2: e + [(s, 0.0)] + list(reversed(n))[:-1],
+    }
+
+
+def _junction_lines(pattern: str, a: dict) -> dict[int, list[list[tuple[float, float]]]]:
+    """Boundary polylines of each part: the arms between its mass and the others."""
+    if pattern == "quad":
+        w, n, e, so = a["west"], a["north"], a["east"], a["south"]
+        return {0: [w, n, e, so], 1: [w, n], 2: [n, e], 3: [e, so]}
+    w, n, e = a["west"], a["north"], a["east"]
+    return {0: [w, e, n], 1: [w, n], 2: [e, n]}
+
+
+def _junction_shapes(seed: int, size: float, pattern: str, roughness: float,
+                     wobble: float) -> tuple[dict, dict]:
+    """``(regions, lines)`` of a junction, both from one set of arms, so a mask and its
+    line agree. ``tee_side`` is tee turned a quarter turn clockwise, (x, y) -> (size - y, x)."""
+    base = "tee" if pattern == "tee_side" else pattern
+    arms = _junction_arms(base, random.Random(seed), size, roughness, wobble)
+    regions = _junction_regions(base, size, arms)
+    lines = _junction_lines(base, arms)
+    if pattern == "tee_side":
+        def turn(pts):
+            return [(size - y, x) for x, y in pts]
+        regions = {k: turn(v) for k, v in regions.items()}
+        lines = {k: [turn(pl) for pl in v] for k, v in lines.items()}
+    return regions, lines
+
+
 def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
                pattern: str = "straight", roughness: float = 0.5, wobble: float = 0.12,
                inset: float = 0.0, height: float = 0.75, amplitude: float = 0.18,
+               part: int = 0, geometry: int | None = None,
                **_) -> tuple[str, str]:
     """Clip path for one tile of a marching-squares set: ``(clip_svg, clip_id)``.
 
@@ -825,6 +929,23 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
             * size over the middle 60% of the width. The base is convex there.
         "notch": like "straight", but the path dips down by ``amplitude`` * size over
             the middle 60% of the width. The mass intrudes into the base there.
+        "tee", "tee_side", "quad": three- and four-region junctions, drawn in the
+            section above. Each part is one mass; the base is what no part covers. A
+            junction needs one clip per mass, so use the same seed, pattern and
+            geometry with part=1, 2 (and 3 for quad), and draw each mass's layers under
+            its own clip. Turn the tile to reach the other orientations, as for the
+            other patterns. Rotations of "tee" by 90 degrees give "tee_side", so the
+            two patterns cover the same orientations.
+
+    part: 0-3, used only by the junction patterns. 0 is every mass together (the whole
+        non-base area). 1, 2 and 3 are one mass each: tee takes 1 and 2, tee_side takes
+        1 and 2, and quad takes 1, 2 and 3. Parts of one junction are disjoint and
+        together make part 0. Any other pattern takes 0 only.
+    geometry: an int, or None (the default, which uses the seed). The path geometry is
+        drawn from geometry in place of seed, and the other arguments are unchanged. Two
+        masks with the same pattern, roughness, wobble and geometry share their
+        boundary whatever their seeds. A class spec gives each named mask its own seed,
+        so the parts of one junction need a common geometry.
 
     roughness: 0-1, the share of the ragged offset. At 0 the path is a straight line
         between its pinned points (for "dot", a regular polygon).
@@ -842,15 +963,20 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
         still checked.
 
     Output is deterministic for a given seed. Each open path has 12 to 20 points,
-    endpoints included. A "dot" has the same count.
+    endpoints included. A "dot" has the same count. Each junction arm has the same count.
     """
     params = _key_args(locals())
     params.pop("_", None)
     _check_march_args(pattern, roughness, wobble, inset, height, amplitude)
-    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset,
-                                  height, amplitude)
-    if not closed:
-        pts += _march_close(pattern, size)
+    _check_junction_args(pattern, part, geometry)
+    gseed = seed if geometry is None else geometry
+    if pattern in _MARCH_JUNCTIONS:
+        pts = _junction_shapes(gseed, size, pattern, roughness, wobble)[0][part]
+    else:
+        pts, closed = _march_boundary(gseed, size, pattern, roughness, wobble, inset,
+                                      height, amplitude)
+        if not closed:
+            pts += _march_close(pattern, size)
     cid = _clip_id("march_mask", seed, size, palette or (), params)
     return f'<clipPath id="{cid}"><polygon points="{_points(pts)}"/></clipPath>', cid
 
@@ -858,7 +984,8 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
 def march_line(seed: int, size: float, palette: Sequence[str],
                pattern: str = "straight", roughness: float = 0.5, wobble: float = 0.12,
                stroke: float = 0.035, color_index: int = 1, inset: float = 0.0,
-               height: float = 0.75, amplitude: float = 0.18, **_) -> str:
+               height: float = 0.75, amplitude: float = 0.18, part: int = 0,
+               geometry: int | None = None, **_) -> str:
     """The boundary of a ``march_mask`` tile, drawn as a stroke with no fill.
 
     It takes the same seed and parameters as ``march_mask`` and draws the same
@@ -867,28 +994,39 @@ def march_line(seed: int, size: float, palette: Sequence[str],
     blob outline. The cell clip is applied, so a stroke that runs past an edge is cut
     there and the neighbouring tile carries on from it.
 
+    A junction is drawn as one polyline per arm of the boundary of ``part``: part 0 gives
+    every arm, so the whole internal outline of the junction; part 1 (or 2, 3) gives the
+    arms that bound that mass.
+
     stroke: stroke width as a fraction of size (default 0.035).
     color_index: palette index of the stroke colour (default: palette[1]). palette[0] is
         not drawn, so the background is left to another layer.
     Other parameters have the same meaning as in ``march_mask``. ``inset`` is used only
-    by "dot", and ``height`` and ``amplitude`` only by their patterns. Extra keywords
-    are ignored.
+    by "dot", ``height`` and ``amplitude`` only by their patterns, and ``part`` and
+    ``geometry`` only by the junctions. Extra keywords are ignored.
     """
     params = _key_args(locals())
     params.pop("_", None)
     _check_march_args(pattern, roughness, wobble, inset, height, amplitude)
+    _check_junction_args(pattern, part, geometry)
     if not stroke > 0.0:
         raise ValueError("stroke must be positive")
     if not 0 <= color_index < len(palette):
         raise ValueError("color_index is out of range for palette")
-    pts, closed = _march_boundary(seed, size, pattern, roughness, wobble, inset,
-                                  height, amplitude)
+    gseed = seed if geometry is None else geometry
     attrs = (f'fill="none" stroke="{palette[color_index]}" '
              f'stroke-width="{_f(size * stroke)}" stroke-linejoin="round"')
-    if closed:
-        body = f'<polygon points="{_points(pts)}" {attrs}/>'
+    if pattern in _MARCH_JUNCTIONS:
+        lines = _junction_shapes(gseed, size, pattern, roughness, wobble)[1][part]
+        body = "".join(f'<polyline points="{_points(pl)}" stroke-linecap="round" {attrs}/>'
+                       for pl in lines)
     else:
-        body = f'<polyline points="{_points(pts)}" stroke-linecap="round" {attrs}/>'
+        pts, closed = _march_boundary(gseed, size, pattern, roughness, wobble, inset,
+                                      height, amplitude)
+        if closed:
+            body = f'<polygon points="{_points(pts)}" {attrs}/>'
+        else:
+            body = f'<polyline points="{_points(pts)}" stroke-linecap="round" {attrs}/>'
     return _wrap("march_line", seed, size, palette, params, body)
 
 
