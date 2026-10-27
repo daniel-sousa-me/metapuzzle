@@ -89,3 +89,15 @@ Suffix `-v2` on `make_targets.py`, `quantize.py` (report to `quantize-report-v2.
 **Localized.** Interior plain cells next to a same-tier transition are `near` (own tier plus its transitions, weights 1/3/3). Others are `far` (plain only). All surplus lands in `near`; `roles-to-scenes --restarts 8` solves in 13 s.
 
 **Result.** Histogram identical across maps. Scene gates still fail, and same-position overlap is higher (excl. L 48 / 41 / 43%). Every surplus piece touches another transition.
+
+## Step 5: marching tiles (scenes only)
+
+`quantize_v4.py` (8-neighbour masks; report `quantize-report-v4.txt`), `make_roles_v4.py`. Codes `<own><nbr><s|c|i|p>`; `d` is `<nbr><own>d`.
+
+**Patterns** (cat / sailboat / tree): s 99 / 134 / 88, c 24 / 22 / 33, i 30 / 22 / 35, p 4 / 0 / 0, d 1 / 0 / 0. Approximations (strip / s+diag / c+diag / i+multi): 6 / 10 / 1 / 3; 1 / 5 / 1 / 0; 0 / 7 / 0 / 0.
+
+**Common histogram** (max): DLs 16, DMc 8, DMi 11, DMp 2, DMs 41, MDd 1, LDc 1, LDi 7, LDs 19, LMc 6, LMi 16, LMs 24, MDc 12, MDi 4, MDp 1, MDs 38, MLc 13, MLi 3, MLp 1, MLs 13. Surplus: 79 / 59 / 81.
+
+**Infeasible.** Own-D codes need 79 cells; each map has 76 D cells (target -3), so `roles-to-scenes` rejects it. No `scenes-v4.txt` or metrics. Near capacity also fails (cat D: 30 surplus, 19 near cells). Rotation-0 transitions (36 / 39 / 35) are unconstrained.
+
+**Class codes:** D, M, L, DLs, DMc, DMi, DMp, DMs, MDd, LDc, LDi, LDs, LMc, LMi, LMs, MDc, MDi, MDp, MDs, MLc, MLi, MLp, MLs.

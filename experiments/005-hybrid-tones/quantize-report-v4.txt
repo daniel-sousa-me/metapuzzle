@@ -1,0 +1,26 @@
+1. v2 tiers (equalized, identical to quantized-v2/*.npy). Target D / M / L: 76 / 123 / 301
+   cat       D / M / L  76 / 123 / 301   frame cells on a tier cut: 8
+   sailboat  D / M / L  76 / 123 / 301   frame cells on a tier cut: 6
+   tree      D / M / L  76 / 123 / 301   frame cells on a tier cut: 7
+2. pattern counts per image (all 500 cells; frame cells are plain):
+   pattern         cat   sailboat       tree
+   plain           342        322        344
+   s                99        134         88
+   c                24         22         33
+   i                30         22         35
+   p                 4          0          0
+   d                 1          0          0
+   approximations (pattern kept, detail dropped):
+   strip             6          1          0
+   s+diag           10          5          7
+   c+diag            1          1          0
+   i+multi           3          0          0
+   cells with two different differing tiers among the 8 neighbours: cat 87, sailboat 38, tree 67
+3. class histogram per image (rotation dropped):
+   class        D   DLs   DMc   DMi   DMp   DMs   MDd     L   LDc   LDi   LDs   LMc   LMi   LMs     M   MDc   MDi   MDp   MDs   MLc   MLi   MLp   MLs
+   cat         27    13     3     8     2    22     1   237     1     7    19     2    11    24    78    12     4     1     9     6     0     1    12
+   sailboat    13    16     3     3     0    41     0   249     0     3    16     6     9    18    60     4     4     0    38     9     3     0     5
+   tree        25    10     8    11     0    22     0   237     1     6    15     6    16    20    82     5     1     0     8    13     1     0    13
+   pairwise L1 (cat-sailboat, cat-tree, sailboat-tree): 146, 60, 146
+   per-code max over images: DLs=16  DMc=8  DMi=11  DMp=2  DMs=41  MDd=1  LDc=1  LDi=7  LDs=19  LMc=6  LMi=16  LMs=24  MDc=12  MDi=4  MDp=1  MDs=38  MLc=13  MLi=3  MLp=1  MLs=13
+wrote /home/user/metapuzzle/experiments/005-hybrid-tones/quantized-codes-v4.txt

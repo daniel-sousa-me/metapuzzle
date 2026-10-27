@@ -1,0 +1,196 @@
+{
+  "_note": "Step 5 (v4, marching tiles): target_counts per transition code = max over maps of its boundary cells; plain tiers take the rest of their totals. Edge roles fix one code per cell (rotation suffix from quantize_v4). *_near (interior, next to a transition of the same own tier) may take that tier's codes with patterns 's' as surplus; *_far take the plain class only. Frame cells plain.",
+  "roles": {
+    "d_frame": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_near": {
+      "classes": [
+        "D",
+        "DLs",
+        "DMs"
+      ],
+      "weights": [
+        1,
+        3,
+        3
+      ]
+    },
+    "d_far": {
+      "classes": [
+        "D"
+      ]
+    },
+    "m_frame": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_near": {
+      "classes": [
+        "M",
+        "MDs",
+        "MLs"
+      ],
+      "weights": [
+        1,
+        3,
+        3
+      ]
+    },
+    "m_far": {
+      "classes": [
+        "M"
+      ]
+    },
+    "l_frame": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_near": {
+      "classes": [
+        "L",
+        "LDs",
+        "LMs"
+      ],
+      "weights": [
+        1,
+        3,
+        3
+      ]
+    },
+    "l_far": {
+      "classes": [
+        "L"
+      ]
+    },
+    "edge_dls": {
+      "classes": [
+        "DLs"
+      ]
+    },
+    "edge_dmc": {
+      "classes": [
+        "DMc"
+      ]
+    },
+    "edge_dmi": {
+      "classes": [
+        "DMi"
+      ]
+    },
+    "edge_dmp": {
+      "classes": [
+        "DMp"
+      ]
+    },
+    "edge_dms": {
+      "classes": [
+        "DMs"
+      ]
+    },
+    "edge_ldc": {
+      "classes": [
+        "LDc"
+      ]
+    },
+    "edge_ldi": {
+      "classes": [
+        "LDi"
+      ]
+    },
+    "edge_lds": {
+      "classes": [
+        "LDs"
+      ]
+    },
+    "edge_lmc": {
+      "classes": [
+        "LMc"
+      ]
+    },
+    "edge_lmi": {
+      "classes": [
+        "LMi"
+      ]
+    },
+    "edge_lms": {
+      "classes": [
+        "LMs"
+      ]
+    },
+    "edge_mdc": {
+      "classes": [
+        "MDc"
+      ]
+    },
+    "edge_mdd": {
+      "classes": [
+        "MDd"
+      ]
+    },
+    "edge_mdi": {
+      "classes": [
+        "MDi"
+      ]
+    },
+    "edge_mdp": {
+      "classes": [
+        "MDp"
+      ]
+    },
+    "edge_mds": {
+      "classes": [
+        "MDs"
+      ]
+    },
+    "edge_mlc": {
+      "classes": [
+        "MLc"
+      ]
+    },
+    "edge_mli": {
+      "classes": [
+        "MLi"
+      ]
+    },
+    "edge_mlp": {
+      "classes": [
+        "MLp"
+      ]
+    },
+    "edge_mls": {
+      "classes": [
+        "MLs"
+      ]
+    }
+  },
+  "target_counts": {
+    "D": -3,
+    "DLs": 16,
+    "DMc": 8,
+    "DMi": 11,
+    "DMp": 2,
+    "DMs": 41,
+    "L": 228,
+    "LDc": 1,
+    "LDi": 7,
+    "LDs": 19,
+    "LMc": 6,
+    "LMi": 16,
+    "LMs": 24,
+    "M": 38,
+    "MDc": 12,
+    "MDd": 1,
+    "MDi": 4,
+    "MDp": 1,
+    "MDs": 38,
+    "MLc": 13,
+    "MLi": 3,
+    "MLp": 1,
+    "MLs": 13
+  }
+}
