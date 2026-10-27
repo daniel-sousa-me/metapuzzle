@@ -1,0 +1,48 @@
+# Motif class counts per picture, v6 (make_motif_maps_v2.py). Class = (motif, base tier); heroes counted
+# per code. spill = cells outside the class region (weight < 2).
+
+class           A hare   B owl  C swan  spread   spill A/B/C
+streak D             2       2       2       0   0/0/0
+chevron D            2       2       2       0   1/0/0
+pebbles D            2       2       2       0   1/0/0
+star D               4       4       4       0   0/1/0
+seedhead M          16      16      16       0   8/10/2
+leaf M              18      18      18       0   4/9/4
+curl M              18      18      18       0   5/2/7
+star M              18      18      18       0   12/7/10
+pebbles L           14      14      14       0   3/4/8
+chevron L           15      15      15       0   4/4/2
+cloud L             15      15      15       0   10/11/8
+snowflake L         12      12      12       0   6/0/10
+amberwedge hero       2       2       2       0   -
+catchlight hero       2       2       2       0   -
+crater hero          2       2       2       0   -
+ambereye hero        1       1       1       0   -
+dot-eye hero         1       1       1       0   -
+beak/nose hero       1       1       1       0   -
+all motifs         145     145     145
+coverage %        14.1    14.1    14.1   (limit 18%)
+# hero piece classes (same in A, B, C): I on L/L, G on DLc/DLc, O on L/L, E on DMd, Y on DLd, N on M
+
+# Lattice test: equally spaced triples of one class in a row or column (regular motifs, all classes)
+# chance = mean over 300 draws of the same counts placed uniformly under the same spacing rule
+A: actual 1 triples, chance mean 4.9 (share of draws at or below actual 0.05); ratio 0.20
+B: actual 1 triples, chance mean 4.1 (share of draws at or below actual 0.05); ratio 0.24
+C: actual 0 triples, chance mean 3.0 (share of draws at or below actual 0.03); ratio 0.00
+
+# Halo and spacing (all pictures): regular motif cells closer than HALO to a tier boundary cell,
+# pairs of motif cells closer than CHEB_MIN, and the mean boundary distance of motifs vs plain cells
+A: literal any-side halo: 64 regular motifs within one cell of a boundary cell on either side (the carrier rule allows these)
+A: regular motifs 136, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 182; mean boundary distance motifs 2.52 vs open D/M/L cells 0.90
+   heroes (boundary distance): O3,11:2, Y5,21:0, G6,24:0, G6,25:0, I11,0:1, I11,1:1, E12,17:0, N14,20:1, O25,24:1
+B: literal any-side halo: 58 regular motifs within one cell of a boundary cell on either side (the carrier rule allows these)
+B: regular motifs 136, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 163; mean boundary distance motifs 2.37 vs open D/M/L cells 0.88
+   heroes (boundary distance): O4,15:1, O5,9:1, I12,7:1, G12,8:0, I12,15:1, G12,16:0, E15,1:0, N16,12:1, Y35,24:0
+C: literal any-side halo: 74 regular motifs within one cell of a boundary cell on either side (the carrier rule allows these)
+C: regular motifs 136, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 187; mean boundary distance motifs 2.35 vs open D/M/L cells 0.79
+   heroes (boundary distance): G1,19:0, G1,24:0, O3,21:2, Y5,11:0, O5,23:2, I6,5:1, I7,5:1, N16,5:2, E32,5:0
+
+# Remaining plain D/M/L cells without a motif, per picture (only cells with no boundary within HALO can take a motif)
+A: 134 motif-eligible cells left unused (of 271 eligible)
+B: 115 motif-eligible cells left unused (of 251 eligible)
+C: 82 motif-eligible cells left unused (of 221 eligible)
