@@ -1,0 +1,4 @@
+sizes=27x38, 27x38, 27x38 shared AB/AC/BC=0/1/1 valid=True wrote 16 files to border-check/round2/run-standard
+piece gates: PASS
+scene gates: PASS
+exit=0
