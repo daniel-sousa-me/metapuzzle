@@ -62,3 +62,7 @@ The 500-piece target was a guess that smaller would be easier; renders show the 
 ## 2026-10-27 — Working grid: 27×38 (1026 pieces)
 
 The scale study (experiment 013) ran the same three placeholders at 500, 750, 1026 and 1536 pieces. Recognition improves clearly from 750 up (ears, tail, sail become unambiguous), solve and render times stay trivial (under a minute at 1536), and surplus grows with perimeter unless equalized. 27×38 is adopted as the working grid; the subject set "Field, Wood and Water" is built at that size. 1536 remains an option if the owner wants a larger product.
+
+## 2026-10-27 — Mechanical uniqueness: rely on artwork, not on connector algebra
+
+Research (experiment 012, docs/design/09): exact minimal mating classes (every tab fits exactly its three intended blanks) exist only for boards with both dimensions ≡ 1 (mod 3) without rotation, and they force pictures B and C to be fixed shuffles of A; with three freely designed subjects only about 20–24% of pieces can follow such a construction, and deviating by a few percent already restores hundreds of false fits per intended one. Decision: keep quarter rotation and free subject design; conventional distinct cuts plus visually distinguishing artwork (chip-signature sub-classes, motifs, marks) carry uniqueness; evaluate it with the visual-ambiguity test (T9) rather than the false-fit ratio. Noted for later: a board such as 28×37 would permit an exact border; rotation-none would halve false fits at the cost of four times as many transition classes.
