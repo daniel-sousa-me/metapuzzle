@@ -1,0 +1,7379 @@
+{
+  "_note": "v7 (005). The v4 class set plus <own><nbr>g (diag), t (tip), b (bump), n (notch) for every ordered pair of D, M, L, W. Transitions: own tier base, neighbour tier mass under a march_mask named 'edge'; rotation as in v4. Diag: T and R mass, L and B base.",
+  "ref_size": 100,
+  "palette": {
+    "indigo": "#2b3262",
+    "slate": "#56647a",
+    "rust": "#9a4f2e",
+    "olive": "#8a8c4c",
+    "ochre": "#b8902f",
+    "sand": "#d9c79c",
+    "cream": "#ece3c8",
+    "pale_blue": "#b7d3e4"
+  },
+  "classes": {
+    "D": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "M": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "L": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "S": {
+      "layers": [
+        {
+          "primitive": "scatter_shapes",
+          "palette": [
+            "cream",
+            "indigo"
+          ],
+          "background": true,
+          "params": {
+            "kinds": [
+              "leaf",
+              "blob"
+            ],
+            "count": 200,
+            "scale": 0.06
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "W": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "DMs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DMc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DMi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DMp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DLs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DLc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DLi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DLp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DWs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DWc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DWi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DWp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MDs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MDc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MDi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MDp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MLs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MLc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MLi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MLp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MWs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MWc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MWi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MWp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LDs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LDc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LDi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LDp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LMs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LMc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LMi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LMp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LWs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LWc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LWi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LWp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WDs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WDc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WDi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WDp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WMs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WMc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WMi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WMp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WLs": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "straight",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WLc": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WLi": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "corner_in",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WLp": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "cap",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DLd": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "dot"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "dot": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "dot",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LDd": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "dot"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "dot": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "dot",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MDd": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "dot"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "dot": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "dot",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "SUN": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "rust",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "disc",
+            "scale": 0.6
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "FLO": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "rust",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "flower",
+            "scale": 0.45
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "FLB": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "slate",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "flower",
+            "scale": 0.45
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "CLD": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "fleck",
+            "scale": 0.5
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "LEF": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "olive",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "leaf",
+            "scale": 0.45
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "MOON": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "indigo",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "moon",
+            "scale": 0.68,
+            "jitter": 0.0
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "cream",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "moon",
+            "scale": 0.6,
+            "jitter": 0.0
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "DMg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DMt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "DMb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "DMn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "DLg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DLt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "DLb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "DLn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "DWg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "DWt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "DWb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "DWn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "MDg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MDt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "MDb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "MDn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "MLg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MLt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "MLb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "MLn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "MWg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "MWt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "MWb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "MWn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "LDg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LDt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "LDb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "LDn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "LMg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LMt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "LMb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "LMn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "LWg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "LWt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "LWb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "LWn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "WDg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WDt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "WDb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "WDn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "WMg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WMt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "WMb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "WMn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "WLg": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "diag",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
+    "WLt": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "tip",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "height": 0.75
+          }
+        }
+      }
+    },
+    "WLb": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "bump",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    },
+    "WLn": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "shape": "ellipse",
+            "count": 34,
+            "length": 0.25,
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "edge"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "edge": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "notch",
+            "roughness": 0.5,
+            "wobble": 0.12,
+            "amplitude": 0.18
+          }
+        }
+      }
+    }
+  }
+}

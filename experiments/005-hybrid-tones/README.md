@@ -137,3 +137,16 @@ Categories: other = unexplained (must be 0); junction = three-tier corner, where
 **Results.** Transition cells per image (cat / sailboat / tree): 86 / 94 / 83, was 158 / 178 / 156; surplus 41 / 33 / 44. `make_roles_v5.py` and `build_scenes_v5.py` (defaults) ran with no shortfall; `validate_scenes` passes. Scene gates still fail and are worse: same position excl. L 40 / 40 / 37% (was 33 / 38 / 31); 2x2 reuse (larger of plain and rotated) 73 / 80 / 80% (was 55 / 73 / 68); transferable blob 47 / 46 / 47% (was 32 / 34 / 32). Plain L is now 287 of 500 cells.
 
 **Renders** (`--rotation quarter --cell 32`, `run-full-v5` with `classes-v4.json`, `run-ink-v5` with `classes-ink.json`): piece gates pass with 0 shared adjacencies. Dark bodies are solid with ragged edges and an olive ring; the ground band has a ragged top.
+
+## Step 8: diagonal and tip tiles
+
+`quantize_v6.py` (tie rule, diag g, tip t), `gen_classes_v7.py` (110 classes), `gen_classes_ink_v7.py`, `make_roles_v6.py`, `build_scenes_v6.py`. Outputs use `-v6`; renders in `run-full-v6/` and `run-ink-v6/`.
+
+- **Ties:** a 2-2 tie between two tiers goes to the lighter one. 20 cells change (cat 10, sailboat 1, tree 9), all dark cells.
+- **Diag (g):** 14 tiles, all in the tree canopy (6 runs). Cat and sailboat runs fail the side check. The sail edge slopes about 2.5 rows per column, so it has no 45-degree run and stays a staircase. Diag sides may meet a three-tier junction (v5's "junction"). Clearing the corner-only quarters on the base side removed 8 tree transition cells (83 to 75).
+- **Tips (t):** cat 3, sailboat 0, tree 0. Caps: 0.
+- **Bump, notch (b, n):** 0. A straight cannot span a one-row step.
+- **Edge check:** 0 unexplained mismatches.
+- **Surplus:** cat 47, sailboat 39, tree 58 (v5: 41 / 33 / 44).
+- **Scene gates** still fail. Same position excluding L: 41.5 / 40.6 / 35.2% (v5 40.3 / 39.6 / 36.9%).
+- **Visual:** the tree octagon edges are diagonal in the ink render; the sail hypotenuse is still a staircase.

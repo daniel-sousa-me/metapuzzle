@@ -1,0 +1,87 @@
+# Equalized tier maps (v5eq), experiment 005. D / M / L per cell; A = cat, B = sailboat, C = tree.
+# Changed cells (vs quantized-v2): (row, col) old -> new.
+
+# cat
+L M L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L M M M L L L L L L L L L L L L L
+L L L L L M M L L D D L L L L L L L L L
+L L L L L L D M L D D M L L L L L L L L
+L L L L L M D D L D M D L L L L L L L L
+L L L L M D D D D D M D L L L L L L L L
+L L L L L D D D D D D D L L L L L L L L
+L L L L L M D D D D D D L L L L L L L L
+L L L L L M D M D D D D L L L L L L L L
+L L L L L M D D D D D D L L L L L L L L
+L L L L L L D D M D D D M M L L L L L L
+L L L L L L L D M D D D M D M L L L L L
+L L L L L L L D D D D D L D D L L L L L
+L L L L L L L D D D D D L M D L L L L L
+L L L L L L L M D D D D L D D L L L L L
+L L L L L L L M M D D D D D M L L L L L
+D D M M L M M M M D M M M M M M M M M M
+M M M M M M M M M M M M M M M M M M M M
+M M M M M M M M M M M M M M M M M M M M
+M M M M M M M M M M M M M M M M M M M M
+M M M M M M M M M M M M M M M M M M M M
+changed: (5,4) L->M, (5,10) M->L, (6,6) D->M, (6,9) L->D, (7,5) M->L, (7,9) M->D, (8,10) D->M, (8,11) M->D, (9,4) L->M, (9,8) M->D, (9,10) D->M, (12,7) D->M, (14,8) D->M, (15,6) M->L, (15,8) D->M, (16,13) M->D, (18,13) M->D, (19,7) L->M, (19,8) D->M, (20,1) M->D, (20,4) M->L
+
+# sailboat
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L D D L L L L L L L L L
+L L L L L L L L L D D L L L L L L L L L
+L L L L L L L L L D D M L L L L L L L L
+L L L L L L L L L D D L L M M L L L L L
+L L L L L L L L L D D L L M M L L L L L
+L L L L L L L L L D D M M L L L L L L L
+L L L L L L L L L D D M M L L L L L L L
+L L L L L L L L L D D M M M L L L L L L
+L L L L L L L L L D M M M M L L L L L L
+L L L L L L L L L D M M M M M L L L L L
+L L L L L L L L L D D M M M M L L L L L
+L L L L L L L L L D D M M M M L L L L L
+L M L L L L L L L D D M M M M L L L L L
+L M L L L L L L M D D M M M M M L L L L
+L M M M M M M M D D D D M M M M L L L L
+M L M D D D D M D D D D D D D D D D L L
+D M M D D D D D D D D D D D D D D D M M
+M M M D D D D D D D D D D D D D D M M M
+M M M M M D M M M M D M M M M M M M M M
+M M M M M M M M M M M M M M M M M M M M
+M M M M M M M M M M M M M M M M M M M M
+changed: (3,9) M->L, (3,10) M->L, (7,11) M->L, (7,13) L->M, (7,14) L->M, (8,11) M->L, (8,13) L->M, (8,14) L->M, (12,10) D->M, (13,10) D->M, (15,15) M->L, (16,1) L->M, (16,15) M->L, (17,1) L->M, (17,8) L->M, (18,1) L->M, (18,8) M->D, (18,11) M->D, (18,16) M->L, (18,17) M->L, (19,2) D->M, (19,7) D->M, (22,5) M->D, (22,10) M->D
+
+# tree
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L L L L L L L L L L L L
+L L L L L L L L L M M D D L L L L L L L
+L L L L L L L L D D M D M L L L L L L L
+L L L L L L D D D D D D D M L L L L L L
+L L L L L L D D D M D M D D M L L L L L
+L L L L L M D D D D D D D D L L L L L L
+L L L L L M D D D D D D D D L L L L L L
+L L L L L L D D D D D D D D L L L L L L
+L L L L L L M D D D D D M M L L L L L L
+L L L L L L L M D D D D M M L L L L L L
+L L L L L L L L L D D M M L L L L L L L
+L L L L L L L L L D D M M L L L L L L L
+L L L L L L L L L D D L L L L L L L L L
+L L L L L L L L L D D L L L L L L L L L
+L L L L L L L L L D D L L L L L L L L L
+L L L L L L L L L D D L L L L L L L M L
+L M M M M D M M D D M L L L L M M M M M
+M M M M M M M M M D D M M M M M M M M M
+M M M M M M M M M D D M M M M M M M M M
+M M M M M M M M M D D M M M M M M M M M
+M M M M M M M M D D D M M M M M M M M M
+M M M M M M M M M M D M M M M M M M M M
+changed: (4,11) L->D, (4,12) L->D, (5,7) M->L, (5,10) D->M, (6,6) M->D, (7,9) D->M, (7,11) D->M, (7,14) L->M, (8,14) M->L, (9,14) M->L, (11,12) D->M, (12,13) L->M, (13,8) M->L, (13,12) L->M, (14,11) L->M, (14,12) L->M, (18,18) L->M, (19,5) M->D, (19,10) D->M, (19,11) M->L, (19,12) M->L, (19,13) M->L, (19,14) M->L, (23,8) M->D
+

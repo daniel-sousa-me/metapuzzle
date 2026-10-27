@@ -1,0 +1,47 @@
+1. tiers (equalized, identical to quantized-v2). D / M / L totals per image:
+   cat       tier totals D/M/L 76/123/301   target D/M/L 76 / 123 / 301
+   sailboat  tier totals D/M/L 76/123/301   target D/M/L 76 / 123 / 301
+   tree      tier totals D/M/L 76/123/301   target D/M/L 76 / 123 / 301
+2. tie rule (2-2 and other ties go to the lighter tier):
+   cat       cells with a tie among differing neighbours  10; cells whose mass tier changed from v5  10
+   sailboat  cells with a tie among differing neighbours   1; cells whose mass tier changed from v5   1
+   tree      cells with a tie among differing neighbours   9; cells whose mass tier changed from v5   9
+   total ties 20, total changed 20
+3. diagonal runs (45 degrees, strict side check):
+   cat       candidates (v5 c cells, interior, base on other sides)  10; runs of length >= 2: 1 (lengths {2: 1}); reverted {'side': 1, 'single': 1}; diag tiles kept 0; run ends 0
+   sailboat  candidates (v5 c cells, interior, base on other sides)  12; runs of length >= 2: 1 (lengths {2: 1}); reverted {'side': 2, 'single': 1}; diag tiles kept 0; run ends 0
+   tree      candidates (v5 c cells, interior, base on other sides)  25; runs of length >= 2: 6 (lengths {2: 4, 3: 2}); reverted {}; diag tiles kept 14; run ends 12
+4. protrusions: p (v5 cap) -> t (tip), darker own tier:
+   cat       tips 3; caps left 0
+   sailboat  tips 0; caps left 0
+   tree      tips 0; caps left 0
+5. pattern counts per image (merged class letter; i is merged into c; plain cells not counted):
+   pattern         cat   sailboat       tree
+   s                57         72         44
+   c                25         22         17
+   p                 0          0          0
+   d                 1          0          0
+   g                 0          0         14
+   t                 3          0          0
+   b                 0          0          0
+   n                 0          0          0
+   plain           414        406        425
+6. approximations per image (v5 detail, unchanged):
+   strip     cat=3  sailboat=1  tree=0
+   s+diag    cat=4  sailboat=2  tree=1
+   c+diag    cat=1  sailboat=0  tree=0
+   i+multi   cat=1  sailboat=0  tree=0
+7. edge check, shared edges whose halves disagree (v6 profiles; other must be 0):
+   categories: frame, approx, junction, cap, other
+   cat       shared edges 955  frame 8  approx 15  junction 38  cap 4  other 0
+   sailboat  shared edges 955  frame 7  approx 8  junction 7  cap 0  other 0
+   tree      shared edges 955  frame 7  approx 1  junction 32  cap 0  other 0
+   total: frame 22  approx 24  junction 77  cap 4  other 0
+   unexplained mismatches (other, must be 0): 0
+8. merged class histogram per image (rotation dropped):
+   class      DMc   DMg   DMs   DMt   DLs   MDc   MDd   MLc   MLg   MLs   MLt   LDc   LMc
+   cat          1     0    14     2    19     8     1    10     0    24     1     4     2
+   sailboat     3     0    40     0    16     3     0     9     0    16     0     1     6
+   tree         4     4    14     0    16     4     0     7    10    14     0     1     1
+Transition cells per image: cat 86, sailboat 94, tree 75; surplus to place (all pairs): cat 47, sailboat 39, tree 58
+wrote boundary-budgets-v6.txt and quantized-codes-v6.txt
