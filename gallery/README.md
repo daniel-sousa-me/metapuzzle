@@ -48,7 +48,9 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 011 | 27x38-v2/run-ink-v5 (motif classes, 31% coverage, black contour) | 27x38 | quarter | 0 / 1 / 1 | PASS | PASS (`summary.md`) | - (recognition 1 to 3/5) | - |
 | 011 | **27x38-v2/run-full-v6** (sparser motif layer, 14% coverage; current best, provisional) | 27x38 | quarter | 1 / 1 / 0 | PASS | PASS (`summary.md`) | - (blind test and T9 pending) | - (pending) |
 | 011 | **27x38-v2/run-ink-v6** (as run-full-v6, black contour; current best, provisional) | 27x38 | quarter | 1 / 1 / 0 | PASS | PASS (`summary.md`) | - (blind test pending) | - |
+| 011 | 27x38-v2/run-full-v7 and run-ink-v7 (pipeline v7, negative result, not evaluated further) | 27x38 | quarter | 2 / 1 / 0 | PASS | FAIL (B-C 2x2 reuse 31.3%) | - | - |
 | 011 | border-check/run-standard-x20, x40, x80 (standard border, invalid) | 27x38 | quarter | not recorded (10 mismatched contacts each) | FAIL (invalid) | - | - | - |
+| 011 | border-check/round2/run-standard (standard border with cross-class seams, valid; feasibility check, not an evaluated candidate) | 27x38 | quarter | 0 / 1 / 1 | PASS | PASS (`summary.md`) | - | - |
 | 013 | g20x25 run-full / run-ink | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 013 | g25x30 run-full / run-ink | 25x30 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 013 | g27x38 run-full / run-ink (placeholder subjects) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | 4 (run-full) | 3 / 2 / 2 |
@@ -276,7 +278,11 @@ Scene gates below are 2x2 window reuse for A-B / A-C / B-C (limit 30%). Left tri
 
 **27x38-v2 with a sparser motif layer (pipeline v6), current best, provisional.** Motifs on 14% of pieces (`motif-counts-v6.txt`), in organic clusters with a silhouette halo and per-piece variation in size, offset and rotation. Shared 1/1/0 in both (v2 had 0/0/1), piece gates PASS, scene gates PASS (2x2 window reuse plain 17 to 21%, same position 1 to 2%). Blind tests (ink and colour) and T9 are pending, so these renders stay provisional until evaluated. ![011 27x38-v2 v6 full](../experiments/011-subjects/27x38-v2/run-full-v6/triptych.png) ![011 27x38-v2 v6 ink](../experiments/011-subjects/27x38-v2/run-ink-v6/triptych.png)
 
+**27x38-v2 with figure-distance motif placement (pipeline v7), negative result.** Motif density by distance from the animal reached only 2 to 4% coverage, so the fallback halo rule (the v6 carrier halo, density by distance from any non-plain cell) was used and reached 5.2%. The fields read as nearly bare. Shared 2/1/0 in both, piece gates PASS, scene gates FAIL (B-C 2x2 window reuse 31.3%, limit 30%). Not evaluated further; v6 remains the current best (`docs/FINDINGS.md`, entry 38). Left triptych full (colour, mostly bare fields), right ink (black contour with sparse dots). ![011 27x38-v2 v7 full](../experiments/011-subjects/27x38-v2/run-full-v7/triptych.png) ![011 27x38-v2 v7 ink](../experiments/011-subjects/27x38-v2/run-ink-v7/triptych.png)
+
 **Border check (standard border, invalid).** The runs with 20, 40 and 80 extra flat pieces are all invalid (10 mismatched contacts each), so the tray stays (`docs/FINDINGS.md`, entry 29). ![011 border-check x20](../experiments/011-subjects/border-check/run-standard-x20/triptych.png) ![011 border-check x40](../experiments/011-subjects/border-check/run-standard-x40/triptych.png) ![011 border-check x80](../experiments/011-subjects/border-check/run-standard-x80/triptych.png)
+
+**Border check, round 2 (standard border with cross-class seams, valid).** A feasibility check, not an evaluated candidate. Scenes from `pipeline-out-v5` and `classes-v11`, with 0 mismatched contacts. Shared 0/1/1, piece gates PASS, scene gates PASS. Each board has 68 seams, of which 41 to 56 join two classes. The seams are not drawn in the render. Triptych of the three boards. ![011 border-check round2 standard](../experiments/011-subjects/border-check/round2/run-standard/triptych.png)
 
 ## 013: Scale study, 500 to 1536 pieces
 
