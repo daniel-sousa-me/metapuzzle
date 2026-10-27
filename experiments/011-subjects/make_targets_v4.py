@@ -356,6 +356,7 @@ DIAG_TOL, DIAG_W = 4, 0.3   # 45-degree runs are tracked, matched more loosely t
 RUN_W = 25.0      # per edge of a straight run above the limit
 TIER_TOL, TIER_W = 0, 0.5     # tier totals (D M W L S) near equal (v3: 4.0; relaxed, the spreads are reported)
 DOMINO = 0.5      # share of background moves that flip two adjacent cells together
+BLOCK_P = 0.0    # v4b: share of background moves that are block moves (domino or 2x2), 0 = v4
 SIDE4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
 RANK_OF_CODE = np.array([RANK[ch] for ch in "DMLSW"])   # code (CODE order) -> rank in budget_v3's ORDER
 SW_CODES = (CODE["S"], CODE["W"])
@@ -530,8 +531,32 @@ def balance(init, start, locked, run_limit, iters, seed, T0):
             continue
         new = int(rng.choice(sorted(cands)))
         cells = [(r, c)]
-        if kind[n][r, c] == KIND_BG and int(t[r, c]) not in (CODE["S"], fig) and new not in (CODE["S"], fig) \
-                and rng.random() < DOMINO:
+        if BLOCK_P and kind[n][r, c] == KIND_BG and int(t[r, c]) not in (CODE["S"], fig) \
+                and new not in (CODE["S"], fig) and rng.random() < BLOCK_P:
+            # v4b: a block move: a 2x1 domino or a 2x2 block of one tier, flipped together across the boundary
+            cur0 = int(t[r, c])
+            shape = int(rng.integers(3))
+            if shape == 0:
+                dr, dc = SIDE4[rng.integers(4)]
+                offs = [(0, 0), (dr, dc)]
+            elif shape == 1:
+                offs = [(0, 0), (0, 1)] if rng.random() < 0.5 else [(0, 0), (1, 0)]
+            else:
+                dr2 = 1 if rng.random() < 0.5 else -1
+                dc2 = 1 if rng.random() < 0.5 else -1
+                offs = [(0, 0), (0, dc2), (dr2, 0), (dr2, dc2)]
+            cells = []
+            for dy, dx in offs:
+                y, x = r + dy, c + dx
+                if not (0 <= y < R and 0 <= x < C) or not movable[n][y, x] or kind[n][y, x] != KIND_BG \
+                        or int(t[y, x]) != cur0 or cur0 in (CODE["S"], fig) or (y, x) in cells:
+                    cells = None
+                    break
+                cells.append((y, x))
+            if not cells:
+                continue
+        elif not BLOCK_P and kind[n][r, c] == KIND_BG and int(t[r, c]) not in (CODE["S"], fig) \
+                and new not in (CODE["S"], fig) and rng.random() < DOMINO:
             dr, dc = SIDE4[rng.integers(4)]
             r2, c2 = r + dr, c + dc
             if not (0 <= r2 < R and 0 <= c2 < C) or not movable[n][r2, c2] or kind[n][r2, c2] != KIND_BG \
@@ -778,7 +803,12 @@ def write_outputs(start, maps, locked, out, rows, cols, run_limit, history):
 
 
 def main(argv):
-    """Usage: make_targets_v4.py [27x38]   Writes 27x38-v4/ (tiers, budgets, two previews, no text)."""
+    """Usage: make_targets_v4.py [27x38] [--block]   Writes 27x38-v4/ (tiers, budgets, two previews, no text);
+    with --block (v4b) the block moves are on and the outputs go to 27x38-v4b/."""
+    global BLOCK_P, OUT_SUFFIX
+    if "--block" in argv:
+        BLOCK_P, OUT_SUFFIX = 0.5, "-v4b"
+        argv = [a for a in argv if a != "--block"]
     for size in argv or [PRIMARY]:
         cols, rows = (int(v) for v in size.lower().split("x"))
         assert (cols, rows) == (SKETCH_COLS, SKETCH_ROWS), "v4 balances the 27 x 38 pictures only"
