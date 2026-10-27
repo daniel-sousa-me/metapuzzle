@@ -1,0 +1,35 @@
+# Boundary budgets (v5), experiment 005. Merged classes per unordered pair (darker tier first).
+# max = per-class max over the three images; surplus = max - own (cells that must be added
+# in near roles). A = cat, B = sailboat, C = tree.
+
+Pair D-M
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DMc  corner-P DMc          4       10        8    10        6        0        2
+DMs  straight             23       23       18    23        0        0        5
+MDc  corner-Q MDc          9        9        9     9        0        0        0
+total                     36       42       35    42        6        0        7
+approx strip             2        0        0
+approx s+diag            7        0        3
+approx c+diag            1        0        0
+approx i+multi           0        2        0
+
+Pair D-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DLc  corner-P DLc          0        1        0     1        1        0        1
+DLs  straight             16       18       17    18        2        0        1
+LDc  corner-Q LDc          1        1        2     2        1        1        0
+total                     17       20       19    21        4        1        2
+approx strip             2        0        0
+approx s+diag            3        0        0
+approx i+multi           1        1        0
+
+Pair M-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+MLc  corner-P MLc         14        9       14    14        0        5        0
+MLp  cap-P MLp             1        1        0     1        0        0        1
+MLs  straight             17       16       17    17        0        1        0
+LMc  corner-Q LMc          5        5        5     5        0        0        0
+total                     37       31       36    37        0        6        1
+approx strip             1        0        0
+
+Transition cells per image: cat 90, sailboat 93, tree 90; surplus to place (all pairs): cat 10, sailboat 7, tree 10

@@ -160,3 +160,13 @@ Categories: other = unexplained (must be 0); junction = three-tier corner, where
 **Checks.** Edge check: 0 unexplained. Gates still fail: same position excl. L 44 / 51 / 46% (was 40 / 40 / 37); 2x2 reuse 84 / 85 / 84% (was 73 / 80 / 80); blob 51 / 51 / 52% (was 47 / 46 / 47). Matching budgets makes the maps more alike locally, so overlap rises.
 
 **Visual.** Full colour (`run-full-v5eq/triptych.png`): the stray navy and olive squares are mostly gone; silhouettes hold, but the cat head is softer and the tree crown more angular. Ink (`run-ink-v5eq/triptych.png`): fewer stray fragments; the tree crown is rougher and the sail edge breaks on the right.
+
+## Step 7b: figure-aware equalization (v5b)
+
+**Script.** `equalize_budgets_v5b.py` revises Step 7. Moves: D-L and M-L edge flips (cost 1); D-M flips only where the cell touches both (cost 2). Hard rules: no isolated cells, protrusions or new olive bites (M with three D sides), changes within one cell of the boundary, tier totals kept per image. Target surplus <= 10; flip weight 2 (largest that holds it).
+
+**Surplus** (cat / sailboat / tree): before 41 / 33 / 44, after 10 / 7 / 10 (Step 7: 0 / 1 / 0).
+
+**Flips** (cat / sailboat / tree): D-L 0 / 0 / 0, M-L 12 / 12 / 10, D-M 6 / 10 / 6; cost 78. D-L was never chosen though it costs the same as M-L.
+
+**Shape** (vs run-full-v5, run-full-v5eq): silhouettes hold. Olive bites 1 / 0 / 0 (Step 7: 4 / 0 / 3; cat keeps its original). Sky specks mostly gone (rare cells 21 / 4 / 10; v5 29 / 8 / 17). Edge check: 0 unexplained; scene gates still fail.
