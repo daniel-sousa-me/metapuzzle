@@ -380,6 +380,120 @@ def test_flower_and_moon_render_deterministically_inside_the_margin(kind):
         assert _dirty_pixels(frag, 100, EDGES) == [], (kind, seed)
 
 
+# ------------------------------------------------------------------ vocabulary kinds (doc 10)
+
+VOCAB_KINDS = ("curl", "streak", "seed_head", "snowflake", "chevron", "pebbles",
+               "cloud_puff", "sparkle")
+
+
+def _ink_mass(img: Image.Image) -> float:
+    """Darkness summed over the image, in units of one full-ink pixel."""
+    return sum(255 - v for v in img.tobytes()[0::3]) / 255.0
+
+
+def _subpaths(frag: str) -> int:
+    """Number of moveto commands across all path data in a fragment."""
+    return sum(d.count("M") for d in re.findall(r' d="([^"]*)"', frag))
+
+
+def _quarter_turn_diff(frag: str, turns: int) -> tuple[int, float]:
+    """Largest and mean channel difference between a cell and the same cell turned."""
+    img = _render_cell(frag, 100)
+    a = img.tobytes()
+    b = img.rotate(90 * turns).tobytes()
+    diffs = [abs(x - y) for x, y in zip(a, b)]
+    return max(diffs), sum(diffs) / len(diffs)
+
+
+@pytest.mark.parametrize("kind", VOCAB_KINDS)
+def test_vocabulary_kind_is_deterministic_and_inside_the_margin(kind):
+    for rotation in ("any", "flip"):
+        for seed in (1, 2, 3):
+            frag = tx.motif(seed, 100.0, PALETTE, kind=kind, scale=0.66, rotation=rotation)
+            assert tx.motif(seed, 100.0, PALETTE, kind=kind, scale=0.66, rotation=rotation) == frag
+            ET.fromstring(tx.cell_svg(frag, 100.0))
+            assert _dirty_pixels(frag, 100, EDGES) == [], (kind, rotation, seed)
+
+
+@pytest.mark.parametrize("kind", VOCAB_KINDS)
+@pytest.mark.parametrize("size", [21, 64])
+def test_vocabulary_kind_has_visible_ink_at_21_and_64_px(kind, size):
+    # Full-size glyph at the pipeline's scale: ink must be a real share of its disc, not
+    # a faint anti-aliased smudge. The weakest kind (streak) measures about 0.12.
+    frag = tx.motif(1, float(size), MOTIF_PALETTE, kind=kind, scale=0.66, jitter=0.0)
+    mass = _ink_mass(_render_cell(frag, size))
+    disc = math.pi * (size * 0.33) ** 2
+    assert mass / disc >= 0.08, (kind, size, mass / disc)
+
+
+def test_vocabulary_kinds_are_pairwise_distinct_at_21_px():
+    images = {kind: _render_cell(tx.motif(1, 21.0, MOTIF_PALETTE, kind=kind, scale=0.66,
+                                          jitter=0.0), 21).tobytes()
+              for kind in VOCAB_KINDS}
+    assert len(set(images.values())) == len(VOCAB_KINDS)
+
+
+@pytest.mark.parametrize("kind, turns", [("sparkle", 1), ("seed_head", 1), ("snowflake", 2)])
+def test_symmetric_kinds_read_the_same_after_a_turn(kind, turns):
+    # sparkle and seed_head are four- and eight-fold symmetric, so a quarter turn leaves
+    # them unchanged; snowflake is six-fold, so a half turn does. Differences are only
+    # anti-aliasing.
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind=kind, scale=0.66, jitter=0.0)
+    worst, mean = _quarter_turn_diff(frag, turns)
+    assert worst <= 24 and mean <= 0.5, (kind, worst, mean)
+
+
+def test_curl_is_one_round_capped_spiral_stroke():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="curl", scale=0.66, jitter=0.0)
+    assert frag.count("<polyline") == 1 and frag.count("<circle") == 0
+    assert 'fill="none"' in frag and 'stroke-linecap="round"' in frag
+
+
+def test_streak_is_a_tapered_body_with_a_round_head():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="streak", scale=0.66, jitter=0.0)
+    assert frag.count("<polygon") == 1 and frag.count("<circle") == 1
+
+
+def test_seed_head_has_a_disc_eight_rays_and_eight_tip_dots():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="seed_head", scale=0.66, jitter=0.0)
+    assert frag.count("<circle") == 9                  # the disc and the eight dots
+    assert _subpaths(frag) == 8                        # the eight rays
+
+
+def test_snowflake_has_six_arms_each_with_two_forks():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="snowflake", scale=0.66, jitter=0.0)
+    assert _subpaths(frag) == 6 + 6 * 2 * 2            # six arms, then four side branches per arm
+
+
+def test_chevron_is_a_single_v_of_two_strokes():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="chevron", scale=0.66, jitter=0.0)
+    assert _subpaths(frag) == 1 and frag.count("<path") == 1
+    d = re.search(r' d="([^"]*)"', frag).group(1)
+    assert d.count("L") == 2                           # two strokes meeting at the apex
+
+
+def test_pebbles_are_three_separate_blobs():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="pebbles", scale=0.66, jitter=0.0)
+    assert frag.count("<path") == 3 and frag.count("<circle") == 0
+
+
+def test_cloud_puff_is_three_discs_on_a_flat_base():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="cloud_puff", scale=0.66, jitter=0.0,
+                    background=False)
+    assert frag.count("<circle") == 3
+    # one rect for the flat base, plus the cell's own clip rect
+    assert frag.count("<rect") == 2
+
+
+def test_sparkle_is_a_four_point_star_with_a_base_coloured_centre_dot():
+    frag = tx.motif(1, 100.0, MOTIF_PALETTE, kind="sparkle", scale=0.66, jitter=0.0,
+                    background=False)
+    pts = re.search(r'points="([^"]*)"', frag).group(1).split()
+    assert len(pts) == 8                               # four tips and four waist points
+    assert frag.count("<circle") == 1
+    assert frag.count('fill="#ffffff"') == 1           # the centre dot is in the base colour
+
+
 # ------------------------------------------------------------------ blotch inset
 
 INSET = 0.08

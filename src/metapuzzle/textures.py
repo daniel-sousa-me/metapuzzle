@@ -1031,7 +1031,9 @@ def march_line(seed: int, size: float, palette: Sequence[str],
 
 
 MOTIF_KINDS = ("disc", "ring", "silhouette_bird", "leaf", "fish", "boat",
-               "window", "star", "drop", "hull", "fleck", "flower", "moon")
+               "window", "star", "drop", "hull", "fleck", "flower", "moon",
+               "curl", "streak", "seed_head", "snowflake", "chevron", "pebbles",
+               "cloud_puff", "sparkle")
 _MOTIF_ROTATIONS = ("none", "any", "flip")
 _MOTIF_MARGIN = 0.08   # minimum gap between a motif and any cell edge, as a fraction of size
 
@@ -1110,6 +1112,102 @@ def _motif_unit(kind: str, fill: str, ink: str) -> str:
         # Outer arc P->Q is large and clockwise on screen; inner arc Q->P is small.
         d = ("M0.8935 0.4490A1 1 0 1 1-0.4490-0.8935A0.95 0.95 0 0 0 0.8935 0.4490Z")
         return f'<path d="{d}" fill="{fill}"/>'
+    # The kinds below follow docs/design/10-motif-vocabulary.md. Each one is drawn to
+    # read at any quarter turn, so none depends on an upright orientation (cloud_puff's
+    # flat base is the exception: it reads as a cloud at any turn, but flatter sideways).
+    if kind == "curl":
+        # One spiral stroke, 1.5 turns, running from the rim inward, with round caps.
+        pts = []
+        n = 56
+        for k in range(n + 1):
+            t = k / n
+            a = 3.0 * math.pi * t
+            r = 0.74 - 0.56 * t
+            pts.append((r * math.cos(a), r * math.sin(a)))
+        return (f'<polyline points="{_points(pts)}" fill="none" stroke="{fill}" '
+                f'stroke-width="0.22" stroke-linecap="round" stroke-linejoin="round"/>')
+    if kind == "streak":
+        # Comet: a slightly curved stroke that tapers from a round head (upper right)
+        # to a fine tail (lower left). The head circle matches the widest point.
+        p0, p1, p2 = (-0.78, 0.5), (0.0, 0.2), (0.56, -0.5)
+        left, right = [], []
+        n = 16
+        for k in range(n + 1):
+            t = k / n
+            u = 1.0 - t
+            x = u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0]
+            y = u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1]
+            dx = 2 * u * (p1[0] - p0[0]) + 2 * t * (p2[0] - p1[0])
+            dy = 2 * u * (p1[1] - p0[1]) + 2 * t * (p2[1] - p1[1])
+            norm = math.hypot(dx, dy)
+            nx, ny = -dy / norm, dx / norm
+            w = 0.02 + 0.18 * t ** 1.5          # half width: fine tail, thick head
+            left.append((x + w * nx, y + w * ny))
+            right.append((x - w * nx, y - w * ny))
+        body = left + right[::-1]
+        return (f'<polygon points="{_points(body)}" fill="{fill}"/>'
+                f'<circle cx="{_f(p2[0])}" cy="{_f(p2[1])}" r="0.2" fill="{fill}"/>')
+    if kind == "seed_head":
+        # Thistledown: a small disc with eight short rays, each ending in a tiny dot.
+        rays, dots = [], []
+        for k in range(8):
+            a = math.radians(k * 45.0)
+            c, s = math.cos(a), math.sin(a)
+            rays.append(f"M{_f(0.28 * c)} {_f(0.28 * s)}L{_f(0.7 * c)} {_f(0.7 * s)}")
+            dots.append(f'<circle cx="{_f(0.8 * c)}" cy="{_f(0.8 * s)}" r="0.1" fill="{fill}"/>')
+        return (f'<path d="{" ".join(rays)}" fill="none" stroke="{fill}" '
+                f'stroke-width="0.11" stroke-linecap="round"/>'
+                f'<circle cx="0" cy="0" r="0.26" fill="{fill}"/>' + "".join(dots))
+    if kind == "snowflake":
+        # Six arms, each with a pair of short side branches forking forward at 60 degrees.
+        segs = []
+        for k in range(6):
+            base_deg = -90.0 + k * 60.0
+            a = math.radians(base_deg)
+            ux, uy = math.cos(a), math.sin(a)
+            segs.append((0.0, 0.0, 0.9 * ux, 0.9 * uy))
+            for along in (0.5, 0.74):
+                bx, by = along * ux, along * uy
+                for turn in (60.0, -60.0):
+                    b = math.radians(base_deg + turn)
+                    segs.append((bx, by, bx + 0.26 * math.cos(b), by + 0.26 * math.sin(b)))
+        d = " ".join(f"M{_f(x1)} {_f(y1)}L{_f(x2)} {_f(y2)}" for x1, y1, x2, y2 in segs)
+        return (f'<path d="{d}" fill="none" stroke="{fill}" stroke-width="0.13" '
+                f'stroke-linecap="round"/>')
+    if kind == "chevron":
+        # A V of two strokes with its apex down: a distant bird, or a seedling.
+        return (f'<path d="M-0.8-0.3L0 0.3L0.8-0.3" fill="none" stroke="{fill}" '
+                f'stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round"/>')
+    if kind == "pebbles":
+        # Three rounded stones of different sizes in a loose triangle (centre x, y, radius).
+        stones = ((-0.42, -0.1, 0.4), (0.36, -0.28, 0.3), (0.12, 0.42, 0.27))
+        wobble = (1.0, 0.86, 0.95, 0.8, 0.98, 0.84, 0.92, 0.78)
+        out = []
+        for i, (cx, cy, r) in enumerate(stones):
+            pts = []
+            for k, m in enumerate(wobble):
+                a = i * 0.9 + k * 2.0 * math.pi / len(wobble)
+                pts.append((cx + r * m * math.cos(a), cy + r * m * math.sin(a)))
+            out.append(f'<path d="{_smooth_closed(pts)}" fill="{fill}"/>')
+        return "".join(out)
+    if kind == "cloud_puff":
+        # Two side lobes and a taller centre disc, resting on one flat base at y = 0.575.
+        # The rectangle fills the gap between the lobes' lowest points, so the base is flat.
+        return (f'<circle cx="-0.483" cy="0.184" r="0.391" fill="{fill}"/>'
+                f'<circle cx="0.483" cy="0.184" r="0.391" fill="{fill}"/>'
+                f'<circle cx="0" cy="0" r="0.575" fill="{fill}"/>'
+                f'<rect x="-0.483" y="0.092" width="0.966" height="0.483" fill="{fill}"/>')
+    if kind == "sparkle":
+        # Four-point star with tips on the axes and a slim waist, and a centre dot in the
+        # base colour (a catchlight). Four-fold symmetric, so it reads at any quarter turn.
+        pts = []
+        for k in range(8):
+            a = -math.pi / 2 + k * math.pi / 4
+            r = 0.94 if k % 2 == 0 else 0.24
+            pts.append((r * math.cos(a), r * math.sin(a)))
+        return (f'<polygon points="{_points(pts)}" fill="{fill}" stroke="{fill}" '
+                f'stroke-width="0.06" stroke-linejoin="round"/>'
+                f'<circle cx="0" cy="0" r="0.15" fill="{ink}"/>')
     raise ValueError(f"kind must be one of {MOTIF_KINDS}, not {kind!r}")
 
 
@@ -1122,9 +1220,12 @@ def motif(seed: int, size: float, palette: Sequence[str], background: bool = Tru
     The shape never comes within ``_MOTIF_MARGIN`` (8%) of a cell edge.
 
     kind: one of MOTIF_KINDS: disc, ring, silhouette_bird, leaf, fish, boat,
-        window, star, drop, hull, fleck. ``hull`` is a boat hull without mast or
-        sail, with its waterline at the origin, so ``offset`` can seat it on a
-        horizon line. ``fleck`` is a small soft irregular blob.
+        window, star, drop, hull, fleck, flower, moon, and the vocabulary glyphs
+        curl (spiral), streak (comet), seed_head (thistledown), snowflake, chevron
+        (V), pebbles, cloud_puff and sparkle (four-point catchlight). ``hull`` is a
+        boat hull without mast or sail, with its waterline at the origin, so
+        ``offset`` can seat it on a horizon line. ``fleck`` is a small soft
+        irregular blob.
     scale: diameter of the circle enclosing the shape, as a fraction of size.
         Must satisfy scale / 2 + jitter <= 0.42, so the default fits with jitter.
     jitter: maximum center offset per axis, as a fraction of size.
