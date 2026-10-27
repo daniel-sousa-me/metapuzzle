@@ -1,0 +1,71 @@
+{
+  "_note": "011, tray board: no frame roles. Interior tier cells may take their tier's transition classes (texture); interior edge roles take only their transition class.",
+  "roles": {
+    "d_int": {
+      "classes": [
+        "D",
+        "DM",
+        "DL"
+      ],
+      "weights": [
+        6,
+        1,
+        1
+      ]
+    },
+    "d_edge_m": {
+      "classes": [
+        "DM"
+      ]
+    },
+    "d_edge_l": {
+      "classes": [
+        "DL"
+      ]
+    },
+    "m_int": {
+      "classes": [
+        "M",
+        "MD",
+        "ML"
+      ],
+      "weights": [
+        6,
+        1,
+        1
+      ]
+    },
+    "m_edge_d": {
+      "classes": [
+        "MD"
+      ]
+    },
+    "m_edge_l": {
+      "classes": [
+        "ML"
+      ]
+    },
+    "l_int": {
+      "classes": [
+        "L",
+        "LD",
+        "LM"
+      ],
+      "weights": [
+        6,
+        1,
+        1
+      ]
+    },
+    "l_edge_d": {
+      "classes": [
+        "LD"
+      ]
+    },
+    "l_edge_m": {
+      "classes": [
+        "LM"
+      ]
+    }
+  }
+}

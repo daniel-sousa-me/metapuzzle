@@ -1,0 +1,618 @@
+"""Tier targets for experiment 011: "Field, Wood and Water" (hare at dawn, owl at dusk, swan at midnight).
+
+Usage: python3 make_targets.py [COLSxROWS ...]   default: 27x38 (primary) then 20x25.
+The first size is written next to this file (tiers-A/B/C.txt, budgets.txt, targets-preview.png,
+contours-preview.png); every size is also written to <COLS>x<ROWS>/. Sizes tried: 20x25, 25x30,
+27x38 (primary, about 1000 cells, owner decision 2026-10-27), 32x48.
+
+Each picture is a tier map: D dark, M mid, L light, S dark chips scattered on light (no transition
+against L), W mid with wave lenses (counts as M for budgets). Value inversion with field ownership
+(docs/design/07, 08): every tier is the figure in one picture, the sky in another and the ground or
+water in the third.
+
+        tier   A hare (dawn, vertical)   B owl (dusk, radial)    C swan (midnight, horizontal)
+        D      ploughed field, lone tree owl and branch           night sky
+        M      hare                      dusk sky                 lake
+        L      sky, light furrow lenses  moon halo and snow       swan, small moon, moon glints
+        S      starling flock            bramble in the snow      wing feathers
+        W      dawn cloud bank           cloud bars               swell
+
+Transition pieces are a shared inventory (FINDINGS 12), so tier counts and, per tier pair, boundary
+edges and corners (budget.py) must match across the three pictures; tips (1-cell caps) and 45-degree
+staircase runs are tracked too (future tip and diagonal tiles). Method:
+  1. SKETCHES: hand-drawn 20 x 25 pixel art. The figure (largest region of the figure tier plus the
+     holes it encloses: eyes, beak) is locked, as are S, W and features marked lower case.
+  2. balance(): seeded simulated annealing that changes only unlocked cells within one cell of a
+     drawn boundary (horizon, snow line, moon rim, clouds, lenses), to a neighbouring background
+     tier. Energy: spreads of counts / edges / corners / 45-degree runs beyond a tolerance, tips and
+     anomalies (caps, 1-wide strips, dots, pinches against any foreign tier), straight runs longer
+     than 5 edges per 20 columns, changes of the Euler number of any tier (no new islands or
+     holes), S touching anything but L, and every changed cell. SEEDS runs in parallel, then a
+     cooler polish pass from the best one.
+  3. Other sizes: the balanced 20 x 25 maps are resampled (blurred one-hot labels, bilinear,
+     argmax), cleaned of anomalies, S and W counts equalized, and balanced again at that size.
+"""
+import os
+import sys
+from multiprocessing import Pool
+from pathlib import Path
+
+import numpy as np
+from PIL import Image, ImageDraw
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from budget import PAIRS, FREE, budgets, table, anomaly_map, pair_key  # noqa: E402
+
+PRIMARY = "27x38"   # COLSxROWS of the primary deliverable (about 1000 cells, owner decision)
+SMOOTH = 0.55       # Gaussian sigma (sketch cells) used when resampling the sketches
+NAMES = ["A", "B", "C"]
+TITLES = {"A": "A hare (dawn)", "B": "B owl (dusk)", "C": "C swan (midnight)"}
+FIGURE = {"A": "M", "B": "D", "C": "L"}
+# Tiers the balancer may paint in each picture (the figure tier only away from the figure).
+BACKGROUND = {"A": "DL", "B": "ML", "C": "DML"}
+SEED = 11         # base seed; SEEDS runs are made and the lowest energy kept
+SEEDS = 4
+ITERS_PER_CELL = 400
+POLISH_T0 = 1.0   # second, cooler annealing pass started from the best first-pass result
+SOFT_RADIUS = 1   # 1 = only cells on a drawn boundary; 2 = also their neighbours
+
+SKETCHES = {}  # filled below
+
+# Hand-drawn sketches, rows top to bottom. D M S as themselves, '.' = L, 'w' = W.
+# Lower case 'd' / 'm' / ',' = D / M / L locked: a drawn feature the balancer must not touch
+# (the hare's tree, the swan's clouds). The figure, S and W are always locked.
+SKETCHES["A"] = """
+wwwwwww.......SSSSS.
+wwwwww.........SSSSS
+wwww...MM...MM..SSSS
+www....MM...MM.SSSSS
+......MM...MM...SSSS
+......MM...MM....SS.
+.....MM...MM........
+.....MM...MM........
+...MMMMMMMM,,,.dddd.
+...MMMMMMMM,,,dddddd
+..MMMMMMMMM,,,dddddd
+..MMMMMMMMMM,,,dddd.
+DDDDMMMMMMMM,,,.dd..
+DDDDMMMMMMMMM,,.dd..
+DDDDMMMMMMMMMMDDddDD
+DDDDMMMMMMMMMMMDDDDD
+DDDDMMMMMMMMMMMDDDDD
+DDDDDMMMMMMMMMMMDDDD
+DDDDDMMMMMMMMMMMDDDD
+DDDDDMMDDMMMMMMMDDDD
+DDDMMMMDDMMMMMMMDDDD
+DDDMMMMDDMMMMMDDDDDD
+DDDDDDDDDDDDDDD....D
+D....DDDDDDDDDD....D
+D....DDDDDDDDDDDDDDD
+"""
+
+SKETCHES["B"] = """
+wwwwwwwwMM.....MMMMM
+wwwwwwwM.........MMM
+wwwwwM............MM
+MMMMM.............MM
+MMMM....DD....DD...M
+MMMM....DDD..DDD...M
+MMMM....DDDDDDDD...M
+MMMM...DD..DD..DD...
+MMMM...DD..DD..DD...
+MMMM...DDDDDDDDDD...
+MMMMM..DDDDMMDDDD..M
+MMMMMMDDDDDMMDDDDMMM
+MMMMMDDDDDDDDDDDDDMM
+MMMMMDDDDDDDDDDDDDMM
+MMMMMDDDDDDDDDDDDDMM
+MMMMMDDDDDDDDDDDDMMM
+MMMMMMDDDDDDDDDDDMMM
+MMMMMMDDDDDDDDDDMMMM
+MMMMMDDDDDDDDMMMMMMM
+MMDDDDDDMMMMMMMMMMMM
+DDDDD.......MMMMMMMM
+DD..................
+....................
+.......SSSSSSSSSS...
+....SSSSSSSSSSSSSSS.
+"""
+
+SKETCHES["C"] = """
+DDmmmmmDDDDDDDDD,,DD
+DmmmmmmmDDDDDDD,,,,D
+DmmmmmmmDDDDDDD,,,,D
+DDDmmmDDDDDDDDDD,,DD
+DDDDDDD..DDDDDDDDDDD
+DDDDDD.....DDDDDDDDD
+DDDDD..DD..DDDDDmmmm
+DDDDD..DD..DDDDmmmmm
+DDDDDDDD..DDDDDmmmmm
+DDDDDDDD..DDDDDDDDDD
+DDDDDM...MMMDDDDDMM.
+DDDMMM...MMMDDDDD...
+MMMMM....MMMMM......
+MMMM...........SSS..
+MMMM........SSSSS...
+MMMM.......SSSSSSS..
+MMMMM......SSSSSSS..
+MMMMMM......SSS.....
+MMMMMMM............M
+MMMMMMMMMMM.....MMMM
+MMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMM
+MM....MMMMMMM...MMMM
+MM....MMMMMMM...MMMM
+wwwwwwwwwwwwwwwwwwww
+"""
+
+
+# ---- parsing, resampling, cleaning ------------------------------------------------------
+CODE = {"D": 0, "M": 1, "L": 2, "S": 3, "W": 4}
+CHARS = np.array(list("DMLSW"))
+BUDGET_TIER = np.array([0, 1, 2, 3, 1])           # W counts as M
+PAIR_ID = -np.ones((4, 4), int)
+for i, (a, b) in enumerate(PAIRS):
+    PAIR_ID[CODE[a], CODE[b]] = PAIR_ID[CODE[b], CODE[a]] = i
+NP = len(PAIRS)
+SKETCH_ROWS, SKETCH_COLS = 25, 20
+SKETCH_CHAR = {".": "L", ",": "L", "d": "D", "m": "M", "w": "W", "D": "D", "M": "M", "S": "S"}
+
+
+def parse(text):
+    """(tier codes, locked mask) of a sketch."""
+    rows = [r.strip() for r in text.strip().splitlines()]
+    assert len(rows) == SKETCH_ROWS and all(len(r) == SKETCH_COLS for r in rows), [len(r) for r in rows]
+    t = np.array([[CODE[SKETCH_CHAR[ch]] for ch in r] for r in rows], np.int8)
+    locked = np.array([[ch in "dm," for ch in r] for r in rows])
+    return t, locked
+
+
+def blur(a, sigma):
+    """Separable Gaussian blur with edge padding (numpy only)."""
+    rad = max(1, int(np.ceil(3 * sigma)))
+    k = np.exp(-0.5 * (np.arange(-rad, rad + 1) / sigma) ** 2)
+    k /= k.sum()
+    p = np.pad(a, rad, mode="edge")
+    p = np.stack([np.convolve(row, k, mode="valid") for row in p])[rad:-rad]
+    p = np.pad(p, ((rad, rad), (0, 0)), mode="edge")
+    return np.stack([np.convolve(col, k, mode="valid") for col in p.T]).T
+
+
+def sample(a, rows, cols):
+    """Bilinear samples of a (sketch grid) at the cell centres of a rows x cols grid."""
+    ys = np.clip((np.arange(rows) + 0.5) * a.shape[0] / rows - 0.5, 0, a.shape[0] - 1)
+    xs = np.clip((np.arange(cols) + 0.5) * a.shape[1] / cols - 0.5, 0, a.shape[1] - 1)
+    y0, x0 = np.floor(ys).astype(int), np.floor(xs).astype(int)
+    y1, x1 = np.minimum(y0 + 1, a.shape[0] - 1), np.minimum(x0 + 1, a.shape[1] - 1)
+    fy, fx = (ys - y0)[:, None], (xs - x0)[None, :]
+    return ((1 - fy) * ((1 - fx) * a[y0][:, x0] + fx * a[y0][:, x1])
+            + fy * ((1 - fx) * a[y1][:, x0] + fx * a[y1][:, x1]))
+
+
+def resample(t, locked, rows, cols, sigma=SMOOTH):
+    """The sketch at another grid size: blurred one-hot labels, bilinear, argmax (smooth outlines).
+    The sketch's own size is returned unchanged."""
+    if (rows, cols) == t.shape:
+        return t.copy(), locked.copy()
+    fields = np.stack([sample(blur((t == k).astype(float), sigma), rows, cols) for k in range(5)])
+    lk = sample(blur(locked.astype(float), sigma), rows, cols) > 0.5
+    return fields.argmax(0).astype(np.int8), lk
+
+
+def clean(t, max_rounds=30):
+    """Remove caps, 1-wide strips, dots and pinches left by resampling. A cap, strip or dot cell
+    takes the most common label among its 4 neighbours; for a pinch, the diagonal cell with the
+    fewest same-label neighbours takes the pinched cell's label (the corner contact is cut)."""
+    t = t.copy()
+    R, C = t.shape
+    inside = lambda r, c: 0 <= r < R and 0 <= c < C
+    four = ((1, 0), (-1, 0), (0, 1), (0, -1))
+    for _ in range(max_rounds):
+        am = anomaly_map(CHARS[t])
+        bad = list(zip(*np.nonzero(am != "")))
+        if not bad:
+            break
+        for r, c in bad:
+            if am[r, c] == "pinch":
+                cands = [(r + dr, c + dc) for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1))
+                         if inside(r + dr, c + dc) and BUDGET_TIER[t[r + dr, c + dc]] != BUDGET_TIER[t[r, c]]]
+                same = lambda y, x: sum(inside(y + a, x + b) and t[y + a, x + b] == t[y, x] for a, b in four)
+                y, x = min(cands, key=lambda yx: same(*yx))
+                t[y, x] = t[r, c]
+            else:
+                nb = [t[r + dr, c + dc] for dr, dc in four if inside(r + dr, c + dc)]
+                vals, cnt = np.unique(nb, return_counts=True)
+                t[r, c] = vals[cnt.argmax()]
+    return t
+
+
+def equalize_label(maps, code, grow_into):
+    """Make the count of one locked label (S or W) equal in all pictures by trimming the larger
+    regions at their edges (cells with the most foreign neighbours first)."""
+    target = min(int((m == code).sum()) for m in maps.values())
+    for n, t in maps.items():
+        while (t == code).sum() > target:
+            R, C = t.shape
+            best = None
+            for r, c in zip(*np.nonzero(t == code)):
+                nb = [t[r + dr, c + dc] for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1))
+                      if 0 <= r + dr < R and 0 <= c + dc < C]
+                foreign = [v for v in nb if v != code]
+                if foreign and (best is None or len(foreign) > best[0]):
+                    repl = grow_into if grow_into in foreign else foreign[0]
+                    best = (len(foreign), r, c, repl)
+            _, r, c, repl = best
+            t[r, c] = repl
+    return target
+
+
+def components(mask):
+    """4-connected component labels of a boolean mask (0 = background)."""
+    R, C = mask.shape
+    lab = np.zeros(mask.shape, int)
+    n = 0
+    for r, c in zip(*np.nonzero(mask)):
+        if lab[r, c]:
+            continue
+        n += 1
+        stack = [(r, c)]
+        lab[r, c] = n
+        while stack:
+            y, x = stack.pop()
+            for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                yy, xx = y + dy, x + dx
+                if 0 <= yy < R and 0 <= xx < C and mask[yy, xx] and not lab[yy, xx]:
+                    lab[yy, xx] = n
+                    stack.append((yy, xx))
+    return lab, n
+
+
+def figure_mask(t, fig):
+    """Largest 4-connected region of the figure tier plus the holes it encloses (eyes, beak)."""
+    lab, n = components(BUDGET_TIER[t] == CODE[fig])
+    sizes = np.bincount(lab.ravel(), minlength=n + 1)
+    sizes[0] = 0
+    main = lab == sizes.argmax()
+    outside, _ = components(~main)
+    border = set(outside[0]) | set(outside[-1]) | set(outside[:, 0]) | set(outside[:, -1])
+    holes = ~main & ~np.isin(outside, list(border - {0}))
+    return main, main | holes
+
+
+# ---- fast statistics for the annealer ---------------------------------------------------
+def pad(b, v=-1):
+    return np.pad(b, 1, constant_values=v)
+
+
+def is_boundary(x, y):
+    return (x != y) & ~(((x == 2) & (y == 3)) | ((x == 3) & (y == 2)))
+
+
+class Stats:
+    """Per picture: edges, corners, diagonal-run cells per pair; tier counts; tips (caps) and
+    other anomalies; straight-run excess; junction cells; Euler numbers per tier."""
+
+    def __init__(self, t, run_limit):
+        b = BUDGET_TIER[t]
+        self.edges = np.zeros(NP, int)
+        for x, y in ((b[:, :-1], b[:, 1:]), (b[:-1], b[1:])):
+            pid = PAIR_ID[x, y]
+            self.edges += np.bincount(pid[pid >= 0], minlength=NP)
+        p = pad(b)
+        R, C = b.shape
+        sh = lambda dr, dc: p[1 + dr:1 + dr + R, 1 + dc:1 + dc + C]
+        side_off = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+        side = [sh(*o) for o in side_off]
+        diag = [sh(-1, 1), sh(1, 1), sh(1, -1), sh(-1, -1)]
+        self.corners = np.zeros(NP, int)
+        self.diag = np.zeros(NP, int)
+        self.tips = 0
+        self.anomalies = 0
+        others = np.zeros(b.shape, int)
+        for y in range(4):
+            pid = PAIR_ID[b, y]
+            valid = pid >= 0
+            s = [x == y for x in side]
+            d = [x == y for x in diag]
+            ns = sum(s)
+            adj = [s[k] & s[(k + 1) % 4] for k in range(4)]
+            adj2 = adj[0] | adj[1] | adj[2] | adj[3]
+            opp = (d[0] & d[2]) | (d[1] & d[3])
+            anyd = d[0] | d[1] | d[2] | d[3]
+            corner = valid & (((ns == 2) & adj2) | ((ns == 0) & anyd & ~opp))
+            self.corners += np.bincount(pid[corner], minlength=NP)
+                # 45-degree runs: convex corners with the same orientation, chained diagonally
+            for k in range(4):
+                cv = valid & (ns == 2) & adj[k]
+                a, bb = side_off[k], side_off[(k + 1) % 4]
+                st = (a[0] - bb[0], a[1] - bb[1])
+                cp = np.pad(cv, 1)
+                fwd = cp[1 + st[0]:1 + st[0] + R, 1 + st[1]:1 + st[1] + C]
+                back = cp[1 - st[0]:1 - st[0] + R, 1 - st[1]:1 - st[1] + C]
+                inrun = cv & (fwd | back)
+                self.diag += np.bincount(pid[inrun], minlength=NP)
+            others += valid & ((ns > 0) | anyd)
+        # anomalies against any foreign tier (a neighbour needing a transition)
+        fs = [(x >= 0) & (x != b) & ~(((x == 2) & (b == 3)) | ((x == 3) & (b == 2))) for x in side]
+        fd = [(x >= 0) & (x != b) & ~(((x == 2) & (b == 3)) | ((x == 3) & (b == 2))) for x in diag]
+        nf = sum(fs)
+        fopp = (fs[0] & fs[2]) | (fs[1] & fs[3])
+        self.tips = int((nf == 3).sum())
+        self.anomalies = int(((nf == 4) | ((nf == 2) & fopp) | ((nf == 0) & ((fd[0] & fd[2]) | (fd[1] & fd[3])))).sum())
+        self.counts = np.bincount(b.ravel(), minlength=4)
+        self.raw_counts = np.bincount(t.ravel(), minlength=5)
+        self.run = run_excess(b, run_limit)
+        self.junction = int((others >= 2).sum())
+        self.regions = tuple(euler(b == k) for k in range(4))
+
+
+def euler(m):
+    """Euler number (regions minus holes, 4-connectivity) of a mask: a cheap, local proxy that
+    changes whenever a flip creates or removes an island or a hole."""
+    return int(m.sum() - (m[:, 1:] & m[:, :-1]).sum() - (m[1:] & m[:-1]).sum()
+               + (m[1:, 1:] & m[:-1, 1:] & m[1:, :-1] & m[:-1, :-1]).sum())
+
+
+def run_excess(b, limit):
+    """Sum over straight boundary segments of (length - limit) where positive."""
+    ex = 0
+    for line in list(is_boundary(b[:-1], b[1:])) + list(is_boundary(b[:, :-1], b[:, 1:]).T):
+        run = 0
+        for v in list(line) + [False]:
+            if v:
+                run += 1
+            else:
+                ex += max(0, run - limit)
+                run = 0
+    return ex
+
+
+def energy(st, changes, ref_regions):
+    e = 0.0
+    for s, ref in zip(st, ref_regions):
+        e += 40.0 * sum(abs(a - b) for a, b in zip(s.regions, ref))
+    E = np.array([s.edges for s in st])
+    K = np.array([s.corners for s in st])
+    G = np.array([s.diag for s in st])
+    N = np.array([s.counts for s in st])
+    for arr, tol, w in ((E, 2, 3.0), (K, 2, 3.0), (G, 2, 2.0), (N[:, :3], 1, 4.0)):
+        spread = arr.max(0) - arr.min(0)
+        e += w * (np.maximum(0, spread - tol) ** 2).sum() + 0.3 * spread.sum()
+    J = np.array([s.junction for s in st])
+    e += 0.5 * max(0, J.max() - J.min() - 6) ** 2
+    e += sum(200.0 * (s.tips + s.anomalies) + 6.0 * s.run for s in st)
+    e += sum(30.0 * (s.edges[3:].sum() + s.corners[3:].sum()) for s in st)   # S touches only L
+    e += 0.08 * K.sum()                      # mild preference for smooth lines
+    e += 1.0 * changes
+    return e
+
+
+def soft_band(t, radius=SOFT_RADIUS):
+    """Cells within `radius` (Chebyshev) of a boundary: the only cells the balancer may change."""
+    b = BUDGET_TIER[t]
+    R, C = b.shape
+    edge = np.zeros(b.shape, bool)
+    h = is_boundary(b[:, :-1], b[:, 1:])
+    v = is_boundary(b[:-1], b[1:])
+    edge[:, :-1] |= h; edge[:, 1:] |= h; edge[:-1] |= v; edge[1:] |= v
+    band = edge.copy()
+    for _ in range(radius - 1):
+        p = np.pad(band, 1)
+        band = np.zeros_like(band)
+        for dr in (-1, 0, 1):
+            for dc in (-1, 0, 1):
+                band |= p[1 + dr:1 + dr + R, 1 + dc:1 + dc + C]
+    return band
+
+
+def balance(start, locked, run_limit, iters, seed, T0=6.0):
+    """Seeded annealing of the unprotected boundary cells (see module docstring)."""
+    rng = np.random.default_rng(seed)
+    maps = {n: start[n].copy() for n in NAMES}
+    R, C = maps[NAMES[0]].shape
+    prot = {}
+    for n in NAMES:
+        main, fig = figure_mask(maps[n], FIGURE[n])
+        near_main = np.zeros_like(main)
+        near_main[1:] |= main[:-1]; near_main[:-1] |= main[1:]
+        near_main[:, 1:] |= main[:, :-1]; near_main[:, :-1] |= main[:, 1:]
+        fixed = fig | locked[n] | (maps[n] == CODE["S"]) | (maps[n] == CODE["W"])
+        prot[n] = (fixed | ~soft_band(maps[n]), near_main)
+    st = {n: Stats(maps[n], run_limit) for n in NAMES}
+    ref = [st[n].regions for n in NAMES]
+    changes = 0
+    cur = energy([st[n] for n in NAMES], changes, ref)
+    best = (cur, {n: maps[n].copy() for n in NAMES})
+    T1 = 0.05
+    for it in range(iters):
+        T = T0 * (T1 / T0) ** (it / iters)
+        n = NAMES[rng.integers(3)]
+        t = maps[n]
+        fixed, near_main = prot[n]
+        r, c = rng.integers(R), rng.integers(C)
+        if fixed[r, c]:
+            continue
+        nb = {int(BUDGET_TIER[t[rr, cc]]) for rr, cc in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1),
+                                                         (r - 1, c - 1), (r - 1, c + 1), (r + 1, c - 1), (r + 1, c + 1))
+              if 0 <= rr < R and 0 <= cc < C}
+        nb = {k for k in nb if CHARS[k] in BACKGROUND[n] and k != BUDGET_TIER[t[r, c]]}
+        if near_main[r, c]:
+            nb.discard(CODE[FIGURE[n]])
+        if not nb:
+            continue
+        new = rng.choice(sorted(nb))
+        old = t[r, c]
+        t[r, c] = new
+        s_new = Stats(t, run_limit)
+        d_change = int(new != start[n][r, c]) - int(old != start[n][r, c])
+        cand = {**st, n: s_new}
+        e = energy([cand[k] for k in NAMES], changes + d_change, ref)
+        if e <= cur or rng.random() < np.exp((cur - e) / T):
+            st[n], cur = s_new, e
+            changes += d_change
+            if e < best[0]:
+                best = (e, {k: maps[k].copy() for k in NAMES})
+        else:
+            t[r, c] = old
+    return best[1], best[0]
+
+
+def _balance_job(args):
+    return balance(*args)
+
+
+def best_of_seeds(start, locked, rows, cols, run_limit, T0=6.0):
+    iters = ITERS_PER_CELL * rows * cols
+    jobs = [(start, locked, run_limit, iters, SEED + k, T0) for k in range(SEEDS)]
+    with Pool(min(SEEDS, os.cpu_count() or 1)) as pool:
+        runs = pool.map(_balance_job, jobs)
+    for k, (_, e) in enumerate(runs):
+        print(f"  {cols}x{rows} T0 {T0} seed {SEED + k}: energy {e:.1f}", flush=True)
+    return min(runs, key=lambda r: r[1])[0]
+
+
+_NATIVE = {}
+
+
+def make(rows, cols):
+    """Returns (start, balanced, run limit) at a grid size. Stage 1 balances the hand sketches at
+    their own size (20 x 25). Other sizes resample the stage-1 maps (and the locks), clean the
+    anomalies resampling leaves, equalize the S and W counts, and balance again at that size."""
+    parsed = {n: parse(SKETCHES[n]) for n in NAMES}
+    locked = {n: parsed[n][1] for n in NAMES}
+    if not _NATIVE:
+        start = {n: parsed[n][0] for n in NAMES}
+        _NATIVE["start"] = start
+        first = best_of_seeds(start, locked, SKETCH_ROWS, SKETCH_COLS, 5)
+        _NATIVE["maps"] = best_of_seeds(first, locked, SKETCH_ROWS, SKETCH_COLS, 5, T0=POLISH_T0)
+    if (rows, cols) == (SKETCH_ROWS, SKETCH_COLS):
+        return _NATIVE["start"], _NATIVE["maps"], 5
+    start, lk = {}, {}
+    for n in NAMES:
+        t, lk[n] = resample(_NATIVE["maps"][n], locked[n], rows, cols)
+        start[n] = clean(t)
+    equalize_label(start, CODE["S"], CODE["L"])
+    equalize_label(start, CODE["W"], CODE["M"])
+    run_limit = max(5, round(5 * cols / SKETCH_COLS))
+    first = best_of_seeds(start, lk, rows, cols, run_limit)
+    return start, best_of_seeds(first, lk, rows, cols, run_limit, T0=POLISH_T0), run_limit
+
+
+# ---- output -----------------------------------------------------------------------------
+INK = (0, 0, 0)
+PAL = {0: (43, 50, 98), 1: (138, 140, 76), 2: (236, 227, 200), 3: (236, 227, 200), 4: (138, 140, 76)}
+
+
+def tier_image(t, up=16):
+    R, C = t.shape
+    img = Image.new("RGB", (C * up, R * up))
+    d = ImageDraw.Draw(img)
+    for r in range(R):
+        for c in range(C):
+            x, y = c * up, r * up
+            d.rectangle([x, y, x + up - 1, y + up - 1], fill=PAL[int(t[r, c])])
+            if t[r, c] == 3:                                      # S: navy chips on cream
+                for j in range(2, up, 5):
+                    for k in range(1 + (j % 2) * 2, up, 5):
+                        d.rectangle([x + k, y + j, x + k + 1, y + j + 1], fill=PAL[0])
+            if t[r, c] == 4:                                      # W: cream lenses on olive
+                for j in (4, 11):
+                    d.line([x + 3 + j % 3, y + j, x + 10 + j % 3, y + j], fill=PAL[2], width=2)
+    return img
+
+
+def contour_image(t, up=16, width=2):
+    """Ink mode: tier boundaries (budget pairs only) as black lines on white; S dots, W dashes."""
+    b = BUDGET_TIER[t]
+    R, C = b.shape
+    img = Image.new("RGB", (C * up + 1, R * up + 1), (255, 255, 255))
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, C * up, R * up], outline=(170, 170, 170))
+    for r in range(R):
+        for c in range(C):
+            if c + 1 < C and is_boundary(b[r, c], b[r, c + 1]):
+                d.line([(c + 1) * up, r * up, (c + 1) * up, (r + 1) * up], fill=INK, width=width)
+            if r + 1 < R and is_boundary(b[r, c], b[r + 1, c]):
+                d.line([c * up, (r + 1) * up, (c + 1) * up, (r + 1) * up], fill=INK, width=width)
+            if t[r, c] == 3:
+                for j, k in ((4, 4), (10, 7), (5, 11)):
+                    d.ellipse([c * up + k - 1, r * up + j - 1, c * up + k + 1, r * up + j + 1], fill=INK)
+            if t[r, c] == 4:
+                d.line([c * up + 4, r * up + 8, c * up + 11, r * up + 8], fill=INK, width=1)
+    return img
+
+
+def sheet(rows_of_images, labels, path, gap=14, lab_h=16):
+    w, h = rows_of_images[0][0].size
+    n = len(rows_of_images[0])
+    can = Image.new("RGB", (n * w + (n + 1) * gap, len(rows_of_images) * (h + lab_h + gap) + gap), (255, 255, 255))
+    d = ImageDraw.Draw(can)
+    for i, row in enumerate(rows_of_images):
+        for j, im in enumerate(row):
+            x, y = gap + j * (w + gap), gap + i * (h + lab_h + gap)
+            d.text((x, y), labels[i][j], fill=(0, 0, 0))
+            can.paste(im, (x, y + lab_h))
+    can.save(path)
+
+
+def write_tiers(t, path):
+    path.write_text("\n".join(" ".join(CHARS[v] for v in row) for row in t) + "\n")
+
+
+def extra_rows(maps):
+    """Table rows for the tile items the coordinator asked to track: tips and 45-degree runs."""
+    st = [Stats(maps[n], 10 ** 6) for n in NAMES]
+    lines = []
+    def row(label, vals):
+        lines.append(f"{label:22s}" + "".join(f"{v:9d}" for v in vals) + f"{max(vals) - min(vals):9d}")
+    row("tips (1-cell caps)", [s.tips for s in st])
+    for i, (a, b) in enumerate(PAIRS[:3]):
+        row(f"{pair_key(a, b)} 45deg-run cells", [int(s.diag[i]) for s in st])
+    return "\n".join(lines)
+
+
+def write_outputs(start, maps, out, rows, cols, run_limit):
+    out.mkdir(parents=True, exist_ok=True)
+    for n in NAMES:
+        write_tiers(maps[n], out / f"tiers-{n}.txt")
+    named = {TITLES[n].split(" (")[0]: budgets(CHARS[maps[n]]) for n in NAMES}
+    moved = {n: int((maps[n] != start[n]).sum()) for n in NAMES}
+    report = [
+        f"# Boundary budgets, experiment 011 (Field, Wood and Water), {cols} columns x {rows} rows.",
+        "# Columns: A hare, B owl, C swan. edges = 4-neighbour cell edges between the two tiers;",
+        "# corners = cells with the other tier on two adjacent sides (convex) or on a diagonal only",
+        "# (concave), both tiers counted. W counts as M; S-L needs no transition and is not a pair.",
+        "# Anomalies need rare tiles (target 0). Tips = 1-cell protrusions (caps). 45deg-run cells =",
+        "# convex corners chained diagonally (staircases of single steps, 2+ cells), per pair.",
+        f"# Straight runs are penalized above {run_limit} edges. Cells moved by the balancer from the",
+        "# resampled sketch: " + ", ".join(f"{n} {moved[n]}" for n in NAMES),
+        "",
+        table(named),
+        extra_rows(maps),
+    ]
+    (out / "budgets.txt").write_text("\n".join(report) + "\n")
+    print("\n".join(report))
+    up = 16
+    labels = [[f"{TITLES[n]} start" for n in NAMES], [f"{TITLES[n]} balanced" for n in NAMES]]
+    sheet([[tier_image(start[n], up) for n in NAMES], [tier_image(maps[n], up) for n in NAMES]], labels,
+          out / "targets-preview.png")
+    sheet([[contour_image(maps[n], up) for n in NAMES]], [[f"{TITLES[n]} ink" for n in NAMES]],
+          out / "contours-preview.png")
+
+
+def main(argv):
+    """Usage: make_targets.py [COLSxROWS ...]   (default: 27x38 primary, then 20x25).
+    The first size is the primary: written next to this file; every size also goes to <COLS>x<ROWS>/."""
+    sizes = argv or [PRIMARY, "20x25"]
+    for i, size in enumerate(sizes):
+        cols, rows = (int(v) for v in size.lower().split("x"))
+        print(f"== {cols}x{rows}", flush=True)
+        start, maps, run_limit = make(rows, cols)
+        write_outputs(start, maps, HERE / f"{cols}x{rows}", rows, cols, run_limit)
+        if i == 0:
+            write_outputs(start, maps, HERE, rows, cols, run_limit)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

@@ -1,0 +1,64 @@
+1. tier counts by fixed thresholds (D / M / L):
+   hare      171 / 158 / 171
+   owl       171 / 158 / 171
+   whale     171 / 158 / 171
+2. equalized tier target (D / M / L): 171 / 158 / 171
+   hare      cells moved across a threshold: 0
+   owl       cells moved across a threshold: 0
+   whale     cells moved across a threshold: 0
+2b. frame and corner shifts, cell (row,col) from -> to, closest to threshold first:
+   hare      0 cells: -
+   owl       0 cells: -
+   whale     0 cells: -
+   hare      frame D/M/L [39, 2, 45]  corner D/M/L [2, 0, 2]
+   owl       frame D/M/L [31, 39, 16]  corner D/M/L [2, 1, 1]
+   whale     frame D/M/L [40, 36, 10]  corner D/M/L [2, 2, 0]
+2c. frame boundaries on cuts (frame cells with a different-tier neighbour, now plain): hare 31, owl 16, whale 35
+3. transition cells (own tier differs from a neighbour) and cells with 2+ different sides:
+   hare      transitions 253  multi-sided 111
+   owl       transitions 265  multi-sided 106
+   whale     transitions 272  multi-sided 116
+4. rotation-equivalent class histogram before equalization:
+   class         D      M      L     DM     DL     MD     ML     LD     LM
+   hare         83     76     88     23     65     37     45     40     43
+   owl          81     78     76     31     59     35     45     57     38
+   whale        70     82     76     43     58     33     43     59     36
+   target       78     79     80     32     61     35     44     52     39
+   pairwise L1: hare-owl 54, hare-whale 90, owl-whale 36
+5. equalization (rule i: side swaps with tone difference >= 0.1):
+   hare      side swaps  4  histogram D=83 M=76 L=88 DM=27 DL=61 MD=37 ML=45 LD=40 LM=43
+   owl       side swaps  1  histogram D=81 M=78 L=76 DM=31 DL=59 MD=35 ML=45 LD=56 LM=39
+   whale     side swaps  1  histogram D=70 M=82 L=76 DM=43 DL=58 MD=33 ML=43 LD=58 LM=37
+   residual L1 to target per image: hare 40, owl 16, whale 40
+   pairwise L1 after: hare-owl 44, hare-whale 80, owl-whale 36
+6. directional histogram (class@side) after equalization, for information (rotation (ii) pools these):
+   D          83   81   70
+   DL@B        9    9   26
+   DL@L       12   11    9
+   DL@R       18   20   12
+   DL@T       22   19   11
+   DM@B        6    8   19
+   DM@L        7    0    4
+   DM@R        4   17    1
+   DM@T       10    6   19
+   L          88   76   76
+   LD@B       16   18    8
+   LD@L       14   16   14
+   LD@R        6   12   10
+   LD@T        4   10   26
+   LM@B       10    1   18
+   LM@L       11    9    6
+   LM@R       16    9    8
+   LM@T        6   20    5
+   M          76   78   82
+   MD@B       13    7   14
+   MD@L        9   18    1
+   MD@R        9    0    1
+   MD@T        6   10   17
+   ML@B        8   22    8
+   ML@L       13   12    8
+   ML@R       11   11    5
+   ML@T       13    0   22
+   (columns: hare, owl, whale)
+   max directional difference: 22
+wrote quantized-scenes.txt, quantized/*.npy, quantized-preview.png

@@ -1,0 +1,5 @@
+histogram: M=73 L=69 D=63 DL=61 LD=59 DM=47 ML=47 LM=43 MD=38
+same-position A-B: 44 cells (8.8%)
+same-position A-C: 14 cells (2.8%)
+same-position B-C: 29 cells (5.8%)
+wrote /home/user/metapuzzle/experiments/011-subjects/scenes.txt: validate_scenes (tray, quarter) OK
