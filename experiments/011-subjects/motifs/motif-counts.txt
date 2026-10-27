@@ -1,0 +1,41 @@
+# Motif class counts per picture (make_motif_maps.py). Class = (motif, base tier); heroes counted
+# per code. 'in region' = pieces placed in a cell of weight >= 2 for that class (spill shown).
+
+class           A hare   B owl  C swan  spread   spill A/B/C
+streak D            10      10      10       0   0/0/0
+chevron D           14      14      14       0   0/0/0
+pebbles D           12      12      12       0   0/0/0
+star D              22      22      22       0   0/3/0
+seedhead M          28      28      28       0   0/0/0
+leaf M              34      34      34       0   0/0/0
+curl M              40      40      40       0   0/0/0
+star M              32      32      32       0   0/0/0
+pebbles L           26      26      26       0   0/0/0
+chevron L           28      28      28       0   0/0/0
+cloud L             30      30      30       0   1/0/0
+snowflake L         34      34      34       0   0/0/2
+amberwedge hero       2       2       2       0   -
+catchlight hero       2       2       2       0   -
+crater hero          2       2       2       0   -
+ambereye hero        1       1       1       0   -
+dot-eye hero         1       1       1       0   -
+beak/nose hero       1       1       1       0   -
+# hero piece classes (same in A, B, C): I on L/L, G on DLc/DLc, O on L/L, E on DMd, Y on DLd, N on M
+all motifs         319     319     319
+
+# Plain cells left without a motif (per base tier), and share of all 1026 pieces
+plain D             50      63      48
+plain M            160     143     139
+plain L            159     159     158
+plain W             28      23      20
+plain S              5       6       5
+plain total        402     394     370
+% of 1026         39.2    38.4    36.1
+  of which far     210     204     173   (no other tier in the 8-neighbourhood: not anchored by a transition neighbour)
+far % of 1026     20.5    19.9    16.9
+
+# Remaining plain D/M/L pieces: share with >= 2 distinctive 4-neighbours (motif or transition
+# piece; the frame counts as none), and the largest motif-free same-tier patch (4-connected)
+A: 369 plain D/M/L, anchored 314 (85%), largest patch 48
+B: 365 plain D/M/L, anchored 307 (84%), largest patch 32
+C: 345 plain D/M/L, anchored 293 (85%), largest patch 23

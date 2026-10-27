@@ -1,0 +1,125 @@
+# Motif maps, 27 columns x 38 rows, aligned to 27x38-v2/tiers-{A,B,C}.txt (make_motif_maps.py).
+# '.' = no motif. Regular motifs (base tier = the tier map's cell): s star/glint, p pebble cluster,
+# k streak, v chevron, c curl, l leaf, d seed head, u cloud puff, f snowflake. Heroes: I amber wedge and
+# G catchlight (on D-L transition pieces), O crater, E amber eye (D-on-M dot), Y eye/catchlight
+# (D-on-L dot), N beak/nose. See docs/design/10-motif-vocabulary.md.
+
+# A hare at dawn
+p . . p . p . p . v . v p . v u . v . u . u . . v . v
+. p . . . . . . p . v . v u . v . u . . . . . u . u .
+. . . . p . p . . v . v . . v . . . v . . . . . u v .
+. . . . . p . . v . v O v u . . . . u . u . u . v . u
+p . . . . . . . . v . v p . . s . . v u . u . u . u .
+. . . . p . . . . . v . . v . . s . . . . Y u . u . .
+p . . . . p . . s . . . v . . s . . . . u . . . G G u
+. . . . p . . . . s . v . v . . s . . u . u . u . . .
+. . . . . . p . s . . . v . . s . . . . u . . . . s .
+. p . . . p . . . . s . . v . . . s . u . u . . s . s
+p . . . . . p . . . . . . . . s . . . . u . u . . s .
+I I . p . p f . f . . s . . s . . s . . . . . f . . .
+. . p . p f . p . . s . s . . . s E . . . . f . . . f
+. . . f . . f . . . . s . s . s . . . s . . . f . . .
+s . . . f . . f u . . . s . s . . s . . N . f . . . .
+. . s . . . . . . f . . . s . . s . s . . . . f . . .
+s . . s . . f . f . . f . . . . . . . . . f . . . s v
+. . s . s . . . . f . . . . s . s . f . . . . . v . .
+s . . s . s . . f . . . . l . s l . . f . . . . s v s
+k . s . k . k . . . . . . s l . s . . . f . . . v . v
+. s . k . . s . . . . l . . . l . l . . . . . . . . .
+k . s . s k . . . . l . l . . . l . l . . . . . f . v
+. . . . k . . c . . c l . . l . . l . . . . . f . . .
+. f . s . . c . l c l c l . . . l . . l . . . . . . v
+f . . k . c . . c . c l . . l . . . l . . . . . . . .
+. . . . . . . c l c l c . l . . l . . l . . v . O . .
+. . . . . . c . c l c l . . . . . l . . . . . . f . .
+k . . . . c . . l d . d l d . . l d l d . . v . . f .
+. . . c . . . c . c d l d . . d . . d . . . . . . . .
+. . c . c . c . . . c d . d . . d . . d . . f . . . v
+. c . c . c . . c d . c d . d . . . d . . . . f . v p
+. . . . c . . c . c d . . . . . . d . . . . . . . . .
+. p . c . c . . c d c d . . . . . . d . . v p . . . .
+k . . . . . . c . c d c . . . . . . . d . . v . . f .
+. . p . . c . . c d c d . . . . . . d . . . . . . . .
+f . . . . . . . . . . . . . . . . . . . d . v . . . .
+. . . . p . . . . . . . . . . . . . . . . . p . . p .
+f . . . . . p . . . . . . . . . . . . p . p . p . . p
+
+# B owl at dusk
+. s . . s . s . s . . . . . . . . . . s . . . s . s .
+s . s . . s . . . . . . . . . . . . . . . s . . s . s
+. s . . s . s . . u . . . . . . . u . . s . s . . . .
+s . s . . s . . u . u . . . . . . . u . . s . . . s .
+. s . s . . . . . u . . . u . O u . . . . . . s . . .
+. . s . . u . . u O . u . . u . . u . . u . . . s . s
+s l . . u . u . . u . . . . . . u . . u . . . . . l .
+l . . . . u . u . . . . . s . . . . u . u . u . . s l
+s . f u . f . . . s . s . . s . s . . . f u . u . l .
+l . u . u . . . . . . . . s . . . . . . . . u . . . .
+. . f . . . . . f . . . s . . . . f . . . . . . f . l
+. f . f . . . f . . f . . . . . . . f . . . . f . . .
+. . f . . . f I G . . . . . f I G . . f . . f . f . .
+. . . . . . . f . . . f . . . . . . f . . . . . . . l
+. l . . . . . . f . f . . . . f . f . . . . . f . l .
+. E . l . . . . . . . . . . . . f . . . . . . . . . l
+. . l . . . s . . . . . N . . . . . . s . . . l . l .
+l c . . . . . s p k . . . . . . . s k . . . l c l . c
+c l . . . . p . s p . . . . . k . k . p . . . . . c l
+l . . . . . s p . s . . . k . s . p s . . . . . c l c
+. c . . . . p v . k . k v . . . v . p v . . . . . . l
+c l . . . . . . v . k . k . . k . p . . . . . . l c .
+l c . . . . . . p v . . . . . . . v . l . . . . c l .
+c l . c l c . . . . . v . v . v . . . . l c l c l c l
+. c . . c . . . . p . s . s v . . . c . c . . . c . .
+c . . c . . c . . . v . . v . . v . . . . . c . . . c
+. d c d . c . . . p s . . s . . s . . . . . d c . d .
+d c . . . . . s . . . . . . . . . . . . . . c d c . d
+c . d c d . . . . . . d . . d . d . c . d c d c d c .
+. . . d . . d . d . d . . d . d . . d . . d . d . d .
+. . . . . . . . . d . d . . . . . . . d . . . . . . .
+. v . . . v . . . . . . . . . p . p . . . . . p . . .
+v . . v . . v . v . v . v . p . p . . . . . p . p . p
+. . v . v . . . . v . v f p . p . . . . . . . p . p .
+v . . v f . . v . . v . v . p . p . . p . p . . . . .
+. v . . . v . . . . . v . p . . . . . . p . p . Y . p
+v f v . v . . . . . . . v . . . . . . . . p . . p . f
+. v f v . . v . . . . v . p . . . . . . p f . p . p .
+
+# C swan at midnight
+p . . . . . . . p . p s p s . . s . v . . . . . . . s
+. . c . . c . . . s . p s . v s . s . G . . u . G . .
+. . . . c . c . s p . . . . . . s . . u f u . u . . .
+. c . c . c . . . . . p . . . . . . u . . O u . u . .
+. . . . . . . p . . p . p . . . s . p . u . . u . u .
+. s . p . . . . . p . Y . p . . . . . u . . u O . . .
+p . . s . I p . p . . . p . . f . k . . . u . . . . .
+s p k . . I . p . . p . . p . p . . . v . . . . . . v
+p k . . . . . . . . . . . . . . . p . s v . . . . v s
+. s . . . . . s k s . . . . p . p . . . . v s v s . v
+. . . . p . s . . . . . k . . p . . . v . . v . . v .
+k . . . . . k . . p . . . . . . p . . . v . . . . . .
+. . . k . . . . . . . . . . . . . p . . . . . . . . .
+. k . . k . . . . . . . . . . p . . . v . . . . . . .
+. . . . . . . . . . . . . . p . p . . . . . . . . . .
+c . . . . . c . . . . . p . . . . . c . c . c s c . c
+. c . c . N . c . . . . . p f . . . . . . . . . . . .
+c . c . c . c . . . v . . f . . . . . f . . . . f . .
+. c . c . c . . . . . . v . f . . . f . . f . f v f .
+. . d . d . . v . v . v . f . . f . . . f . f . f . .
+c . c d . . v . v . v . . . f . . . f . . . . v . f .
+. c d . . . . . . v . v . . . . . . . . . f v f . . .
+. . . c . v . v . . v . . . . . . . . . . . f v f . .
+c . c d . . v u v . u . v . . . . . . . u f u f u . .
+d c . c . v u v u v . v u . u . . . . . . u . u . . .
+. d c . . . . u v . v u v u . . . . . . . . u . . s .
+c . . c d . . . . v . . u . . u . . . . . . . . s . s
+d c . . c . . . . . . . . . . . . . . . . . s . . . .
+c . d c d c . . . . . . . . . . . . . . . . . s . s .
+. l . . l . . l . . . . . . . . . d s . . s . . . . s
+. . l . . l . . d . l s l d s . d s . . s . . . f . .
+l . . . l . . d l . . l . . d . . . . . . . . f . . s
+. l . l . E . l d l d s l . . s . f . f . . . . . . .
+l . l . . l . d l d s l d . s . . . f . f . . . . . s
+. l . . l . . l d . l d l s d s . . . f . . f . . . .
+l . . . . . l . . l s l . . s . s . . . . . . f . s .
+. . . . . . . . l d l s d . . s . . . . s . . . . . .
+. . p . . . . . . l d l s . . . . . s . . . s . . . .
