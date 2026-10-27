@@ -502,7 +502,9 @@ def pieces_from_scenes(
                 raise
             if strict_border:
                 validate_scenes(bl, maps, free_corners)  # the classic rule: raises for boards of one shape
-            differ = True  # frame class mixes differ: cross-class seams must absorb the difference
+            # same-shaped boards with different frame mixes: cross-class seams must absorb the difference
+            # (boards of different shapes always had unequal frames and were never required to succeed)
+            differ = len({(b.cols, b.rows) for b in bl}) == 1
     validate_scenes(bl, maps, free_corners, strict_border=False)
     a_board, a_map = bl[0], maps[0]
     quarter = a_board.rotation == "quarter"

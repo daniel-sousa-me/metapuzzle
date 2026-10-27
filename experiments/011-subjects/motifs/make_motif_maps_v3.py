@@ -31,11 +31,11 @@ RK = {t: i for i, t in enumerate(ORDER)}
 PICS = ["A", "B", "C"]
 MAX_COVER = 0.25                 # motif cells per picture, as a fraction of 27 x 38 (v7 cap; v2: 0.18)
 CHEB_MIN = 2                     # minimum Chebyshev distance between two motif cells of one class
-HALO = 2                         # minimum Chebyshev distance of a regular motif from a tier boundary cell
+HALO = 1                         # minimum Chebyshev distance of a regular motif from a transition carrier (v7: 1, was 2)
 BOUNDARY = "carrier"             # boundary cells: the darker side of each tier boundary (see boundary_distance)
 FIG_TIER = {"A": "M", "B": "D", "C": "L"}   # tier of each figure (make_targets.py FIGURE)
-LADDER = {2: 0.05, 3: 0.10, 4: 0.10, 5: 0.15, 6: 0.20, 7: 0.25}   # chance by figure distance (v7)
-FAR = 0.30                       # chance from figure distance 8 on; 0 below 2 (the figure halo)
+LADDER = {3: 0.15, 4: 0.25}     # chance per cell by silhouette distance (v7, coordinator decision)
+FAR = 0.30                       # chance from silhouette distance 5 on; 0 within 2 cells
 OFF_REGION = 0.25                # factor on the chance for a cell outside the class's region (weight < 2)
 BAND = {"B": (0, 9)}             # v7: cream top band of B (L cells in these rows): one motif type per 3 x 3 window
 
@@ -217,10 +217,10 @@ def region_raw(regs, r, c):
 
 
 def density(fd):
-    """Chance of a regular motif on a plain cell at figure distance fd (LADDER); 0 inside the figure halo."""
-    if fd is None or fd < 2:
+    """Chance of a regular motif on a plain cell at silhouette distance fd (LADDER); 0 within 2 cells."""
+    if fd is None or fd < 3:
         return 0.0
-    return FAR if fd >= 8 else LADDER[fd]
+    return FAR if fd >= 5 else LADDER[fd]
 
 
 def figure_mask(g, tier):
@@ -252,6 +252,32 @@ def figure_mask(g, tier):
     out, _ = components(lambda r, c: not main[r][c])
     border = {out[r][c] for r in range(R) for c in range(C) if (r in (0, R - 1) or c in (0, C - 1)) and out[r][c] >= 0}
     return [[main[r][c] or (out[r][c] >= 0 and out[r][c] not in border) for c in range(C)] for r in range(R)]
+
+
+def family_distance(g):
+    """v7: Chebyshev distance of every cell to the silhouette, measured as the distance to the nearest cell of the
+    other family: dark/mid (D, M: the animal and its ground) versus cream (L). S and W boundaries and the D-M tone
+    transitions are not counted. For L cells this is the distance to the nearest D or M cell; for D and M cells the
+    distance to the nearest L cell."""
+    R, C = len(g), len(g[0])
+
+    def bfs(sources):
+        dist = [[None] * C for _ in range(R)]
+        q = deque()
+        for r, c in sources:
+            dist[r][c] = 0
+            q.append((r, c))
+        while q:
+            r, c = q.popleft()
+            for rr, cc in neighbours(R, C, r, c):
+                if dist[rr][cc] is None:
+                    dist[rr][cc] = dist[r][c] + 1
+                    q.append((rr, cc))
+        return dist
+
+    to_l = bfs([(r, c) for r in range(R) for c in range(C) if g[r][c] == "L"])
+    to_dm = bfs([(r, c) for r in range(R) for c in range(C) if g[r][c] in "DM"])
+    return [[to_dm[r][c] if g[r][c] == "L" else to_l[r][c] for c in range(C)] for r in range(R)]
 
 
 def figure_distance(g, fm):
@@ -346,11 +372,10 @@ def build_all(seed=11):
     for p in PICS:
         g = load(p)
         R, C = len(g), len(g[0])
-        fm = figure_mask(g, FIG_TIER[p])
         m = [["." for _ in range(C)] for _ in range(R)]
         for code, r, c in HEROES[p]:
             m[r][c] = code
-        S[p] = {"g": g, "m": m, "dist": boundary_distance(g), "fd": figure_distance(g, fm),
+        S[p] = {"g": g, "m": m, "dist": boundary_distance(g), "fd": family_distance(g),
                 "placed": {}, "rng": random.Random(f"{seed}{p}"), "spill": {}}
     for cls in SEQ:
         for p in PICS:
@@ -488,7 +513,7 @@ def main():
         g, m, _ = maps[p]
         R, C = len(g), len(g[0])
         dist = boundary_distance(g)
-        fd = figure_distance(g, figure_mask(g, FIG_TIER[p]))
+        fd = family_distance(g)
         parts = []
         for lo, hi, nom in bands:
             elig = [(r, c) for r in range(R) for c in range(C)

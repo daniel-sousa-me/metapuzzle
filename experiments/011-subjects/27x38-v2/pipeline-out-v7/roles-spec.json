@@ -653,9 +653,44 @@
         "LWc"
       ]
     },
+    "mo_d_k_a": {
+      "classes": [
+        "D_k_a"
+      ]
+    },
+    "mo_d_k_b": {
+      "classes": [
+        "D_k_b"
+      ]
+    },
+    "mo_d_p_a": {
+      "classes": [
+        "D_p_a"
+      ]
+    },
+    "mo_d_p_b": {
+      "classes": [
+        "D_p_b"
+      ]
+    },
+    "mo_d_p_c": {
+      "classes": [
+        "D_p_c"
+      ]
+    },
     "mo_d_s_a": {
       "classes": [
         "D_s_a"
+      ]
+    },
+    "mo_d_v_a": {
+      "classes": [
+        "D_v_a"
+      ]
+    },
+    "mo_d_v_b": {
+      "classes": [
+        "D_v_b"
       ]
     },
     "mo_h_e": {
@@ -693,9 +728,9 @@
         "L_f_a"
       ]
     },
-    "mo_l_p_a": {
+    "mo_l_u_a": {
       "classes": [
-        "L_p_a"
+        "L_u_a"
       ]
     },
     "mo_l_v_a": {
@@ -708,6 +743,16 @@
         "M_c_a"
       ]
     },
+    "mo_m_c_b": {
+      "classes": [
+        "M_c_b"
+      ]
+    },
+    "mo_m_c_c": {
+      "classes": [
+        "M_c_c"
+      ]
+    },
     "mo_m_d_a": {
       "classes": [
         "M_d_a"
@@ -716,6 +761,11 @@
     "mo_m_d_b": {
       "classes": [
         "M_d_b"
+      ]
+    },
+    "mo_m_d_c": {
+      "classes": [
+        "M_d_c"
       ]
     },
     "mo_m_l_a": {
@@ -728,6 +778,11 @@
         "M_l_b"
       ]
     },
+    "mo_m_l_c": {
+      "classes": [
+        "M_l_c"
+      ]
+    },
     "mo_m_s_a": {
       "classes": [
         "M_s_a"
@@ -737,17 +792,29 @@
       "classes": [
         "M_s_b"
       ]
+    },
+    "mo_m_s_c": {
+      "classes": [
+        "M_s_c"
+      ]
     }
   },
   "target_counts": {
-    "D": 110,
+    "D": 103,
     "DLc": 23,
     "DLs": 49,
     "DMc": 12,
     "DMs": 40,
     "DWc": 1,
     "DWs": 6,
+    "D_k_a": 1,
+    "D_k_b": 1,
+    "D_p_a": 1,
+    "D_p_b": 1,
+    "D_p_c": 1,
     "D_s_a": 1,
+    "D_v_a": 1,
+    "D_v_b": 1,
     "H_E": 1,
     "H_G": 2,
     "H_I": 2,
@@ -761,29 +828,34 @@
     "LSc": 3,
     "LWc": 3,
     "L_f_a": 1,
-    "L_p_a": 1,
+    "L_u_a": 1,
     "L_v_a": 1,
     "Lb": 55,
     "Lo": 55,
     "Lr": 55,
     "Lx": 55,
-    "M": 67,
+    "M": 63,
     "MDc": 11,
     "MDd": 0,
     "MLc": 23,
     "MLs": 43,
     "MWc": 3,
     "MWs": 19,
-    "M_c_a": 1,
-    "M_d_a": 1,
-    "M_d_b": 1,
-    "M_l_a": 1,
-    "M_l_b": 1,
-    "M_s_a": 1,
+    "M_c_a": 2,
+    "M_c_b": 2,
+    "M_c_c": 2,
+    "M_d_a": 2,
+    "M_d_b": 2,
+    "M_d_c": 2,
+    "M_l_a": 3,
+    "M_l_b": 2,
+    "M_l_c": 2,
+    "M_s_a": 2,
     "M_s_b": 1,
-    "Mb": 68,
-    "Mc": 68,
-    "Mr": 68,
+    "M_s_c": 1,
+    "Mb": 64,
+    "Mc": 64,
+    "Mr": 64,
     "S": 5,
     "SLc": 7,
     "SLs": 12,
