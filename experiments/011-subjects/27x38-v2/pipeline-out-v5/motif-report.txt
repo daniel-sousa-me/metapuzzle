@@ -1,0 +1,11 @@
+# Motif and hero cells, experiment 011 v5 (A hare, B owl, C swan). moves = motif displaced from a cell
+# that had to host a surplus piece, to the nearest plain cell of its tier.
+
+A hare: D_k 10, D_p 12, D_s 22, D_v 14, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f 34, L_p 26, L_u 30, L_v 28, M_c 40, M_d 28, M_l 34, M_s 32
+   displaced 5: (3, 19)->(4, 17) D_s (D); (4, 19)->(5, 18) D_k (D); (2, 20)->(1, 20) D_s (D); (3, 20)->(5, 20) D_k (D); (4, 20)->(1, 18) D_s (D)
+B owl: D_k 10, D_p 12, D_s 22, D_v 14, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f 34, L_p 26, L_u 30, L_v 28, M_c 40, M_d 28, M_l 34, M_s 32
+   displaced 2: (3, 27)->(3, 26) M_d (M); (22, 28)->(21, 28) M_c (M)
+C swan: D_k 10, D_p 12, D_s 22, D_v 14, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f 34, L_p 26, L_u 30, L_v 28, M_c 40, M_d 28, M_l 34, M_s 32
+   displaced 9: (14, 1)->(15, 1) D_v (D); (7, 4)->(9, 1) D_p (D); (16, 4)->(12, 1) D_s (D); (2, 6)->(2, 5) D_s (D); (17, 6)->(20, 9) D_k (D); (1, 8)->(1, 6) D_k (D); (25, 8)->(20, 12) D_v (D); (12, 10)->(12, 11) D_k (D); (25, 10)->(7, 9) D_v (D)
+class counts identical across A, B, C: yes (checked)
+plain motif cells per tier (identical): 58/0/135/0/122; plain remainder 53/5/144/16/158

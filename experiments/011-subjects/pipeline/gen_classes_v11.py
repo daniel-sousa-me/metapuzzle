@@ -25,7 +25,7 @@ M or L layers) plus one or more motif layers, each a single ``motif`` primitive 
     H_I amber wedge  on plain L: hull (ochre)
     H_O crater ring  on plain L: ring (olive)
     H_N beak or nose on plain M: drop (navy)
-    H_G catchlight   on the D-L convex corner DLc: star (cream) on the D side
+    H_G catchlight   on the D-L convex corner DLc: star (navy) on the cream L part (the D corner is too small)
     H_E amber eye    on the D-in-M dot MDd: disc (ochre) on the dot
     H_Y eye glint    on the D-in-L dot LDd: disc (cream) on the dot
 
@@ -84,13 +84,13 @@ REGULAR = {
     "D_s": ("D", [part("star", "cream", "indigo", 0.46)]),
     "D_p": ("D", [part("disc", "pale_blue", "indigo", 0.22, *xy) for xy in PEBBLE_XY]),
     "D_k": ("D", [part("drop", "cream", "indigo", 0.56)]),
-    "D_v": ("D", [part("silhouette_bird", "cream", "indigo", 0.50)]),
+    "D_v": ("D", [part("silhouette_bird", "cream", "indigo", 0.66)]),
     "M_s": ("M", [part("star", "cream", "olive", 0.44)]),
     "M_c": ("M", [part("ring", "cream", "olive", 0.50)]),
     "M_l": ("M", [part("leaf", "rust", "olive", 0.56)]),
     "M_d": ("M", [part("flower", "cream", "olive", 0.56)]),
     "L_p": ("L", [part("disc", "indigo", "cream", 0.22, *xy) for xy in PEBBLE_XY]),
-    "L_v": ("L", [part("silhouette_bird", "indigo", "cream", 0.50)]),
+    "L_v": ("L", [part("silhouette_bird", "indigo", "cream", 0.66)]),
     "L_u": ("L", [part("disc", "pale_blue", "cream", 0.36, -0.12, 0.04),
                   part("disc", "pale_blue", "cream", 0.36, 0.08, -0.06),
                   part("disc", "pale_blue", "cream", 0.26, 0.13, 0.10)]),
@@ -100,7 +100,7 @@ HEROES = {
     "H_I": ("L", [part("hull", "ochre", "cream", 0.60, 0.0, 0.08)]),
     "H_O": ("L", [part("ring", "olive", "cream", 0.50)]),
     "H_N": ("M", [part("drop", "indigo", "olive", 0.34)]),
-    "H_G": ("DLc", [part("star", "cream", "indigo", 0.30, -0.16, 0.16)]),
+    "H_G": ("DLc", [part("star", "indigo", "cream", 0.30, 0.10, -0.10)]),
     "H_E": ("MDd", [part("disc", "ochre", "indigo", 0.22)]),
     "H_Y": ("LDd", [part("disc", "cream", "indigo", 0.20)]),
 }

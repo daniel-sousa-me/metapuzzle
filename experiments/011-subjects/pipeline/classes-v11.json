@@ -9140,7 +9140,7 @@
           "background": false,
           "params": {
             "kind": "silhouette_bird",
-            "scale": 0.5,
+            "scale": 0.66,
             "jitter": 0.0,
             "rotation": "none",
             "offset": [
@@ -9472,7 +9472,7 @@
           "background": false,
           "params": {
             "kind": "silhouette_bird",
-            "scale": 0.5,
+            "scale": 0.66,
             "jitter": 0.0,
             "rotation": "none",
             "offset": [
@@ -9932,9 +9932,9 @@
         {
           "primitive": "motif",
           "palette": [
-            "indigo",
             "cream",
-            "indigo"
+            "indigo",
+            "cream"
           ],
           "background": false,
           "params": {
@@ -9943,8 +9943,8 @@
             "jitter": 0.0,
             "rotation": "none",
             "offset": [
-              -0.16,
-              0.16
+              0.1,
+              -0.1
             ]
           }
         }
