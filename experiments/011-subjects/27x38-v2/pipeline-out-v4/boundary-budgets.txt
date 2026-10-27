@@ -1,0 +1,35 @@
+# Boundary budgets, experiment 011 (A hare, B owl, C swan). max = per-class max over images;
+# surplus = max - own (cells that must be added in near roles). W is a tier of its own here.
+
+class   pair      A hare      B owl     C swan   max   sur_A   sur_B   sur_C
+DMc       DM          12         12         11    12       0       0       1
+DMs       DM          33         40         21    40       7       0      19
+MDc       DM          10         11          6    11       1       0       5
+MDd       DM           1          1          1     1       0       0       0
+total     DM          56         64         39    64       8       0      25
+DWc       DW           1          0          0     1       0       1       1
+DWs       DW           1          6          6     6       5       0       0
+WDc       DW           0          0          1     1       1       1       0
+total     DW           2          6          7     8       6       2       1
+DLc       DL          17         25         21    25       8       0       4
+DLs       DL          49         48         49    49       0       1       0
+LDc       DL          29         21         27    29       0       8       2
+LDd       DL           1          1          1     1       0       0       0
+total     DL          96         95         98   104       8       9       6
+MWc       MW           3          0          2     3       0       3       1
+MWs       MW          12         15         19    19       7       4       0
+WMc       MW           5          5          5     5       0       0       0
+total     MW          20         20         26    27       7       7       1
+MLc       ML          23         22         18    23       0       1       5
+MLs       ML          35         37         43    43       8       6       0
+LMc       ML          23         25         25    25       2       0       0
+total     ML          81         84         86    91      10       7       5
+WLc       WL           4          3          2     4       0       1       2
+WLs       WL           4          5         12    12       8       7       0
+LWc       WL           0          3          2     3       3       0       1
+total     WL           8         11         16    19      11       8       3
+SLc       SL           7          7          7     7       0       0       0
+SLs       SL          12         11         12    12       0       1       0
+LSc       SL           3          1          3     3       0       2       0
+total     SL          22         19         22    22       0       3       0
+Transition cells per image: A 285, B 299, C 294; surplus (max minus own, all classes): A 50, B 36, C 41

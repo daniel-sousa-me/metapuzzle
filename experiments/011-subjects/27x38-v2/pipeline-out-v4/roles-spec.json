@@ -1,0 +1,694 @@
+{
+  "_note": "Experiment 011 v4 roles (chip sub-classes on L and M, frame included): surplus transition pieces placed along the per-pair fallback chain (D far, D near, M far, M near, L far; M far, M near, L far; W far, W near, M far; S edge, S interior). target_counts = v2's (per-class max over images for transitions, common plain targets). Edge roles fixed; plain L and M cells take chip roles.",
+  "roles": {
+    "d_frame": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_near": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_far": {
+      "classes": [
+        "D"
+      ]
+    },
+    "s_frame": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_near": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_far": {
+      "classes": [
+        "S"
+      ]
+    },
+    "w_frame": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_near": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_far": {
+      "classes": [
+        "W"
+      ]
+    },
+    "chip_a_l": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        1.0,
+        0.35,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_a_lr": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        1.0,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_a_lb": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        1.0,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_a_lo": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        1.0,
+        0.35
+      ]
+    },
+    "chip_a_lx": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        0.35,
+        1.0
+      ]
+    },
+    "chip_a_m": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        1.0,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_a_mr": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        1.0,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_a_mb": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        1.0,
+        0.35
+      ]
+    },
+    "chip_a_mc": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        1.0
+      ]
+    },
+    "chip_b_l": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        1.0,
+        0.35,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_b_lr": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        1.0,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_b_lb": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        1.0,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_b_lo": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        1.0,
+        0.35
+      ]
+    },
+    "chip_b_lx": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        0.35,
+        1.0
+      ]
+    },
+    "chip_b_m": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        1.0,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_b_mr": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        1.0,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_b_mb": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        1.0,
+        0.35
+      ]
+    },
+    "chip_b_mc": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        1.0
+      ]
+    },
+    "chip_c_l": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        1.0,
+        0.35,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_c_lr": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        1.0,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_c_lb": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        1.0,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_c_lo": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        1.0,
+        0.35
+      ]
+    },
+    "chip_c_lx": {
+      "classes": [
+        "L",
+        "Lr",
+        "Lb",
+        "Lo",
+        "Lx"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        0.35,
+        1.0
+      ]
+    },
+    "chip_c_m": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        1.0,
+        0.35,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_c_mr": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        1.0,
+        0.35,
+        0.35
+      ]
+    },
+    "chip_c_mb": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        1.0,
+        0.35
+      ]
+    },
+    "chip_c_mc": {
+      "classes": [
+        "M",
+        "Mr",
+        "Mb",
+        "Mc"
+      ],
+      "weights": [
+        0.35,
+        0.35,
+        0.35,
+        1.0
+      ]
+    },
+    "d_fur_dl": {
+      "classes": [
+        "DLc",
+        "DLs",
+        "LDc",
+        "LDd"
+      ]
+    },
+    "d_fur_dm": {
+      "classes": [
+        "DMc",
+        "DMs",
+        "MDc",
+        "MDd"
+      ]
+    },
+    "d_fur_dw": {
+      "classes": [
+        "DWc",
+        "DWs",
+        "WDc"
+      ]
+    },
+    "l_fur_dl": {
+      "classes": [
+        "DLc",
+        "DLs",
+        "LDc",
+        "LDd"
+      ]
+    },
+    "l_fur_ml": {
+      "classes": [
+        "MLc",
+        "MLs",
+        "LMc"
+      ]
+    },
+    "m_fur_dl": {
+      "classes": [
+        "DLc",
+        "DLs",
+        "LDc",
+        "LDd"
+      ]
+    },
+    "m_fur_ml": {
+      "classes": [
+        "MLc",
+        "MLs",
+        "LMc"
+      ]
+    },
+    "m_fur_wl": {
+      "classes": [
+        "WLc",
+        "WLs",
+        "LWc"
+      ]
+    },
+    "se_lsc": {
+      "classes": [
+        "LSc"
+      ]
+    },
+    "se_sls": {
+      "classes": [
+        "SLs"
+      ]
+    },
+    "w_fur_mw": {
+      "classes": [
+        "MWc",
+        "MWs",
+        "WMc"
+      ]
+    },
+    "w_fur_wl": {
+      "classes": [
+        "WLc",
+        "WLs",
+        "LWc"
+      ]
+    },
+    "edge_dmc": {
+      "classes": [
+        "DMc"
+      ]
+    },
+    "edge_dms": {
+      "classes": [
+        "DMs"
+      ]
+    },
+    "edge_dwc": {
+      "classes": [
+        "DWc"
+      ]
+    },
+    "edge_dws": {
+      "classes": [
+        "DWs"
+      ]
+    },
+    "edge_dlc": {
+      "classes": [
+        "DLc"
+      ]
+    },
+    "edge_dls": {
+      "classes": [
+        "DLs"
+      ]
+    },
+    "edge_slc": {
+      "classes": [
+        "SLc"
+      ]
+    },
+    "edge_sls": {
+      "classes": [
+        "SLs"
+      ]
+    },
+    "edge_mdc": {
+      "classes": [
+        "MDc"
+      ]
+    },
+    "edge_mdd": {
+      "classes": [
+        "MDd"
+      ]
+    },
+    "edge_mwc": {
+      "classes": [
+        "MWc"
+      ]
+    },
+    "edge_mws": {
+      "classes": [
+        "MWs"
+      ]
+    },
+    "edge_mlc": {
+      "classes": [
+        "MLc"
+      ]
+    },
+    "edge_mls": {
+      "classes": [
+        "MLs"
+      ]
+    },
+    "edge_wdc": {
+      "classes": [
+        "WDc"
+      ]
+    },
+    "edge_wmc": {
+      "classes": [
+        "WMc"
+      ]
+    },
+    "edge_wlc": {
+      "classes": [
+        "WLc"
+      ]
+    },
+    "edge_wls": {
+      "classes": [
+        "WLs"
+      ]
+    },
+    "edge_ldc": {
+      "classes": [
+        "LDc"
+      ]
+    },
+    "edge_ldd": {
+      "classes": [
+        "LDd"
+      ]
+    },
+    "edge_lsc": {
+      "classes": [
+        "LSc"
+      ]
+    },
+    "edge_lmc": {
+      "classes": [
+        "LMc"
+      ]
+    },
+    "edge_lwc": {
+      "classes": [
+        "LWc"
+      ]
+    }
+  },
+  "target_counts": {
+    "D": 111,
+    "DLc": 25,
+    "DLs": 49,
+    "DMc": 12,
+    "DMs": 40,
+    "DWc": 1,
+    "DWs": 6,
+    "L": 56,
+    "LDc": 29,
+    "LDd": 1,
+    "LMc": 25,
+    "LSc": 3,
+    "LWc": 3,
+    "Lb": 56,
+    "Lo": 56,
+    "Lr": 56,
+    "Lx": 56,
+    "M": 69,
+    "MDc": 11,
+    "MDd": 1,
+    "MLc": 23,
+    "MLs": 43,
+    "MWc": 3,
+    "MWs": 19,
+    "Mb": 70,
+    "Mc": 70,
+    "Mr": 70,
+    "S": 5,
+    "SLc": 7,
+    "SLs": 12,
+    "W": 16,
+    "WDc": 1,
+    "WLc": 4,
+    "WLs": 12,
+    "WMc": 5
+  }
+}
