@@ -25,3 +25,7 @@ All pieces are interior-shaped and the puzzle sits in a tray. Removes border con
 ## Shape deviation within the square lattice (owner, 2026-10-26)
 
 Individual piece cuts that deviate from a square while occupying one lattice cell. Later-stage experiment; see docs/design/05-piece-geometry.md.
+
+## Chip-signature sub-classes for solvable backgrounds (manager, 2026-10-27)
+
+Background pieces within one tone region are visually interchangeable, so placing them is trial-and-error. Give the light (and mid) tiers sub-classes that differ only in their sparse interior chips (rust, blue, olive, none, mixed) and let each scene arrange those sub-classes in a different low-frequency pattern (e.g. rust chips gather top-left in A, along the horizon in B, around the figure in C). Chips stay inside pieces, so no adjacency constraint is added, but a player can sort by chip colour and narrow where a piece belongs, and the three images get a second, subtler layer of difference. Implemented as classes in the spec and roles in the scene files; counts match automatically via the role solver.
