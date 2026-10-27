@@ -167,8 +167,25 @@ def test_motif_ink_pieces_use_only_black_and_white(ink):
         assert "#000000" in colours and "#ffffff" in colours, name
 
 
+V3_CODES = {"DM", "DL", "MD", "ML", "LD", "LM"}   # gen_classes_ink.py adds these to the v4 classes
+
+
+def _is_dot(cls: dict) -> bool:
+    return any(m.get("primitive") == "march_mask" and m.get("params", {}).get("pattern") == "dot"
+               for m in cls.get("masks", {}).values())
+
+
 def test_ink_render_script_writes_the_same_spec(tmp_path):
     out = subprocess.run([sys.executable, str(EXP / "gen_classes_ink.py")],
                          capture_output=True, text=True, check=True)
-    assert "with 67 classes" in out.stdout
-    assert json.loads(INK_SPEC.read_text())["classes"]["DMs"]["masks"]["edge"]
+    v4 = json.loads(V4_SPEC.read_text())["classes"]
+    spec = json.loads(INK_SPEC.read_text())
+    expected = set(v4) | V3_CODES
+    assert set(spec["classes"]) == expected
+    assert f"with {len(expected)} classes" in out.stdout
+    dots = sorted(name for name, cls in v4.items() if _is_dot(cls))
+    assert {"LDd", "DLd", "MDd"} <= set(dots)
+    for name in dots:  # every dot class is an outline of its dot mask, like the other transitions
+        assert spec["classes"][name]["masks"]["dot"]["params"]["pattern"] == "dot", name
+        assert spec["classes"][name]["layers"][1]["outline_of"] == "dot", name
+    assert spec["classes"]["DMs"]["masks"]["edge"]

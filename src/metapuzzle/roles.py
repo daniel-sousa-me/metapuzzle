@@ -17,8 +17,8 @@ Method. Cells are grouped as the border rule sees them: one group per side and p
 (rotation none) or one edge pool and one corner pool (quarter), plus the interior. A skeleton
 gives every group a class multiset, the same in all three maps, so the skeleton fixes the
 histogram and the border counts. It is searched first by simulated annealing on a violation
-count: for each map and group, every set of roles needs enough cells among its allowed classes,
-and the fixed or target counts must hold. Max-flow then gives each map a class map for the
+count: for each map and group, the roles must fit the histogram (Hall's condition, tested by max
+flow, so the cost is polynomial in the number of roles), and the fixed or target counts must hold. Max-flow then gives each map a class map for the
 skeleton, and a second annealing swaps classes inside a group, which keeps the groups and the
 histogram exact. The objective is the same-position overlap summed over all pairs, plus a
 weighted preference term (weights) and an optional penalty for identical neighbours.
@@ -46,7 +46,6 @@ ROTATIONS = ("none", "quarter")
 _SPEC_KEYS = frozenset({"roles", "fixed", "target_counts"})
 
 Container = tuple[str, tuple[int, ...]]  # (name, slot ids) of cells the border rule compares
-Constraint = tuple[frozenset, int, tuple]  # (classes, cells needed, roles), from _hall
 
 
 @dataclass(frozen=True)
@@ -198,34 +197,14 @@ def _containers(board: Board, rotation: str) -> list[Container]:
     return [(k, tuple(v)) for k, v in keys.items()]
 
 
-def _hall(counts: Mapping[str, int], allowed: Mapping[str, tuple[str, ...]]) -> list[Constraint]:
-    """Constraints a class histogram must meet to take cells with these role counts.
+def _max_flow(supply: Mapping[str, int], demand: Mapping[str, int], allowed):
+    """Max flow from role counts (supply) to class counts (demand), by Edmonds-Karp.
 
-    A histogram N can label the cells (role counts) iff for every set A of roles the classes
-    allowed to A hold at least sum(counts[r] for r in A) cells of N (Hall's condition for the
-    bipartite supply/demand problem). One constraint is kept per class set, the strongest one.
+    Role r sends to each class in allowed[r] without limit, and class c takes at most demand[c].
+    Returns (flow, cap, reach): the residual capacities, and the nodes reachable from the source
+    in the residual graph (the final search, which found no path to the sink).
     """
-    roles = sorted(r for r, n in counts.items() if n > 0)
-    best: dict[frozenset, tuple[int, tuple]] = {}
-    for size in range(1, len(roles) + 1):
-        for sub in combinations(roles, size):
-            cs = frozenset(c for r in sub for c in allowed[r])
-            need = sum(counts[r] for r in sub)
-            if cs not in best or need > best[cs][0]:
-                best[cs] = (need, sub)
-    return [(cs, need, sub) for cs, (need, sub) in best.items()]
-
-
-def _deficit(hist: Mapping[str, int], cons: Sequence[tuple]) -> int:
-    """Cells missing from the histogram over all constraints (0 when all hold)."""
-    return sum(max(0, need - sum(hist.get(c, 0) for c in cs)) for _, cs, need, _ in cons)
-
-
-def _transport(supply: Mapping[str, int], demand: Mapping[str, int], allowed) -> dict[tuple[str, str], int] | None:
-    """Max flow from role counts to class counts. Returns the flow per (role, class), or None."""
     total = sum(supply.values())
-    if total != sum(demand.values()):
-        return None
     cap: dict = {}
 
     def add(u, v, c) -> None:
@@ -243,7 +222,7 @@ def _transport(supply: Mapping[str, int], demand: Mapping[str, int], allowed) ->
         if n > 0:
             add(("c", c), "T", n)
     flow = 0
-    while True:  # Edmonds-Karp on a graph with a handful of nodes
+    while True:  # each augmenting path saturates an edge, so the loop is polynomial in the graph size
         parent: dict = {"S": None}
         queue = deque(["S"])
         while queue and "T" not in parent:
@@ -253,7 +232,7 @@ def _transport(supply: Mapping[str, int], demand: Mapping[str, int], allowed) ->
                     parent[v] = u
                     queue.append(v)
         if "T" not in parent:
-            break
+            return flow, cap, parent
         path = []
         v = "T"
         while parent[v] is not None:
@@ -264,6 +243,40 @@ def _transport(supply: Mapping[str, int], demand: Mapping[str, int], allowed) ->
             cap[u][v] -= push
             cap[v][u] += push
         flow += push
+
+
+def _classes_of(roles, allowed) -> list[str]:
+    return sorted({c for r in roles for c in allowed[r]})
+
+
+def _shortfall(supply: Mapping[str, int], demand: Mapping[str, int], allowed) -> tuple[int, tuple[str, ...]]:
+    """Cells of the role counts that the class counts cannot take, and the roles of a violated set.
+
+    A histogram N can label cells with these role counts iff, for every set A of roles, the
+    classes allowed to A hold at least sum(supply[r] for r in A) cells of N (Hall's condition).
+    A max flow tests all sets at once in polynomial time. The shortfall is total minus max flow.
+    When it is positive, the roles still reachable from the source in the residual graph form a
+    violated set A, and need minus have for A equals the shortfall. Returns (0, ()) when all hold.
+    """
+    total = sum(supply.values())
+    flow, _, reach = _max_flow(supply, demand, allowed)
+    if flow >= total:
+        return 0, ()
+    roles = tuple(sorted(r for r, n in supply.items() if n > 0 and ("r", r) in reach))
+    return total - flow, roles
+
+
+def _deficit(hist: Mapping[str, int], supplies: Sequence[Mapping[str, int]], allowed) -> int:
+    """Cells missing from the histogram over the role counts of every supply (0 when all fit)."""
+    return sum(_shortfall(sup, hist, allowed)[0] for sup in supplies)
+
+
+def _transport(supply: Mapping[str, int], demand: Mapping[str, int], allowed) -> dict[tuple[str, str], int] | None:
+    """Max flow from role counts to class counts. Returns the flow per (role, class), or None."""
+    total = sum(supply.values())
+    if total != sum(demand.values()):
+        return None
+    flow, cap, _ = _max_flow(supply, demand, allowed)
     if flow != total:
         return None
     out: dict[tuple[str, str], int] = {}
@@ -289,13 +302,16 @@ def _goal(spec: RolesSpec, all_classes: Sequence[str], cells: int, flat, allowed
             raise SceneError(f"target_counts sum to {sum(target.values())} but the maps have {cells} cells")
         problems = []
         for k, cells_k in enumerate(flat):
-            for cs, need, sub in _hall(Counter(cells_k), allowed):
+            counts = Counter(cells_k)
+            short, sub = _shortfall(counts, target, allowed)
+            if short:
+                cs = _classes_of(sub, allowed)
+                need = sum(counts[r] for r in sub)
                 have = sum(target[c] for c in cs)
-                if need > have:
-                    problems.append(
-                        f"map {NAMES[k]}: roles {', '.join(sub)} need {need} cells from classes "
-                        f"{', '.join(sorted(cs))}, target_counts gives them {have}"
-                    )
+                problems.append(
+                    f"map {NAMES[k]}: roles {', '.join(sub)} need {need} cells from classes "
+                    f"{', '.join(cs)}, target_counts gives them {have}"
+                )
         if problems:
             raise SceneError("no common histogram: " + "; ".join(problems))
         return target
@@ -315,15 +331,18 @@ def _accept(delta: float, temp: float, rng: random.Random) -> bool:
     return delta <= 0 or rng.random() < math.exp(-delta / temp)
 
 
-def _skeleton_failure(containers, cons, M, N, goal, iters: int) -> str:
+def _skeleton_failure(containers, supplies, allowed, M, N, goal, iters: int) -> str:
     worst = []
-    for g, cl in enumerate(cons):
-        for k, cs, need, sub in cl:
-            have = sum(M[g].get(c, 0) for c in cs)
-            if need > have:
-                worst.append((need - have, (
+    for g, sups in enumerate(supplies):
+        for k, sup in enumerate(sups):
+            short, sub = _shortfall(sup, M[g], allowed)
+            if short:
+                cs = _classes_of(sub, allowed)
+                need = sum(sup[r] for r in sub)
+                have = sum(M[g].get(c, 0) for c in cs)
+                worst.append((short, (
                     f"roles {', '.join(sub)} of map {NAMES[k]} need {need} cells from classes "
-                    f"{', '.join(sorted(cs))} in {containers[g][0]}; the histogram gives them {have}"
+                    f"{', '.join(cs)} in {containers[g][0]}; the histogram gives them {have}"
                 )))
     worst.sort(key=lambda t: -t[0])
     parts = [text for _, text in worst[:3]]
@@ -334,10 +353,7 @@ def _skeleton_failure(containers, cons, M, N, goal, iters: int) -> str:
 def _find_skeleton(containers, gcounts, allowed, weights, goal, all_classes, cont_of, rng, iters) -> list[Counter]:
     """Per container, a class multiset that every map's role counts can take (annealed)."""
     G = len(containers)
-    cons = [
-        [(k, cs, need, sub) for k in range(3) for cs, need, sub in _hall(gcounts[k][g], allowed)]
-        for g in range(G)
-    ]
+    supplies = [[gcounts[k][g] for k in range(3)] for g in range(G)]
     # Greedy start: map A's role counts, each cell to the allowed class with the lowest count per weight.
     M: list[Counter] = []
     for g in range(G):
@@ -354,7 +370,7 @@ def _find_skeleton(containers, gcounts, allowed, weights, goal, all_classes, con
     def pen(c: str, n: int) -> int:
         return abs(n - goal[c]) if c in goal else 0
 
-    defi = [_deficit(M[g], cons[g]) for g in range(G)]
+    defi = [_deficit(M[g], supplies[g], allowed) for g in range(G)]
     fixed_cost = sum(pen(c, N[c]) for c in goal)
     cost = sum(defi) + fixed_cost
     T = len(cont_of)
@@ -375,8 +391,8 @@ def _find_skeleton(containers, gcounts, allowed, weights, goal, all_classes, con
             nh = Counter(M[h])
             nh[d] -= 1
             nh[c] += 1
-            dg = _deficit(ng, cons[g]) - defi[g]
-            dh = _deficit(nh, cons[h]) - defi[h]
+            dg = _deficit(ng, supplies[g], allowed) - defi[g]
+            dh = _deficit(nh, supplies[h], allowed) - defi[h]
             if _accept(dg + dh, temp, rng):
                 M[g], M[h] = ng, nh
                 defi[g] += dg
@@ -391,7 +407,7 @@ def _find_skeleton(containers, gcounts, allowed, weights, goal, all_classes, con
             ng = Counter(M[g])
             ng[c] -= 1
             ng[d] += 1
-            dg = _deficit(ng, cons[g]) - defi[g]
+            dg = _deficit(ng, supplies[g], allowed) - defi[g]
             dfix = pen(c, N[c] - 1) - pen(c, N[c]) + pen(d, N[d] + 1) - pen(d, N[d])
             if _accept(dg + dfix, temp, rng):
                 M[g] = ng
@@ -401,7 +417,7 @@ def _find_skeleton(containers, gcounts, allowed, weights, goal, all_classes, con
                 fixed_cost += dfix
         cost = sum(defi) + fixed_cost
     if cost:
-        raise SceneError(_skeleton_failure(containers, cons, M, N, goal, iters))
+        raise SceneError(_skeleton_failure(containers, supplies, allowed, M, N, goal, iters))
     return M
 
 

@@ -1,8 +1,17 @@
+import random
+import time
+from itertools import combinations
+
 import pytest
 
 from metapuzzle.board import square_board
 from metapuzzle.cli import main
-from metapuzzle.roles import assign_classes, parse_roles_spec, write_scene_file
+from metapuzzle.roles import (
+    _shortfall,
+    assign_classes,
+    parse_roles_spec,
+    write_scene_file,
+)
 from metapuzzle.scene import SceneError, load_scenes, validate_scenes
 from metapuzzle.scene_metrics import same_position_overlap
 
@@ -164,3 +173,67 @@ def test_role_suffix_passes_through_to_scene_token():
         assert m.cls[1][1] == "MD" and m.rot[1][1] == 90
         assert m.tokens()[1][1] == "MD@90"
         assert m.tokens()[0][0] == "D" and m.rot[0][0] == 0
+
+
+# ---------------------------------------------------------------- feasibility check
+
+def _brute_shortfall(supply, demand, allowed):
+    """max over every set A of roles of sum(supply[A]) - sum(demand[classes allowed to A]), exponential."""
+    roles = [r for r, n in supply.items() if n > 0]
+    best = 0
+    for size in range(len(roles) + 1):
+        for sub in combinations(roles, size):
+            cs = {c for r in sub for c in allowed[r]}
+            best = max(best, sum(supply[r] for r in sub) - sum(demand.get(c, 0) for c in cs))
+    return best
+
+
+def test_shortfall_matches_hall_enumeration():
+    rng = random.Random(0)
+    for _ in range(300):
+        classes = [f"c{i}" for i in range(rng.randint(1, 5))]
+        roles = [f"r{i}" for i in range(rng.randint(1, 6))]
+        allowed = {r: tuple(rng.sample(classes, rng.randint(1, len(classes)))) for r in roles}
+        supply = {r: rng.randint(0, 4) for r in roles}
+        demand = {c: rng.randint(0, 4) for c in classes}
+        short, sub = _shortfall(supply, demand, allowed)
+        assert short == _brute_shortfall(supply, demand, allowed), (supply, demand, allowed)
+        if short:  # the returned roles are a violated set, with need - have equal to the shortfall
+            need = sum(supply[r] for r in sub)
+            have = sum(demand.get(c, 0) for c in {c for r in sub for c in allowed[r]})
+            assert need - have == short
+
+
+def test_thirty_roles_in_one_container_are_checked_in_polynomial_time():
+    # The 6x6 interior holds 30 distinct roles. Subset enumeration would visit 2**30 sets.
+    board = square_board(8, 8, rotation="quarter")
+    kinds: dict[str, list[int]] = {}
+    for slot in board.slots:
+        kinds.setdefault(slot.kind, []).append(slot.id)
+    rng = random.Random(1)
+    pool = {"interior": [f"r{i:02d}" for i in range(30)] + [f"r{i:02d}" for i in range(6)],
+            "edge": ["r00", "r01", "r02", "r03"] * 6,
+            "corner": ["r04", "r05", "r06", "r07"]}
+    for values in pool.values():
+        rng.shuffle(values)
+    first = [None] * 64
+    for kind, ids in kinds.items():
+        for p, role in zip(ids, pool[kind]):
+            first[p] = role
+    flats = [first]
+    for _ in range(2):  # same role counts per container, placed differently
+        f = list(first)
+        for ids in kinds.values():
+            vals = [first[p] for p in ids]
+            rng.shuffle(vals)
+            for p, v in zip(ids, vals):
+                f[p] = v
+        flats.append(f)
+    maps = [[row[y * 8:(y + 1) * 8] for y in range(8)] for row in flats]
+    classes = [f"K{j:02d}" for j in range(12)]
+    spec = {"roles": {f"r{i:02d}": {"classes": sorted(rng.sample(classes, 3))} for i in range(30)}}
+    start = time.perf_counter()
+    out = assign_classes(maps, spec, rotation="quarter", seed=0, iters=2000)
+    assert time.perf_counter() - start < 60
+    validate_scenes([board] * 3, out)
+    assert out[0].histogram() == out[1].histogram() == out[2].histogram()
