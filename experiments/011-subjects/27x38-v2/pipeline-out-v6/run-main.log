@@ -1,0 +1,202 @@
+0. equalize (005 v5b logic; v2: five tiers, S-L moves only, S-D/S-M/S-W never created)
+   cells allowed to change per image: [766, 777, 821]
+   surplus before: A 73, B 58, C 62   total 193
+   seed 0: best score 737.00 (9 s)
+   seed 1: best score 722.00 (9 s)
+   seed 2: best score 671.00 (9 s)
+   chosen seed 2, score 671.00
+   surplus after:  A 50, B 36, C 41   total 127
+   changed cells per image: A 8, B 22, C 6 (tier totals unchanged, frame unchanged, changes inside the band)
+   wrote tiers-eq-A/B/C.txt and equalize-report.txt
+tiles used after equalize: eq (this run)
+1. tiers per image (input) and transition cells
+   A hare   tiles D 286 M 396 W  36 L 281 S  27   transitions 285 (own D/S/M/W/L 154/22/101/8/0)
+   B owl    tiles D 287 M 397 W  34 L 281 S  27   transitions 299 (own D/S/M/W/L 165/19/104/11/0)
+   C swan   tiles D 286 M 397 W  36 L 280 S  27   transitions 294 (own D/S/M/W/L 144/22/112/16/0)
+   classify 0.0 s
+   wrote /home/user/metapuzzle/experiments/011-subjects/27x38-v2/pipeline-out-v6/quantized-codes.txt
+2. budgets (per class: max over images, own counts, surplus = max - own)
+   class   pair      A hare      B owl     C swan   max   sur_A   sur_B   sur_C
+   DMc       DM          12         12         11    12       0       0       1
+   DMs       DM          33         40         21    40       7       0      19
+   MDc       DM          10         11          6    11       1       0       5
+   MDd       DM           1          1          1     1       0       0       0
+   total     DM          56         64         39    64       8       0      25
+   DWc       DW           1          0          0     1       0       1       1
+   DWs       DW           1          6          6     6       5       0       0
+   WDc       DW           0          0          1     1       1       1       0
+   total     DW           2          6          7     8       6       2       1
+   DLc       DL          17         25         21    25       8       0       4
+   DLs       DL          49         48         49    49       0       1       0
+   LDc       DL          29         21         27    29       0       8       2
+   LDd       DL           1          1          1     1       0       0       0
+   total     DL          96         95         98   104       8       9       6
+   MWc       MW           3          0          2     3       0       3       1
+   MWs       MW          12         15         19    19       7       4       0
+   WMc       MW           5          5          5     5       0       0       0
+   total     MW          20         20         26    27       7       7       1
+   MLc       ML          23         22         18    23       0       1       5
+   MLs       ML          35         37         43    43       8       6       0
+   LMc       ML          23         25         25    25       2       0       0
+   total     ML          81         84         86    91      10       7       5
+   WLc       WL           4          3          2     4       0       1       2
+   WLs       WL           4          5         12    12       8       7       0
+   LWc       WL           0          3          2     3       3       0       1
+   total     WL           8         11         16    19      11       8       3
+   SLc       SL           7          7          7     7       0       0       0
+   SLs       SL          12         11         12    12       0       1       0
+   LSc       SL           3          1          3     3       0       2       0
+   total     SL          22         19         22    22       0       3       0
+   Transition cells per image: A 285, B 299, C 294; surplus (max minus own, all classes): A 50, B 36, C 41
+   approximations: A {'s+diag': 4}; B {'i+multi': 1}; C {'s+diag': 4, 'i+multi': 1}
+   cells with a three-tier junction (two lighter tiers among 8 neighbours): A 8, B 18, C 10
+   shared 4-neighbour edges (different tiers, frame included):
+     DL     A 101  B 102  C 103
+     DM     A  65  B  69  C  69
+     DW     A   7  B   7  C   8
+     ML     A  81  B  85  C  85
+     MW     A  18  B  24  C  24
+     SL     A  26  B  27  C  26
+     WL     A  12  B  11  C  16
+   W-M contacts (MW edges): A 18, B 24, C 24
+   S contacts: S-L edges (transitions) A 26, B 27, C 26; S-D/S-M/S-W 8-neighbour contacts (must be 0) A 0, B 0, C 0
+   verify_edges (shared edges whose halves disagree, from the rotated pieces' profiles):
+     A hare   shared edges 1987  approx 6  frame 33  junction 13
+     B owl    shared edges 1987  approx 2  frame 19  junction 23
+     C swan   shared edges 1987  approx 8  frame 55  junction 16
+     total: approx 16  frame 107  junction 52
+3. roles: total transitions 335, plain target total 691, tiers DSMWL
+   A hare   F (plain-capable, frame incl.) 132/5/295/28/281; frame 62/0/0/9/55; surplus DM 8 DW 6 DL 8 MW 7 ML 10 WL 11
+   A hare   host pools (cells per chain stage): D-far 10 D-near 60 M-far 159 M-near 136 L-far 32 W-far 0 W-near 19 S-edge 5 S-interior 0
+   B owl    F (plain-capable, frame incl.) 122/8/293/23/281; frame 0/5/86/0/35; surplus DW 2 DL 9 MW 7 ML 7 WL 8 SL 3
+   B owl    host pools (cells per chain stage): D-far 54 D-near 68 M-far 40 M-near 167 L-far 40 W-far 0 W-near 23 S-edge 3 S-interior 0
+   C swan   F (plain-capable, frame incl.) 142/5/285/20/280; frame 70/0/56/0/0; surplus DM 25 DW 1 DL 6 MW 1 ML 5 WL 3
+   C swan   host pools (cells per chain stage): D-far 1 D-near 71 M-far 86 M-near 143 L-far 72 W-far 0 W-near 20 S-edge 5 S-interior 0
+   plain targets 111/5/279/16/280; chain cost 100 (750 feasible targets checked)
+   A hare   host tiers needed D/S/M/W/L 21/0/16/12/1; chain cost 39
+   B owl    host tiers needed D/S/M/W/L 11/3/14/7/1; chain cost 25
+   C swan   host tiers needed D/S/M/W/L 31/0/6/4/0; chain cost 36
+# Motif class counts per picture, v6 (make_motif_maps_v2.py). Class = (motif, base tier); heroes counted
+# per code. spill = cells outside the class region (weight < 2).
+
+class           A hare   B owl  C swan  spread   spill A/B/C
+streak D             2       2       2       0   0/0/0
+chevron D            2       2       2       0   1/0/0
+pebbles D            2       2       2       0   0/0/0
+star D               4       4       4       0   0/2/0
+seedhead M          16      16      16       0   9/9/2
+leaf M              18      18      18       0   3/10/3
+curl M              18      18      18       0   1/3/6
+star M              18      18      18       0   10/5/9
+pebbles L           14      14      14       0   3/4/8
+chevron L           15      15      15       0   5/5/5
+cloud L             15      15      15       0   9/10/7
+snowflake L         12      12      12       0   5/0/9
+amberwedge hero       2       2       2       0   -
+catchlight hero       2       2       2       0   -
+crater hero          2       2       2       0   -
+ambereye hero        1       1       1       0   -
+dot-eye hero         1       1       1       0   -
+beak/nose hero       1       1       1       0   -
+all motifs         145     145     145
+coverage %        14.1    14.1    14.1   (limit 18%)
+# hero piece classes (same in A, B, C): I on L/L, G on DLc/DLc, O on L/L, E on DMd, Y on DLd, N on M
+
+# Lattice test: equally spaced triples of one class in a row or column (regular motifs, all classes)
+# chance = mean over 300 draws of the same counts placed uniformly under the same spacing rule
+A: actual 1 triples, chance mean 4.8 (share of draws at or below actual 0.07); ratio 0.21
+B: actual 0 triples, chance mean 4.2 (share of draws at or below actual 0.02); ratio 0.00
+C: actual 3 triples, chance mean 3.1 (share of draws at or below actual 0.64); ratio 0.97
+
+# Halo and spacing (all pictures): regular motif cells closer than HALO to a tier boundary cell,
+# pairs of motif cells closer than CHEB_MIN, and the mean boundary distance of motifs vs plain cells
+A: literal any-side halo: 65 regular motifs within one cell of a boundary cell on either side (the carrier rule allows these)
+A: regular motifs 136, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 171; mean boundary distance motifs 2.49 vs open D/M/L cells 0.91
+   heroes (boundary distance): O3,11:2, Y5,21:0, G6,24:0, G6,25:0, I11,0:1, I11,1:1, E12,17:0, N14,20:1, O25,24:1
+B: literal any-side halo: 62 regular motifs within one cell of a boundary cell on either side (the carrier rule allows these)
+B: regular motifs 136, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 163; mean boundary distance motifs 2.31 vs open D/M/L cells 0.89
+   heroes (boundary distance): O4,15:1, O5,9:1, I12,7:1, G12,8:0, I12,15:1, G12,16:0, E15,1:0, N16,12:1, Y35,24:0
+C: literal any-side halo: 80 regular motifs within one cell of a boundary cell on either side (the carrier rule allows these)
+C: regular motifs 136, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 181; mean boundary distance motifs 2.29 vs open D/M/L cells 0.80
+   heroes (boundary distance): G1,19:0, G1,24:0, O3,21:2, Y5,11:0, O5,23:2, I6,5:1, I7,5:1, N16,5:2, E32,5:0
+
+# Remaining plain D/M/L cells without a motif, per picture (only cells with no boundary within HALO can take a motif)
+A: 135 motif-eligible cells left unused (of 272 eligible)
+B: 116 motif-eligible cells left unused (of 252 eligible)
+C: 85 motif-eligible cells left unused (of 224 eligible)
+0b. motif maps: make_motif_maps_v2.py rerun on the equalized tiles; written to pipeline-out-v6/motif-maps-v6.txt
+   motif and hero cells per picture (identical across A, B, C): D_k_a 1, D_k_b 1, D_p_a 1, D_p_b 1, D_s_a 2, D_s_b 1, D_s_c 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 4, L_f_b 4, L_f_c 4, L_p_a 5, L_p_b 5, L_p_c 4, L_u_a 5, L_u_b 5, L_u_c 5, L_v_a 5, L_v_b 5, L_v_c 5, M_c_a 6, M_c_b 6, M_c_c 6, M_d_a 6, M_d_b 5, M_d_c 5, M_l_a 6, M_l_b 6, M_l_c 6, M_s_a 6, M_s_b 6, M_s_c 6
+   plain remainder after motifs: 101/5/208/16/220 (plain targets 111/5/279/16/280 minus motif cells 10/0/71/0/60)
+   A hare   D-far: spacing relaxed for 6 of 10 hosts
+   A hare   W-near: spacing relaxed for 6 of 12 hosts
+   C swan   D-near: spacing relaxed for 7 of 30 hosts
+   A hare   motifs displaced from hosts: 3 D_s_c, D_s_a, D_k_b
+   B owl    motifs displaced from hosts: 6 M_l_a, M_s_b, M_l_b, M_d_c, M_d_a, M_l_a
+   C swan   motifs displaced from hosts: 1 D_s_a
+   chip split: plain targets 111/5/279/16/280 -> sub-class quotas Lr 44, Lb 44, Lo 44, Lx 44, Mr 52, Mb 52, Mc 52; plain L 44 M 52
+   placement per pair (pieces by chain stage; fallback = placed after the pair's first stage):
+     image      pair surpl      D-far    D-near     M-far    M-near     L-far     W-far    W-near    S-edgeS-interior  fallback
+     A hare       DM     8          8         0         0         0         0         0         0         0         0         0
+     A hare       DW     6          2         4         0         0         0         0         0         0         0         4
+     A hare       DL     8          0         7         0         0         1         0         0         0         0         8
+     A hare       MW     7          0         0         0         0         0         0         7         0         0         7
+     A hare       ML    10          0         0        10         0         0         0         0         0         0         0
+     A hare       WL    11          0         0         6         0         0         0         5         0         0        11
+     B owl        DW     2          2         0         0         0         0         0         0         0         0         0
+     B owl        DL     9          9         0         0         0         0         0         0         0         0         0
+     B owl        MW     7          0         0         0         0         0         0         7         0         0         7
+     B owl        ML     7          0         0         6         0         1         0         0         0         0         1
+     B owl        WL     8          0         0         8         0         0         0         0         0         0         8
+     B owl        SL     3          0         0         0         0         0         0         0         3         0         0
+     C swan       DM    25          1        24         0         0         0         0         0         0         0        24
+     C swan       DW     1          0         1         0         0         0         0         0         0         0         1
+     C swan       DL     6          0         5         1         0         0         0         0         0         0         6
+     C swan       MW     1          0         0         0         0         0         0         1         0         0         1
+     C swan       ML     5          0         0         5         0         0         0         0         0         0         0
+     C swan       WL     3          0         0         0         0         0         0         3         0         0         3
+   wrote roles.txt, roles-spec.json, placement.txt (12 role names)
+4. scenes: border tray, rotation quarter, containers ['all']
+   restart 0: objective 109.05
+   restart 1: objective 106.85
+   restart 2: objective 106.15
+   restart 3: objective 107.40
+   restart 4: objective 109.40
+   restart 5: objective 106.80
+   restart 6: objective 112.60
+   restart 7: objective 111.35
+   validate_scenes passed (border tray)
+   best restart 2 (objective 106.15); wrote /home/user/metapuzzle/experiments/011-subjects/27x38-v2/pipeline-out-v6/scenes.txt; all maps match target_counts
+   # Chip sub-classes per picture, experiment 011 v4. Own class = the class of the role's preference.
+   # centroid (x, y): fractions of the picture, y down.
+   
+   A hare: chip roles 428, own class 403 (94.2%)
+      Lr 44 (0.18,0.12); Lb 44 (0.84,0.49); Lo 44 (0.56,0.42); Lx 44 (0.28,0.37); Mr 52 (0.44,0.42); Mb 52 (0.50,0.83); Mc 52 (0.64,0.58)
+   B owl: chip roles 428, own class 394 (92.1%)
+      Lr 44 (0.29,0.48); Lb 44 (0.44,0.32); Lo 44 (0.47,0.93); Lx 44 (0.65,0.19); Mr 52 (0.16,0.15); Mb 52 (0.88,0.53); Mc 52 (0.50,0.72)
+   C swan: chip roles 428, own class 396 (92.5%)
+      Lr 44 (0.47,0.31); Lb 44 (0.73,0.16); Lo 44 (0.37,0.42); Lx 44 (0.77,0.74); Mr 52 (0.40,0.47); Mb 52 (0.18,0.83); Mc 52 (0.63,0.81)
+   sub-class histograms identical across A, B, C: True
+5. scene-metrics exit 0; wrote /home/user/metapuzzle/experiments/011-subjects/27x38-v2/pipeline-out-v6/scene-metrics.txt
+   maps (cols x rows): A 27x38, B 27x38, C 27x38
+   class histograms:
+     A: D=101 M=52 Mb=52 Mc=52 Mr=52 DLs=49 L=44 Lb=44 Lo=44 Lr=44 Lx=44 MLs=43 DMs=40 LDc=29 LMc=25 DLc=23 MLc=23 MWs=19 W=16 DMc=12 SLs=12 WLs=12 MDc=11 SLc=7 DWs=6 M_c_a=6 M_c_b=6 M_c_c=6 M_d_a=6 M_l_a=6 M_l_b=6 M_l_c=6 M_s_a=6 M_s_b=6 M_s_c=6 L_p_a=5 L_p_b=5 L_u_a=5 L_u_b=5 L_u_c=5 L_v_a=5 L_v_b=5 L_v_c=5 M_d_b=5 M_d_c=5 S=5 WMc=5 L_f_a=4 L_f_b=4 L_f_c=4 L_p_c=4 WLc=4 LSc=3 LWc=3 MWc=3 D_s_a=2 H_G=2 H_I=2 H_O=2 DWc=1 D_k_a=1 D_k_b=1 D_p_a=1 D_p_b=1 D_s_b=1 D_s_c=1 D_v_a=1 D_v_b=1 H_E=1 H_N=1 H_Y=1 WDc=1
+     B: D=101 M=52 Mb=52 Mc=52 Mr=52 DLs=49 L=44 Lb=44 Lo=44 Lr=44 Lx=44 MLs=43 DMs=40 LDc=29 LMc=25 DLc=23 MLc=23 MWs=19 W=16 DMc=12 SLs=12 WLs=12 MDc=11 SLc=7 DWs=6 M_c_a=6 M_c_b=6 M_c_c=6 M_d_a=6 M_l_a=6 M_l_b=6 M_l_c=6 M_s_a=6 M_s_b=6 M_s_c=6 L_p_a=5 L_p_b=5 L_u_a=5 L_u_b=5 L_u_c=5 L_v_a=5 L_v_b=5 L_v_c=5 M_d_b=5 M_d_c=5 S=5 WMc=5 L_f_a=4 L_f_b=4 L_f_c=4 L_p_c=4 WLc=4 LSc=3 LWc=3 MWc=3 D_s_a=2 H_G=2 H_I=2 H_O=2 DWc=1 D_k_a=1 D_k_b=1 D_p_a=1 D_p_b=1 D_s_b=1 D_s_c=1 D_v_a=1 D_v_b=1 H_E=1 H_N=1 H_Y=1 WDc=1
+     C: D=101 M=52 Mb=52 Mc=52 Mr=52 DLs=49 L=44 Lb=44 Lo=44 Lr=44 Lx=44 MLs=43 DMs=40 LDc=29 LMc=25 DLc=23 MLc=23 MWs=19 W=16 DMc=12 SLs=12 WLs=12 MDc=11 SLc=7 DWs=6 M_c_a=6 M_c_b=6 M_c_c=6 M_d_a=6 M_l_a=6 M_l_b=6 M_l_c=6 M_s_a=6 M_s_b=6 M_s_c=6 L_p_a=5 L_p_b=5 L_u_a=5 L_u_b=5 L_u_c=5 L_v_a=5 L_v_b=5 L_v_c=5 M_d_b=5 M_d_c=5 S=5 WMc=5 L_f_a=4 L_f_b=4 L_f_c=4 L_p_c=4 WLc=4 LSc=3 LWc=3 MWc=3 D_s_a=2 H_G=2 H_I=2 H_O=2 DWc=1 D_k_a=1 D_k_b=1 D_p_a=1 D_p_b=1 D_s_b=1 D_s_c=1 D_v_a=1 D_v_b=1 H_E=1 H_N=1 H_Y=1 WDc=1
+   largest same-class blob per class:
+     A: Mb=44 L=39 Mc=32 Mr=30 Lr=27 M=25 D=20 Lo=18 Lb=17 DLs=16 Lx=14 W=14 MWs=10 DMs=6 MLs=6 SLs=5 S=4 WLs=4 LDc=3 LMc=3 DLc=2 DMc=2 DWs=2 H_G=2 H_I=2 LSc=2 MLc=2 MWc=2 SLc=2 WLc=2 DWc=1 D_k_a=1 D_k_b=1 D_p_a=1 D_p_b=1 D_s_a=1 D_s_b=1 D_s_c=1 D_v_a=1 D_v_b=1 H_E=1 H_N=1 H_O=1 H_Y=1 LWc=1 L_f_a=1 L_f_b=1 L_f_c=1 L_p_a=1 L_p_b=1 L_p_c=1 L_u_a=1 L_u_b=1 L_u_c=1 L_v_a=1 L_v_b=1 L_v_c=1 MDc=1 M_c_a=1 M_c_b=1 M_c_c=1 M_d_a=1 M_d_b=1 M_d_c=1 M_l_a=1 M_l_b=1 M_l_c=1 M_s_a=1 M_s_b=1 M_s_c=1 WDc=1 WMc=1
+     B: D=84 Lx=30 Mb=26 Mr=26 Mc=19 M=15 Lb=12 L=11 Lr=11 DMs=8 Lo=8 MWs=8 DLs=6 W=6 MLs=5 S=5 SLs=5 DWs=4 WLs=4 DLc=3 LDc=3 DMc=2 LMc=2 LSc=2 MLc=2 SLc=2 DWc=1 D_k_a=1 D_k_b=1 D_p_a=1 D_p_b=1 D_s_a=1 D_s_b=1 D_s_c=1 D_v_a=1 D_v_b=1 H_E=1 H_G=1 H_I=1 H_N=1 H_O=1 H_Y=1 LWc=1 L_f_a=1 L_f_b=1 L_f_c=1 L_p_a=1 L_p_b=1 L_p_c=1 L_u_a=1 L_u_b=1 L_u_c=1 L_v_a=1 L_v_b=1 L_v_c=1 MDc=1 MWc=1 M_c_a=1 M_c_b=1 M_c_c=1 M_d_a=1 M_d_b=1 M_d_c=1 M_l_a=1 M_l_b=1 M_l_c=1 M_s_a=1 M_s_b=1 M_s_c=1 WDc=1 WLc=1 WMc=1
+     C: Mr=30 L=27 Lx=25 D=23 Lb=22 Lr=21 Mc=18 M=17 Mb=16 DLs=11 Lo=11 MLs=8 MWs=7 W=7 WLs=7 SLs=6 DMs=5 S=5 DWs=4 MLc=3 DLc=2 DMc=2 H_I=2 LDc=2 LMc=2 LSc=2 MDc=2 SLc=2 DWc=1 D_k_a=1 D_k_b=1 D_p_a=1 D_p_b=1 D_s_a=1 D_s_b=1 D_s_c=1 D_v_a=1 D_v_b=1 H_E=1 H_G=1 H_N=1 H_O=1 H_Y=1 LWc=1 L_f_a=1 L_f_b=1 L_f_c=1 L_p_a=1 L_p_b=1 L_p_c=1 L_u_a=1 L_u_b=1 L_u_c=1 L_v_a=1 L_v_b=1 L_v_c=1 MWc=1 M_c_a=1 M_c_b=1 M_c_c=1 M_d_a=1 M_d_b=1 M_d_c=1 M_l_a=1 M_l_b=1 M_l_c=1 M_s_a=1 M_s_b=1 M_s_c=1 WDc=1 WLc=1 WMc=1
+   same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+   pairs (window reuse shown as plain/rotated, window = rows x cols):
+     A-B: same position 6 (0.6%)
+   classes-v12.json: used classes missing: none
+   classes-ink-v12.json: used classes missing: none
+6. prototype run-ink-v6 (classes-ink-v12.json): exit 0, 13.4 s
+   sizes=27x38, 27x38, 27x38 shared AB/AC/BC=1/1/0 valid=True wrote 16 files to /home/user/metapuzzle/experiments/011-subjects/27x38-v2/run-ink-v6
+   piece gates: PASS
+   scene gates: PASS
+6. prototype run-full-v6 (classes-v12.json): exit 0, 27.5 s
+   sizes=27x38, 27x38, 27x38 shared AB/AC/BC=1/1/0 valid=True wrote 16 files to /home/user/metapuzzle/experiments/011-subjects/27x38-v2/run-full-v6
+   piece gates: PASS
+   scene gates: PASS
+done in 95.2 s

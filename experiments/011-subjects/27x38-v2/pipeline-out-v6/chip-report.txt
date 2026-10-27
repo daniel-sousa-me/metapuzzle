@@ -1,0 +1,10 @@
+# Chip sub-classes per picture, experiment 011 v4. Own class = the class of the role's preference.
+# centroid (x, y): fractions of the picture, y down.
+
+A hare: chip roles 428, own class 403 (94.2%)
+   Lr 44 (0.18,0.12); Lb 44 (0.84,0.49); Lo 44 (0.56,0.42); Lx 44 (0.28,0.37); Mr 52 (0.44,0.42); Mb 52 (0.50,0.83); Mc 52 (0.64,0.58)
+B owl: chip roles 428, own class 394 (92.1%)
+   Lr 44 (0.29,0.48); Lb 44 (0.44,0.32); Lo 44 (0.47,0.93); Lx 44 (0.65,0.19); Mr 52 (0.16,0.15); Mb 52 (0.88,0.53); Mc 52 (0.50,0.72)
+C swan: chip roles 428, own class 396 (92.5%)
+   Lr 44 (0.47,0.31); Lb 44 (0.73,0.16); Lo 44 (0.37,0.42); Lx 44 (0.77,0.74); Mr 52 (0.40,0.47); Mb 52 (0.18,0.83); Mc 52 (0.63,0.81)
+sub-class histograms identical across A, B, C: True

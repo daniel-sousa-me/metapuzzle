@@ -1,0 +1,11 @@
+# Motif and hero cells, experiment 011 v6 (A hare, B owl, C swan). moves = motif displaced from a cell
+# that had to host a surplus piece, to the nearest plain cell of its tier.
+
+A hare: D_k_a 1, D_k_b 1, D_p_a 1, D_p_b 1, D_s_a 2, D_s_b 1, D_s_c 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 4, L_f_b 4, L_f_c 4, L_p_a 5, L_p_b 5, L_p_c 4, L_u_a 5, L_u_b 5, L_u_c 5, L_v_a 5, L_v_b 5, L_v_c 5, M_c_a 6, M_c_b 6, M_c_c 6, M_d_a 6, M_d_b 5, M_d_c 5, M_l_a 6, M_l_b 6, M_l_c 6, M_s_a 6, M_s_b 6, M_s_c 6
+   displaced 3: (2, 20)->(1, 18) D_s_c (D, HALO BREACH); (4, 20)->(4, 18) D_s_a (D, HALO BREACH); (4, 21)->(2, 21) D_k_b (D, HALO BREACH)
+B owl: D_k_a 1, D_k_b 1, D_p_a 1, D_p_b 1, D_s_a 2, D_s_b 1, D_s_c 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 4, L_f_b 4, L_f_c 4, L_p_a 5, L_p_b 5, L_p_c 4, L_u_a 5, L_u_b 5, L_u_c 5, L_v_a 5, L_v_b 5, L_v_c 5, M_c_a 6, M_c_b 6, M_c_c 6, M_d_a 6, M_d_b 5, M_d_c 5, M_l_a 6, M_l_b 6, M_l_c 6, M_s_a 6, M_s_b 6, M_s_c 6
+   displaced 6: (22, 2)->(20, 2) M_l_a (M, HALO BREACH); (24, 4)->(22, 4) M_s_b (M, HALO BREACH); (3, 24)->(1, 23) M_l_b (M, HALO BREACH); (5, 24)->(7, 24) M_d_c (M, HALO BREACH); (20, 24)->(18, 24) M_d_a (M, HALO BREACH); (9, 29)->(7, 29) M_l_a (M, HALO BREACH)
+C swan: D_k_a 1, D_k_b 1, D_p_a 1, D_p_b 1, D_s_a 2, D_s_b 1, D_s_c 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 4, L_f_b 4, L_f_c 4, L_p_a 5, L_p_b 5, L_p_c 4, L_u_a 5, L_u_b 5, L_u_c 5, L_v_a 5, L_v_b 5, L_v_c 5, M_c_a 6, M_c_b 6, M_c_c 6, M_d_a 6, M_d_b 5, M_d_c 5, M_l_a 6, M_l_b 6, M_l_c 6, M_s_a 6, M_s_b 6, M_s_c 6
+   displaced 1: (2, 6)->(1, 8) D_s_a (D, HALO BREACH)
+class counts identical across A, B, C: yes (checked)
+plain motif cells per tier (identical): 10/0/71/0/60; plain remainder 101/5/208/16/220
