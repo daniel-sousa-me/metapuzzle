@@ -97,6 +97,115 @@ def seam_counts(sol) -> list[dict]:
     return out
 
 
+CUT_RUN_MIN = 3  # a straight run of at least this many consecutive flat seams is reported
+
+
+def flat_seams(sol, k: int) -> list[tuple[str, int, int]]:
+    """Interior flat-flat contacts of placement `k` as (orientation, line, pos).
+
+    "V" is a contact on the vertical grid line between columns line-1 and line, at row pos.
+    "H" is a contact on the horizontal grid line between rows line-1 and line, at column pos.
+    """
+    b = sol.boards[k]
+    pl = sol.placements[k]
+    by_id = {p.piece_id: p for p in sol.pieces}
+    at = {slot: pid for pid, (slot, _) in pl.items()}
+
+    def flat(pid: int, face: int) -> bool:
+        return by_id[pid].sides[(face - pl[pid][1] // 90) % 4] == "flat"
+
+    out: list[tuple[str, int, int]] = []
+    for sl in b.slots:
+        for face, (x, y), orient in ((1, (sl.x + 1, sl.y), "V"), (2, (sl.x, sl.y + 1), "H")):
+            if x >= b.cols or y >= b.rows:
+                continue
+            a, c = at[sl.id], at[b.slot_at(x, y)]
+            if flat(a, face) and flat(c, (face + 2) % 4):
+                out.append((orient, x, sl.y) if orient == "V" else (orient, y, sl.x))
+    return out
+
+
+def straight_runs(seams: Sequence[tuple[str, int, int]]) -> list[tuple[str, int, int, int]]:
+    """Maximal runs of consecutive seams on one grid line: (orientation, line, start, length)."""
+    lines: dict[tuple[str, int], list[int]] = {}
+    for orient, line, pos in seams:
+        lines.setdefault((orient, line), []).append(pos)
+    runs = []
+    for (orient, line), poss in sorted(lines.items()):
+        poss.sort()
+        start = prev = poss[0]
+        for pos in poss[1:]:
+            if pos == prev + 1:
+                prev = pos
+                continue
+            runs.append((orient, line, start, prev - start + 1))
+            start = prev = pos
+        runs.append((orient, line, start, prev - start + 1))
+    return runs
+
+
+def cut_stats(sol) -> list[dict]:
+    """Per board: interior flat seams, and the straight runs of CUT_RUN_MIN or more of them."""
+    out = []
+    for k, (name, b) in enumerate(zip(NAMES, sol.boards)):
+        seams = flat_seams(sol, k)
+        runs = straight_runs(seams)
+        long_runs = [r for r in runs if r[3] >= CUT_RUN_MIN]
+        out.append({
+            "name": name,
+            "cols": b.cols,
+            "rows": b.rows,
+            "seams": len(seams),
+            "vertical": sum(1 for s in seams if s[0] == "V"),
+            "horizontal": sum(1 for s in seams if s[0] == "H"),
+            "runs": long_runs,
+            "run_seams": sum(r[3] for r in long_runs),
+            "longest": max((r[3] for r in runs), default=0),
+        })
+    return out
+
+
+def cuts_report_text(stats: Sequence[dict]) -> str:
+    """Readable cut report: counts per solution, then each long run with its grid position (0-based)."""
+    lines = [
+        "Cut-overlay report",
+        "interior flat seams: contacts where both pieces show a flat side (grid tells in the physical puzzle)",
+        f"straight runs: {CUT_RUN_MIN} or more consecutive flat seams on one grid line; "
+        "rows and columns are 0-based from the top left",
+        "",
+    ]
+    for st in stats:
+        lines.append(
+            f"{st['name']}  {st['cols']}x{st['rows']}  interior flat seams {st['seams']} "
+            f"(vertical {st['vertical']}, horizontal {st['horizontal']})  "
+            f"runs of {CUT_RUN_MIN}+: {len(st['runs'])} ({st['run_seams']} seams, longest {st['longest']})"
+        )
+        for orient, line, start, length in st["runs"]:
+            end = start + length - 1
+            if orient == "V":
+                where = f"vertical, between columns {line - 1} and {line}, rows {start}-{end}"
+            else:
+                where = f"horizontal, between rows {line - 1} and {line}, columns {start}-{end}"
+            lines.append(f"  {where} ({length} seams)")
+    return "\n".join(lines) + "\n"
+
+
+def write_cut_overlays(sol, drawer, out_dir, *, cell: int, grid: str, labels: bool) -> dict[str, Path]:
+    """Write solution-A/B/C-cuts.png (the normal render with cell outlines on top) and cuts-report.txt."""
+    out = Path(out_dir)
+    cache: dict = {}
+    written: dict[str, Path] = {}
+    for k, n in enumerate(NAMES):
+        svg = render_solution_svg(sol, k, drawer, cell_size=cell, grid=grid, labels=labels,
+                                  cache=cache, cut_overlay=True)
+        name = f"solution-{n}-cuts.png"
+        written[name] = render_solution_png(svg, out / name)
+    report_path = out / "cuts-report.txt"
+    report_path.write_text(cuts_report_text(cut_stats(sol)), encoding="utf-8")
+    written["cuts-report.txt"] = report_path
+    return written
+
+
 def _triptych(paths: Sequence[Path], dest: Path) -> Path:
     """Side by side, each image at most TRIPTYCH_MAX_HEIGHT tall, TRIPTYCH_GAP apart, white."""
     images = []
@@ -179,6 +288,7 @@ def run_prototype(
     mating_weight: float = 0.0,
     max_shared_fraction: float | None = None,
     strict_border: bool = False,
+    cut_overlay: bool = False,
 ) -> dict:
     """Solve the three class maps and write the prototype outputs into `out_dir`.
 
@@ -197,6 +307,8 @@ def run_prototype(
     `out_dir`. Invalid solutions still write their outputs and return `valid: False`.
     `gates` is {"piece": ok, "scene": ok, "failures": [...]} (failures prefixed "piece: " or
     "scene: "); `gate_lines` are the two printed gate lines. Gate failures do not change `valid`.
+    `cut_overlay` also writes solution-A/B/C-cuts.png (every cell outline on top, see
+    `write_cut_overlays`) and cuts-report.txt; off by default, and then no such files are written.
     """
     maps = load_scenes(scenes_path)
     map_sizes = [(m.cols, m.rows) for m in maps]
@@ -252,6 +364,9 @@ def run_prototype(
         files[f"grid-faint/solution-{n}.png"] = faint_pngs[-1]
     files["triptych-grid.png"] = _triptych(faint_pngs, out / "triptych-grid.png")
 
+    if cut_overlay:
+        files.update(write_cut_overlays(sol, drawer, out, cell=cell, grid=grid, labels=labels))
+
     params = {
         "scenes": str(scenes_path),
         "classes": str(classes_path),
@@ -270,6 +385,10 @@ def run_prototype(
         "interior seams (A / B / C)": " / ".join(str(x["seams"]) for x in seams),
         "cross-class seams (A / B / C)": " / ".join(str(x["cross_class"]) for x in seams),
     }
+    if cut_overlay:
+        cstats = cut_stats(sol)
+        params["cut overlay"] = "on (solution-*-cuts.png, cuts-report.txt)"
+        params[f"straight seam runs of {CUT_RUN_MIN}+ (A / B / C)"] = " / ".join(str(len(c["runs"])) for c in cstats)
     piece_failures, scene_failures = rep["gates"]["failures"], scene_rep["gates"]["failures"]
     gate_lines = [gate_line("piece", piece_failures), gate_line("scene", scene_failures)]
     gates = {

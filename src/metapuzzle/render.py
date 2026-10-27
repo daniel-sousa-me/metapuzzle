@@ -19,6 +19,8 @@ GRID_STYLES = {
 }
 N_DOTS = 12
 DARKEN = 0.8  # dot shade relative to the piece colour
+CUT_OPACITY = 0.35  # outline opacity of the cut overlay
+CUT_BUMP = 0.15  # radius of a tab/blank bump, as a fraction of the cell size
 
 FragmentCache = dict  # (piece_id: int, size: float) -> SVG fragment
 
@@ -100,6 +102,55 @@ def _check_grid(grid: str) -> None:
         raise ValueError(f"grid must be none, faint or strong; got {grid!r}")
 
 
+def cut_outline_d(solution: Solution, solution_index: int, cell_size: float = 40, margin: float = 8) -> str:
+    """SVG path data outlining every cell of placement `solution_index` as it is placed.
+
+    Each side is one subpath in board coordinates. Its profile is the one facing that board
+    direction after the piece's rotation (`sides[(d - r/90) % 4]`). A flat side is a straight
+    line. A tab side bulges outward, a blank side bulges inward, and andro or wild (no
+    orientation) bulge outward too, so every non-flat contact shows as a bump on each piece.
+    A tab-blank contact draws one bump; an andro contact draws a full circle.
+    """
+    if solution_index not in (0, 1, 2):
+        raise ValueError("solution_index must be 0, 1 or 2")
+    board = solution.boards[solution_index]
+    placement = solution.placements[solution_index]
+    by_id = {p.piece_id: p for p in solution.pieces}
+    by_slot = {slot: (pid, rot) for pid, (slot, rot) in placement.items()}
+    s = float(cell_size)
+    h = s / 2
+    r = CUT_BUMP * s
+    parts: list[str] = []
+    for slot in board.slots:
+        pid, rot = by_slot[slot.id]
+        sides = by_id[pid].sides
+        q = rot // 90
+        x0 = margin + slot.x * s
+        y0 = margin + slot.y * s
+        corner = {"NW": (x0, y0), "NE": (x0 + s, y0), "SE": (x0 + s, y0 + s), "SW": (x0, y0 + s)}
+        # (start corner, end corner, midpoint, unit vector start->end), clockwise, for N, E, S, W
+        edges = (
+            (corner["NW"], corner["NE"], (x0 + h, y0), (1, 0)),
+            (corner["NE"], corner["SE"], (x0 + s, y0 + h), (0, 1)),
+            (corner["SE"], corner["SW"], (x0 + h, y0 + s), (-1, 0)),
+            (corner["SW"], corner["NW"], (x0, y0 + h), (0, -1)),
+        )
+        for d, (a, b, (mx, my), (tx, ty)) in enumerate(edges):
+            profile = sides[(d - q) % 4]
+            if profile == "flat":
+                parts.append(f"M{_num(a[0])} {_num(a[1])}L{_num(b[0])} {_num(b[1])}")
+                continue
+            # Clockwise traversal: sweep 1 bulges to the left of travel (outward), sweep 0 inward.
+            sweep = 0 if profile == "blank" else 1
+            sx, sy = mx - r * tx, my - r * ty
+            ex, ey = mx + r * tx, my + r * ty
+            parts.append(
+                f"M{_num(a[0])} {_num(a[1])}L{_num(sx)} {_num(sy)}"
+                f"A{_num(r)} {_num(r)} 0 0 {sweep} {_num(ex)} {_num(ey)}L{_num(b[0])} {_num(b[1])}"
+            )
+    return "".join(parts)
+
+
 def render_solution_svg(
     solution: Solution,
     solution_index: int,
@@ -110,11 +161,14 @@ def render_solution_svg(
     rotate: bool = True,
     labels: bool = False,
     cache: FragmentCache | None = None,
+    cut_overlay: bool = False,
 ) -> str:
     """SVG of placement `solution_index` (0=A, 1=B, 2=C).
 
     Each slot gets one `<g data-slot data-piece>` group whose transform places and rotates the
     piece's fragment. Pass a shared `cache` to reuse fragments across solutions.
+    With `cut_overlay`, every cell outline (flat, tab, blank; see `cut_outline_d`) is drawn on
+    top of the artwork at low opacity, following the placed rotation.
     """
     if solution_index not in (0, 1, 2):
         raise ValueError("solution_index must be 0, 1 or 2")
@@ -152,6 +206,12 @@ def render_solution_svg(
             y = margin + slot.y * cell_size
             out.append(f'<rect x="{_num(x)}" y="{_num(y)}" width="{_num(cell_size)}" height="{_num(cell_size)}"/>')
         out.append("</g>")
+    if cut_overlay:
+        width_px = max(0.5, 0.03 * cell_size)
+        out.append(
+            f'<path d="{cut_outline_d(solution, solution_index, cell_size, margin)}" fill="none" '
+            f'stroke="#000" stroke-opacity="{CUT_OPACITY}" stroke-width="{_num(width_px)}"/>'
+        )
     if labels:
         fs = max(6.0, cell_size * 0.22)
         for slot in board.slots:

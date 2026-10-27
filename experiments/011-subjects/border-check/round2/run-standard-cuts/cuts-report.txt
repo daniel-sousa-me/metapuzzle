@@ -1,0 +1,8 @@
+Cut-overlay report
+interior flat seams: contacts where both pieces show a flat side (grid tells in the physical puzzle)
+straight runs: 3 or more consecutive flat seams on one grid line; rows and columns are 0-based from the top left
+
+A  27x38  interior flat seams 68 (vertical 30, horizontal 38)  runs of 3+: 1 (3 seams, longest 3)
+  vertical, between columns 15 and 16, rows 5-7 (3 seams)
+B  27x38  interior flat seams 68 (vertical 32, horizontal 36)  runs of 3+: 0 (0 seams, longest 2)
+C  27x38  interior flat seams 68 (vertical 43, horizontal 25)  runs of 3+: 0 (0 seams, longest 2)

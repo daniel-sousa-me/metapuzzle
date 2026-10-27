@@ -194,9 +194,11 @@ validate_solution(solution) -> list[str]     # empty means valid
 ```python
 run_prototype(scenes_path, classes_path, out_dir, *, sizes=None, border="standard", rotation="none",
               seed=0, iters=None, cell=48, grid="none", labels=False, extra_flat=0,
-              mating_weight=0.0, max_shared_fraction=None, strict_border=False) -> dict
+              mating_weight=0.0, max_shared_fraction=None, strict_border=False, cut_overlay=False) -> dict
 ```
 Loads the class maps, derives the inventory (with `extra_flat` added to the automatic seams), restricts rotations by the class spec (pinned to 0 in none mode), solves, and writes the outputs. Returns `valid`, `violations`, `shared`, `gates` (`{"piece", "scene", "failures"}`), `gate_lines`, `files` and `out_dir`. Invalid solutions still write their outputs.
+
+**Cut overlay (`cut_overlay`, CLI `--cut-overlay`).** Writes `solution-A/B/C-cuts.png`, the normal render with every cell outline drawn on top at 35% opacity, following the placed rotation (`render.cut_outline_d`). A flat side is a straight line. A tab bulges outward and a blank inward, each a semicircle of radius 0.15 cell at the side midpoint. Andro and wild have no orientation, so they also bulge outward and each andro contact shows as a full circle. `cuts-report.txt` gives, per solution, the interior flat seams (contacts where both pieces show a flat side; the count equals `seam_counts`) and the straight runs of three or more consecutive seams on one grid line, with 0-based positions (`prototype.cut_stats`). The seams and runs are the grid tells the physical puzzle would show. Off by default: with the flag off, no cut files are written and every other output is unchanged. Example: `experiments/011-subjects/border-check/round2/run-standard-cuts/` (the round-2 standard-border solution, quarter rotation, 27x38) has 68 interior seams per board and one run of three (A, vertical, columns 15 and 16, rows 5 to 7); B and C have none.
 
 **Parameter ranges in class specs (`classes.py`).** A numeric layer parameter may be sampled per piece instead of fixed. `{"range": [lo, hi]}` works for any numeric parameter; a plain `[lo, hi]` pair works only where the primitive's default is a number (`scale`, `density`, `length`), so list-valued parameters such as `offset`, `kinds` and `radius` stay literal. The value is drawn uniformly (inclusive integers when both bounds are integers) from the piece seed mixed with the layer index and the parameter name, so it is fixed for a piece, identical on every call, and independent of the render size. `ClassSpec.validate()` requires numeric bounds with `lo < hi` and checks each layer at both ends. Mask parameters cannot be ranges. The pipeline's three scale variants per motif (`gen_classes_v12.py`) could be replaced by one `{"range": [0.8, 1.2]}` class, but the variants also scale offsets and margins, so that change is not made here.
 
@@ -209,6 +211,7 @@ metapuzzle solve [--cols N] [--rows N] [--sizes CxR,CxR,CxR] [--border standard|
                  [--mating-weight W] [--max-shared-fraction F] [--out sol.json]
 metapuzzle prototype --scenes FILE --classes SPEC.json --out DIR [--sizes ...] [--rotation ...]
                  [--seed N] [--iters N] [--cell N] [--extra-flat N] [--strict-border] [--mating-weight W] [--max-shared-fraction F]
+                 [--cut-overlay]
 metapuzzle report sol.json [--json]
 ```
 Defaults 10x8 standard none seed 0. `--sizes` gives per-solution sizes (cols x rows; one entry is repeated three times; piece counts must be equal). With `--scenes`, sizes come from the maps (a conflicting `--sizes` is an error). Exit code 2 when the result is not valid. `metapuzzle connectors` exits 2 when some contacts do not mate.

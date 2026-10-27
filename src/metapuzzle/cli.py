@@ -98,6 +98,8 @@ def build_parser() -> argparse.ArgumentParser:
     _mating_args(pt)
     pt.add_argument("--cell", type=int, default=48, help="cell size in pixels")
     pt.add_argument("--labels", action="store_true", help="print piece ids in the cells")
+    pt.add_argument("--cut-overlay", action="store_true",
+                    help="also write solution-{A,B,C}-cuts.png (every cell outline on top) and cuts-report.txt")
     gt = sub.add_parser(
         "gen-transitions",
         help="add transition classes (base texture + masked mass texture) for field pairs",
@@ -229,6 +231,7 @@ def _cmd_prototype(a: argparse.Namespace) -> int:
         a.scenes, a.classes, a.out, sizes=a.sizes, border=a.border, rotation=a.rotation,
         seed=a.seed, iters=a.iters, cell=a.cell, labels=a.labels, extra_flat=a.extra_flat,
         mating_weight=a.mating_weight, max_shared_fraction=a.max_shared_fraction, strict_border=a.strict_border,
+        cut_overlay=a.cut_overlay,
     )
     s = res["shared"]
     print(
