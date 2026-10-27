@@ -1,8 +1,9 @@
 """Scenes for v5 from roles-v5.txt, with the common histogram given instead of searched.
 
-`metapuzzle roles-to-scenes` searches a common histogram with roles._hall, which enumerates every subset
-of the roles present in a container. The v5 interior has about 28 distinct roles per map (13 fixed edge
-classes plus the slot roles), so the enumeration does not finish (killed after 15 min). Here the
+`metapuzzle roles-to-scenes` searches a common histogram, testing each candidate with roles._shortfall, a
+max-flow check of Hall's condition that reports the violated roles and the shortfall. It replaced an
+enumeration of every subset of the roles in a container, which did not finish on v5 (about 28 distinct
+roles per map in the interior, killed after 15 min). Here the
 histogram is the spec's target_counts, which every map must hit, so the skeleton is known: each
 container holds the frame classes (plain, equal in all maps) or, for the interior, the target minus the
 frame. Placement (max-flow per container) and the overlap annealing are the library's own

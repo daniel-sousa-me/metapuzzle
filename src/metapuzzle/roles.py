@@ -3,7 +3,7 @@
 A roles file has the scene file layout (three grids, blank line between them, '#' comments),
 with role names as tokens. A token may carry an orientation suffix (``dark_edge_m@90``); the suffix
 is copied unchanged to that cell's scene token (``DM@90``) in every map, and plain roles emit none.
-Suffixes need rotation "quarter" and interior cells (``validate_scenes`` checks both). A roles spec (JSON) lists, per role, the classes it may take and
+A nonzero suffix needs rotation "quarter", on any cell, frame cells included (``validate_scenes`` checks it; see docs/engine-spec.md). ``@*`` frees that one cell of a class whose other cells are forced. A roles spec (JSON) lists, per role, the classes it may take and
 optional preference weights, plus optional ``fixed`` counts (a required total per class) and
 ``target_counts`` (the whole histogram). Without target_counts the solver chooses a histogram
 that all three maps can realise.
@@ -17,8 +17,8 @@ Method. Cells are grouped as the border rule sees them: one group per side and p
 (rotation none) or one edge pool and one corner pool (quarter), plus the interior. A skeleton
 gives every group a class multiset, the same in all three maps, so the skeleton fixes the
 histogram and the border counts. It is searched first by simulated annealing on a violation
-count: for each map and group, the roles must fit the histogram (Hall's condition, tested by max
-flow, so the cost is polynomial in the number of roles), and the fixed or target counts must hold. Max-flow then gives each map a class map for the
+count: for each map and group, the roles must fit the histogram. This is Hall's condition, tested by
+max flow (``_shortfall``), which replaced the earlier enumeration of every subset of roles; the cost is polynomial in the number of roles. The fixed or target counts must also hold. Max-flow then gives each map a class map for the
 skeleton, and a second annealing swaps classes inside a group, which keeps the groups and the
 histogram exact. The objective is the same-position overlap summed over all pairs, plus a
 weighted preference term (weights) and an optional penalty for identical neighbours.
