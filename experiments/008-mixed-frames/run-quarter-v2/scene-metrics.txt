@@ -1,0 +1,27 @@
+maps (cols x rows): A 20x24, B 30x16, C 40x12
+class histograms:
+  A: T2=96 T3=96 T1=86 T4=86 T0=58 T5=58
+  B: T2=96 T3=96 T1=86 T4=86 T0=58 T5=58
+  C: T2=96 T3=96 T1=86 T4=86 T0=58 T5=58
+largest same-class blob per class:
+  A: T1=62 T2=56 T0=14 T4=11 T3=8 T5=7
+  B: T0=37 T5=26 T1=24 T3=17 T2=15 T4=11
+  C: T5=19 T4=16 T3=15 T1=13 T2=11 T0=5
+same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+pairs (window reuse shown as plain/rotated, window = rows x cols):
+  A-B: same position n/a (shapes differ)
+    same position excl. dominant T2 (covers 20.0% of cells, not gated): n/a (shapes differ)
+    weighted overlap: n/a (shapes differ)
+    window reuse: 1x2 0.96/1.00  2x1 1.00/1.00  2x2 0.61/0.84  3x3 0.02/0.02
+    transferable blob: 15 cells (3.1% of A)
+  A-C: same position n/a (shapes differ)
+    same position excl. dominant T2 (covers 20.0% of cells, not gated): n/a (shapes differ)
+    weighted overlap: n/a (shapes differ)
+    window reuse: 1x2 0.93/0.98  2x1 0.95/0.99  2x2 0.72/0.83  3x3 0.00/0.01
+    transferable blob: 11 cells (2.3% of A)
+  B-C: same position n/a (shapes differ)
+    same position excl. dominant T2 (covers 20.0% of cells, not gated): n/a (shapes differ)
+    weighted overlap: n/a (shapes differ)
+    window reuse: 1x2 0.95/1.00  2x1 0.93/0.96  2x2 0.74/0.81  3x3 0.03/0.05
+    transferable blob: 18 cells (3.8% of B)
+scene gates: FAIL (A-B 2x2 window reuse 60.6% ≥ 30%; A-C 2x2 window reuse 71.6% ≥ 30%; B-C 2x2 window reuse 73.6% ≥ 30%)

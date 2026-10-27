@@ -19,7 +19,7 @@ from pathlib import Path
 
 from .board import PROFILES, SIDE_DELTA, Board, mates, square_board
 from .metrics import PAIR_INDEX, PAIR_NAMES, cluster_penalty, corner_order, shared_adjacencies
-from .pieces import Piece, piece_from_dict, piece_to_dict, rotations_for_piece
+from .pieces import Piece, build_valid_layout, group_placements, piece_from_dict, piece_to_dict, rotations_for_piece
 from .scene import ClassMap, validate_scenes
 
 DEFAULT_ITERS = 300_000
@@ -267,6 +267,46 @@ def solve(
                 frozen[k].add(s)
             used += 1
 
+    # ---- seam-aware mode: valid layouts by construction ----------------------------------
+    # Needed when some picture has fewer frame slots than there are flat-sided pieces: the surplus
+    # sits inside as seams (two flat sides touching). Every non-flat side must then mate with every
+    # other non-flat side, so that validity hangs on the flat sides alone.
+    strict_layouts = None
+    n_flat = sum(FLAT in row for row in sc)
+    if (
+        bl[0].border == "standard"
+        and not distinct_corner_orders
+        and any(n_flat > sum(1 for s in b.slots if s.boundary_sides) for b in bl)
+    ):
+        flat_free = all(
+            mate_m[tcodes[a][(d - qa) & 3]][tcodes[b][(d + 2 - qb) & 3]]
+            for a in range(nt)
+            for b in range(nt)
+            for qa in [r // 90 for r in type_piece[a].allowed_rotations]
+            for qb in [r // 90 for r in type_piece[b].allowed_rotations]
+            for d in range(4)
+            if FLAT not in (tcodes[a][(d - qa) & 3], tcodes[b][(d + 2 - qb) & 3])
+        )
+        cls_at = [[class_maps[k].cls[s.y][s.x] for s in b.slots] if class_maps else None for k, b in enumerate(bl)]
+        forced_at = [[class_maps[k].rot[s.y][s.x] or None for s in b.slots] if class_maps else None for k, b in enumerate(bl)]
+        def layout_mismatch(k: int, slot_of: list, rot_of: list) -> int:
+            at_ = [-1] * n
+            for i_, s_ in enumerate(slot_of):
+                at_[s_] = i_
+            bad_ = 0
+            for s_ in range(n):
+                for d_, t_ in nbd[k][s_]:
+                    if s_ < t_:
+                        a_, b_ = at_[s_], at_[t_]
+                        if not mate_m[sc[a_][(d_ - rot_of[a_] // 90) & 3]][sc[b_][(d_ + 2 - rot_of[b_] // 90) & 3]]:
+                            bad_ += 1
+            return bad_
+
+        if flat_free:
+            built = [build_valid_layout(b, pieces, cls_at[k], forced_at[k], rng) for k, b in enumerate(bl)]
+            if all(built) and not any(layout_mismatch(k, built[k][0], built[k][1]) for k in range(3)):
+                strict_layouts = built
+
     # ---- initial placement -------------------------------------------------------------
     def init_state(k: int):
         for _attempt in range(40):
@@ -311,7 +351,14 @@ def solve(
 
     at, pos, rot = [], [], []
     for k in range(3):
-        a_, p_, r_ = init_state(k)
+        if strict_layouts:
+            slot_of, rot_of, _ = strict_layouts[k]
+            a_ = [-1] * n
+            for i_, s_ in enumerate(slot_of):
+                a_[s_] = i_
+            a_, p_, r_ = a_, list(slot_of), [d_ // 90 for d_ in rot_of]
+        else:
+            a_, p_, r_ = init_state(k)
         at.append(a_)
         pos.append(p_)
         rot.append(r_)
@@ -421,6 +468,172 @@ def solve(
                 if dx * dx + dy * dy == 1:
                     out.append((pi, x, r_) if x < r_ else (pi, r_, x))
 
+    if strict_layouts:
+        # Moves keep every flat side against a flat side. Units: a single piece on a slot it fits
+        # exactly (flat sides = the slot's boundary sides), or a seam group (root + leaves).
+        # Single moves swap two singles; group moves put a group on any of its placements and send
+        # the displaced pieces to the vacated slots (plain singles one by one, or a whole group).
+        fl = [[frozenset(d for d in range(4) if tcodes[t][(d - q) & 3] == FLAT) for q in range(4)] for t in range(nt)]
+        sing_memo: dict = {}
+
+        def sing(k: int, t: int, sl: int) -> tuple:
+            key = (t, sl, k)
+            r = sing_memo.get(key)
+            if r is None:
+                tp = type_piece[t]
+                bs = frozenset(bl[k].slots[sl].boundary_sides)
+                cc_ = class_maps[k].cls[Y[k][sl]][X[k][sl]] if class_maps else None
+                fo = (class_maps[k].rot[Y[k][sl]][X[k][sl]] or None) if class_maps else None
+                r = tuple(
+                    q for q in sorted(x // 90 for x in tp.allowed_rotations)
+                    if (cc_ is None or cc_ == tp.cls) and (fo is None or fo == q * 90) and fl[t][q] == bs
+                )
+                sing_memo[key] = r
+            return r
+
+        cx = [[[s for s in range(n) if sing(k, t, s)] for t in range(nt)] for k in range(3)]
+        gid = [[-1] * n for _ in range(3)]
+        groups = []
+        for k in range(3):
+            groups.append(strict_layouts[k][2])
+            for g_, mem in enumerate(groups[k]):
+                for i_ in mem:
+                    gid[k][i_] = g_
+        gopt: dict = {}  # (k, type signature) -> (arrangements, index by slot set)
+
+        def arrangements(k: int, mem: list):
+            sig = (k, tuple(ptype[i_] for i_ in mem))
+            if sig not in gopt:
+                cm = class_maps[k] if class_maps else None
+                cls_ = [cm.cls[y][x] for y, x in zip(Y[k], X[k])] if cm else None
+                for_ = [cm.rot[y][x] or None for y, x in zip(Y[k], X[k])] if cm else None
+                arr = [tuple((s_, r_ // 90) for s_, r_ in pl) for pl in
+                       group_placements(bl[k], [pieces[i_] for i_ in mem], cls_, for_)]
+                idx: dict = {}
+                for a_ in arr:
+                    idx.setdefault(frozenset(s_ for s_, _ in a_), []).append(a_)
+                gopt[sig] = (arr, idx)
+            return gopt[sig]
+
+        glist = [[g_ for g_ in range(len(groups[k]))] for k in range(3)]
+        while it < iters and not done:
+            it += 1
+            if not (it & 127):
+                T = t_hi * ratio ** (it / iters)
+            if prim and S and rand() < 0.4:  # focus on pieces in shared adjacencies
+                ne = [i for i in range(3) if S[i]]
+                pi = ne[randrange(len(ne))]
+                e = tuple(S[pi])[randrange(len(S[pi]))]
+                p = e[randrange(2)]
+                k = PAIR_INDEX[pi][randrange(2)]
+            else:
+                k = randrange(3)
+                p = at[k][randrange(n)]
+            atk, posk, rk = at[k], pos[k], rot[k]
+            g_ = gid[k][p]
+            moves = []
+            if g_ < 0:
+                s = posk[p]
+                cl = cx[k][ptype[p]]
+                t = cl[randrange(len(cl))]
+                if t == s:
+                    continue
+                q = atk[t]
+                if gid[k][q] >= 0:
+                    continue
+                oq = sing(k, ptype[q], s)
+                if not oq:
+                    continue
+                op = sing(k, ptype[p], t)
+                moves = [(p, t, rk[p] if rk[p] in op else op[randrange(len(op))]),
+                         (q, s, rk[q] if rk[q] in oq else oq[randrange(len(oq))])]
+            else:
+                mem = groups[k][g_]
+                arr, idx = arrangements(k, mem)
+                if not arr:
+                    continue
+                new = arr[randrange(len(arr))]
+                old_slots = [posk[i_] for i_ in mem]
+                if all(a_[0] == o_ and a_[1] == rk[i_] for a_, o_, i_ in zip(new, old_slots, mem)):
+                    continue
+                moves = [(i_, a_[0], a_[1]) for i_, a_ in zip(mem, new)]
+                newset, oldset = {a_[0] for a_ in new}, set(old_slots)
+                disp = newset - oldset
+                if disp:
+                    vac = list(oldset - newset)
+                    occ = [atk[s_] for s_ in disp]
+                    gids = {gid[k][o_] for o_ in occ}
+                    if gids == {-1}:
+                        randperm = vac[:]
+                        for j_ in range(len(randperm) - 1, 0, -1):
+                            r_ = randrange(j_ + 1)
+                            randperm[j_], randperm[r_] = randperm[r_], randperm[j_]
+                        okm = True
+                        for o_, vs in zip(occ, randperm):
+                            oo = sing(k, ptype[o_], vs)
+                            if not oo:
+                                okm = False
+                                break
+                            moves.append((o_, vs, rk[o_] if rk[o_] in oo else oo[randrange(len(oo))]))
+                        if not okm:
+                            continue
+                    elif len(gids) == 1 and -1 not in gids and disp == newset:
+                        g2 = next(iter(gids))
+                        mem2 = groups[k][g2]
+                        if g2 == g_ or {posk[i_] for i_ in mem2} != newset or len(mem2) != len(mem):
+                            continue
+                        arr2, idx2 = arrangements(k, mem2)
+                        back = idx2.get(frozenset(oldset))
+                        if not back:
+                            continue
+                        moves += [(i_, a_[0], a_[1]) for i_, a_ in zip(mem2, back[randrange(len(back))])]
+                    else:
+                        continue
+            # energy change: edges incident to the moved pieces before and after
+            newat = {ns_: p_ for p_, ns_, _ in moves}
+            old_inc, new_inc = set(), set()
+            for p_, ns_, _ in moves:
+                for t_ in nbrs[k][posk[p_]]:
+                    a_ = atk[t_]
+                    old_inc.add((p_, a_) if p_ < a_ else (a_, p_))
+                for t_ in nbrs[k][ns_]:
+                    a_ = newat.get(t_, atk[t_])
+                    new_inc.add((p_, a_) if p_ < a_ else (a_, p_))
+            removed, added = old_inc - new_inc, new_inc - old_inc
+            dprim = 0
+            dclu = 0
+            changes = []
+            for l_, pi in oth[k]:
+                El = E_sol[l_]
+                rem_pi = [e for e in removed if e in El]
+                add_pi = [e for e in added if e in El]
+                if rem_pi or add_pi:
+                    ns = set(S[pi])
+                    ns.difference_update(rem_pi)
+                    ns.update(add_pi)
+                    c_ = _components_cost(ns)
+                    changes.append((pi, ns, c_))
+                    dprim += len(add_pi) - len(rem_pi)
+                    dclu += c_ - cc[pi]
+            dE = dprim + cluster_weight * dclu
+            if dE <= 0 or rand() < exp(-dE / T):
+                for p_, ns_, nq in moves:
+                    atk[ns_] = p_
+                    posk[p_] = ns_
+                    rk[p_] = nq
+                E_sol[k].difference_update(removed)
+                E_sol[k].update(added)
+                for pi, ns, c_ in changes:
+                    clu += c_ - cc[pi]
+                    cc[pi] = c_
+                    S[pi] = ns
+                prim += dprim
+                if prim == 0 and clu == 0:
+                    record()
+                    done = True
+                elif best_valid is None or prim + cluster_weight * clu < best_valid[0]:
+                    record()
+        done = True
     while it < iters and not done:
         it += 1
         if not (it & 127):

@@ -80,6 +80,8 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--rotation", choices=["none", "quarter"], default="none")
     pt.add_argument("--seed", type=int, default=0)
     pt.add_argument("--iters", type=int, default=None)
+    pt.add_argument("--extra-flat", type=int, default=0, metavar="N",
+                    help="flat-sided pieces beyond those the frames need; the surplus sits inside as seams")
     pt.add_argument("--cell", type=int, default=48, help="cell size in pixels")
     pt.add_argument("--labels", action="store_true", help="print piece ids in the cells")
     gt = sub.add_parser(
@@ -206,7 +208,7 @@ def _cmd_prototype(a: argparse.Namespace) -> int:
 
     res = run_prototype(
         a.scenes, a.classes, a.out, sizes=a.sizes, border=a.border, rotation=a.rotation,
-        seed=a.seed, iters=a.iters, cell=a.cell, labels=a.labels,
+        seed=a.seed, iters=a.iters, cell=a.cell, labels=a.labels, extra_flat=a.extra_flat,
     )
     s = res["shared"]
     print(

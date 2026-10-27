@@ -1,12 +1,12 @@
 """Variant (ii): rotation none with extra flat-sided pieces, via run_prototype.
 
-`metapuzzle prototype` has no --extra-flat option (only `solve` does, and it takes no class
-spec). run_prototype calls pieces_from_scenes without extra_flat_pieces, so this script wraps
-pieces_from_scenes with functools.partial to pass the count, then calls run_prototype unchanged.
+Round 1 had to wrap pieces_from_scenes because `metapuzzle prototype` had no --extra-flat option.
+It has one now, so this script just calls run_prototype(extra_flat=EXTRA); the same run is
+`metapuzzle prototype --scenes scenes.txt --classes classes.json --out OUT --rotation none
+--extra-flat EXTRA --cell 24`.
 Usage: python run_flat.py EXTRA OUT_DIR [--cell N] [--iters N]
 """
 import argparse
-import functools
 import sys
 from pathlib import Path
 
@@ -23,9 +23,8 @@ def main() -> int:
     ap.add_argument("--cell", type=int, default=24)
     ap.add_argument("--iters", type=int, default=None)
     a = ap.parse_args()
-    P.pieces_from_scenes = functools.partial(P.pieces_from_scenes, extra_flat_pieces=a.extra)
-    res = P.run_prototype(HERE / "scenes.txt", HERE / "classes.json", a.out,
-                          border="standard", rotation="none", cell=a.cell, iters=a.iters)
+    res = P.run_prototype(HERE / "scenes.txt", HERE / "classes.json", a.out, border="standard",
+                          rotation="none", cell=a.cell, iters=a.iters, extra_flat=a.extra)
     s = res["shared"]
     print(f"extra={a.extra} shared AB/AC/BC={s['AB']}/{s['AC']}/{s['BC']} valid={res['valid']} "
           f"violations={len(res['violations'])} out={res['out_dir']}")

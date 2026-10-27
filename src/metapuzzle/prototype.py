@@ -74,6 +74,26 @@ def _check_cells_fit(maps, boards, pieces: list[Piece]) -> None:
                 )
 
 
+def seam_counts(sol) -> list[dict]:
+    """Per board: flat-flat contacts (seams) inside the picture and flat-sided pieces off the frame."""
+    by_id = {p.piece_id: p for p in sol.pieces}
+    out = []
+    for pl, b in zip(sol.placements, sol.boards):
+        at = {s: pid for pid, (s, _) in pl.items()}
+        seams = 0
+        for sl in b.slots:
+            for face, (x, y) in ((1, (sl.x + 1, sl.y)), (2, (sl.x, sl.y + 1))):  # E and S: each contact once
+                if x >= b.cols or y >= b.rows:
+                    continue
+                a, c = at[sl.id], at[b.slot_at(x, y)]
+                if (by_id[a].sides[(face - pl[a][1] // 90) % 4] == "flat"
+                        and by_id[c].sides[(face + 2 - pl[c][1] // 90) % 4] == "flat"):
+                    seams += 1
+        inside = sum(1 for pid, (s, _) in pl.items() if "flat" in by_id[pid].sides and not b.slots[s].boundary_sides)
+        out.append({"seams": seams, "flat_pieces_inside": inside})
+    return out
+
+
 def _triptych(paths: Sequence[Path], dest: Path) -> Path:
     """Side by side, each image at most TRIPTYCH_MAX_HEIGHT tall, TRIPTYCH_GAP apart, white."""
     images = []
@@ -144,12 +164,17 @@ def run_prototype(
     cell: int = 48,
     grid: str = "none",
     labels: bool = False,
+    extra_flat: int = 0,
 ) -> dict:
     """Solve the three class maps and write the prototype outputs into `out_dir`.
 
     The class maps set each solution's board size. `sizes` (COLSxROWS,COLSxROWS,COLSxROWS or
     a sequence of pairs) is optional and must equal the map sizes. Piece rotations come from
     the class spec: pinned to 0 in "none" mode, the spec's allowed rotations in "quarter" mode.
+
+    Boards of different shapes have different frames, so the border inventory covers the largest
+    frame and the surplus flat-sided pieces sit inside the smaller pictures as seams (two flat
+    sides touching). `extra_flat` adds that many more flat-sided pieces beyond the automatic ones.
 
     Returns a dict with `valid`, `violations`, `shared` (per pair), `files` (name -> path) and
     `out_dir`. Invalid solutions still write their outputs and return `valid: False`.
@@ -166,12 +191,13 @@ def run_prototype(
     spec = load_class_spec(classes_path)
 
     class_rotations = {cls: _allowed_rotations(spec, cls, rotation) for cls in maps[0].histogram()}
-    pieces = pieces_from_scenes(boards, maps, allowed_rotations=class_rotations)
+    pieces = pieces_from_scenes(boards, maps, extra_flat_pieces=extra_flat, allowed_rotations=class_rotations)
     _check_cells_fit(maps, boards, pieces)
     missing_classes = sorted(set(maps[0].histogram()) - set(spec.classes))
 
     sol = solve(boards, pieces, maps, seed=seed, iters=iters)
     errs = validate_solution(sol)
+    seams = seam_counts(sol)
     rep = report(sol)
 
     out = Path(out_dir)
@@ -212,12 +238,14 @@ def run_prototype(
         "sizes": ", ".join(f"{c}x{r}" for c, r in map_sizes),
         "border": border,
         "rotation": rotation,
+        "extra_flat": extra_flat,
         "seed": seed,
         "iters": sol.meta.get("iters"),
         "iters_used": sol.meta.get("iters_used"),
         "cell": cell,
         "grid": grid,
         "labels": labels,
+        "interior seams (A / B / C)": " / ".join(str(x["seams"]) for x in seams),
     }
     piece_failures, scene_failures = rep["gates"]["failures"], scene_rep["gates"]["failures"]
     gate_lines = [gate_line("piece", piece_failures), gate_line("scene", scene_failures)]
@@ -235,6 +263,7 @@ def run_prototype(
     )
 
     return {
+        "seams": seams,
         "out_dir": str(out),
         "params": params,
         "valid": not errs,

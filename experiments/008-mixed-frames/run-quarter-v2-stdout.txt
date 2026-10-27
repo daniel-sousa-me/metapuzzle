@@ -1,0 +1,3 @@
+sizes=20x24, 30x16, 40x12 shared AB/AC/BC=0/0/0 valid=True wrote 16 files to run-quarter-v2
+piece gates: PASS
+scene gates: FAIL (A-B 2x2 window reuse 60.6% ≥ 30%; A-C 2x2 window reuse 71.6% ≥ 30%; B-C 2x2 window reuse 73.6% ≥ 30%)

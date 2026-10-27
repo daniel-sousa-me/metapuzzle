@@ -1,4 +1,5 @@
 import json
+import random
 
 import pytest
 
@@ -174,6 +175,91 @@ def test_class_maps_mixed_frames():
     pieces = pieces_from_scenes(boards, maps)
     sol = solve(boards, pieces, maps, seed=0)
     assert sol.meta["valid"] and sum(sol.meta["shared"].values()) == 0
+
+
+# ---- class maps with mixed frames: flat-sided surplus pieces sit inside as seams --------------
+def concentric_map(cols, rows, counts, labels="fab"):
+    """Classes by depth from the border: the first counts[0] cells (outermost) get labels[0], and so on."""
+    cells = sorted((min(x, y, cols - 1 - x, rows - 1 - y), y, x) for y in range(rows) for x in range(cols))
+    grid = [[""] * cols for _ in range(rows)]
+    i = 0
+    for lab, n in zip(labels, counts):
+        for _, y, x in cells[i:i + n]:
+            grid[y][x] = lab
+        i += n
+    return ClassMap.from_tokens(grid)
+
+
+def tone_map(cols, rows, counts, seed):
+    """Light at the top, dark at the bottom, with noise; classes T5..T0 hold counts[0..] cells."""
+    rng = random.Random(seed)
+    cells = sorted((y / (rows - 1) + rng.uniform(-0.45, 0.45), x, y) for y in range(rows) for x in range(cols))
+    grid = [[""] * cols for _ in range(rows)]
+    i = 0
+    for c, n in enumerate(counts):
+        for _, x, y in cells[i:i + n]:
+            grid[y][x] = f"T{c}"
+        i += n
+    return ClassMap.from_tokens(grid)
+
+
+def interior_flat(sol):
+    """Per board: flat-sided pieces that sit off the frame."""
+    out = []
+    for pl, b in zip(sol.placements, sol.boards):
+        out.append(sum(1 for pid, (s, _) in pl.items() if "flat" in sol.pieces[pid].sides and not b.slots[s].boundary_sides))
+    return out
+
+
+@pytest.mark.parametrize("rotation", ["none", "quarter"])
+def test_mixed_frames_96_with_class_maps(rotation):
+    boards = [square_board(c, r, "standard", rotation) for c, r in MIXED]
+    maps = [concentric_map(c, r, [64, 16, 16]) for c, r in MIXED]
+    pieces = pieces_from_scenes(boards, maps)
+    perimeters = [sum(1 for s in b.slots if s.boundary_sides) for b in boards]
+    assert sum("flat" in p.sides for p in pieces) >= max(perimeters)
+    sol = solve(boards, pieces, maps, seed=0)
+    assert sol.meta["valid"] and validate_solution(sol) == []
+    assert sum(sol.meta["shared"].values()) <= 3
+    assert all(n > 0 for n in interior_flat(sol)[:2])  # the smaller frames hold seams
+    for k, pl in enumerate(sol.placements):  # classes follow the maps
+        for pid, (s, _) in pl.items():
+            sl = boards[k].slots[s]
+            assert sol.pieces[pid].cls == maps[k].cls[sl.y][sl.x]
+
+
+@pytest.mark.parametrize("rotation", ["none", "quarter"])
+def test_mixed_frames_class_maps_valid_before_annealing(rotation):
+    boards = [square_board(c, r, "standard", rotation) for c, r in MIXED]
+    maps = [concentric_map(c, r, [64, 16, 16]) for c, r in MIXED]
+    sol = solve(boards, pieces_from_scenes(boards, maps), maps, iters=0)
+    assert sol.meta["valid"] and validate_solution(sol) == []
+
+
+@pytest.mark.parametrize("rotation", ["none", "quarter"])
+def test_mixed_frames_480_with_class_maps(rotation):
+    sizes = [(20, 24), (30, 16), (40, 12)]
+    counts = [58, 86, 96, 96, 86, 58]
+    boards = [square_board(c, r, "standard", rotation) for c, r in sizes]
+    maps = [tone_map(c, r, counts, i) for i, (c, r) in enumerate(sizes)]
+    pieces = pieces_from_scenes(boards, maps)
+    sol = solve(boards, pieces, maps, seed=0)
+    assert sol.meta["valid"] and validate_solution(sol) == []
+    assert sol.meta["iters_used"] <= DEFAULT_ITERS
+    assert sum(sol.meta["shared"].values()) <= 6
+    assert min(interior_flat(sol)) > 0
+
+
+def test_extra_flat_pieces_with_class_maps_stay_valid():
+    sizes = [(8, 12), (12, 8), (16, 6)]
+    for rotation in ("none", "quarter"):
+        boards = [square_board(c, r, "standard", rotation) for c, r in sizes]
+        maps = [concentric_map(c, r, [64, 16, 16]) for c, r in sizes]
+        base = pieces_from_scenes(boards, maps)
+        more = pieces_from_scenes(boards, maps, extra_flat_pieces=6)
+        assert sum("flat" in p.sides for p in more) >= sum("flat" in p.sides for p in base) + 6
+        sol = solve(boards, more, maps, seed=1)
+        assert sol.meta["valid"] and validate_solution(sol) == []
 
 
 def test_json_roundtrip():

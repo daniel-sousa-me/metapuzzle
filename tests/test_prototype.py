@@ -5,7 +5,8 @@ from metapuzzle.classes import SAMPLE_SPEC_PATH
 from metapuzzle.cli import main
 from metapuzzle.optimize import Solution, validate_solution
 from metapuzzle.prototype import run_prototype
-from metapuzzle.scene import SceneError
+from metapuzzle.board import square_board
+from metapuzzle.scene import SceneError, load_scenes, pieces_from_scenes
 
 # Identical histograms (canopy 14, sea 3, sun 3) and identical border counts: the frame is all canopy.
 TINY_SCENES = """\
@@ -97,3 +98,43 @@ def test_cli_prototype(tmp_path, scenes, capsys):
     assert main(["prototype", "--scenes", str(scenes), "--classes", str(SAMPLE_SPEC_PATH),
                  "--out", str(tmp_path / "x"), "--sizes", "8x10"]) == 1
     assert "error" in capsys.readouterr().err
+
+
+def _mixed_scenes(path):
+    """Three concentric maps (canopy outside, then sea, then sun) in 6x8, 8x6 and 12x4 frames."""
+    blocks = []
+    for cols, rows in [(6, 8), (8, 6), (12, 4)]:
+        cells = sorted((min(x, y, cols - 1 - x, rows - 1 - y), y, x) for y in range(rows) for x in range(cols))
+        grid = [[""] * cols for _ in range(rows)]
+        for i, (_, y, x) in enumerate(cells):
+            grid[y][x] = "canopy" if i < 40 else "sea" if i < 44 else "sun"
+        blocks.append("\n".join(" ".join(r) for r in grid))
+    path.write_text("\n\n".join(blocks) + "\n")
+    return path
+
+
+@pytest.mark.parametrize("rotation", ["none", "quarter"])
+def test_mixed_frames_with_class_maps_are_valid(tmp_path, rotation):
+    scenes = _mixed_scenes(tmp_path / "mixed.txt")
+    res = run_prototype(scenes, SAMPLE_SPEC_PATH, tmp_path / "out", rotation=rotation, cell=12)
+    assert res["valid"] and res["violations"] == []
+    sol = Solution.load(res["files"]["solution.json"])
+    assert [(b.cols, b.rows) for b in sol.boards] == [(6, 8), (8, 6), (12, 4)]
+    assert validate_solution(sol) == []
+    assert all(x["flat_pieces_inside"] > 0 for x in res["seams"][:2])  # the smaller frames hold seams
+    assert "interior seams (A / B / C)" in (tmp_path / "out" / "summary.md").read_text()
+
+
+def test_extra_flat_option(tmp_path, capsys):
+    scenes = _mixed_scenes(tmp_path / "mixed.txt")
+    args = ["prototype", "--scenes", str(scenes), "--classes", str(SAMPLE_SPEC_PATH), "--out", str(tmp_path / "c"),
+            "--rotation", "quarter", "--extra-flat", "4", "--cell", "12", "--iters", "2000"]
+    assert main(args) == 0
+    assert "valid=True" in capsys.readouterr().out
+    sol = Solution.load(tmp_path / "c" / "solution.json")
+    assert validate_solution(sol) == []
+    assert "- extra_flat: 4" in (tmp_path / "c" / "summary.md").read_text()
+    flat = lambda pieces: sum("flat" in p.sides for p in pieces)  # noqa: E731
+    boards = [square_board(c, r, "standard", "quarter") for c, r in [(6, 8), (8, 6), (12, 4)]]
+    maps = load_scenes(scenes)
+    assert flat(sol.pieces) >= flat(pieces_from_scenes(boards, maps)) + 4
