@@ -170,16 +170,30 @@ def stipple(seed: int, size: float, palette: Sequence[str], *,
 
 def dabs(seed: int, size: float, palette: Sequence[str], *,
          count: float = 60.0, length: float = 0.10, width: float = 0.035,
-         shape: str = "mixed", background: bool = True) -> str:
-    """Short brush-like dabs at uniformly random angles.
+         shape: str = "mixed", background: bool = True,
+         angle: float | None = None, angle_jitter: float = 0.0) -> str:
+    """Short brush-like dabs at uniformly random angles, or at a common orientation.
 
     count: dabs per 100x100 units of cell area.
     length, width: nominal dab size as fractions of size (each varied 0.7-1.2x).
     shape: "rect" (rounded rectangle), "ellipse", or "mixed".
+    angle: None (default) for a random angle per dab. A number in degrees gives
+        every dab that angle, measured from the x axis, so 0 lays them horizontal.
+    angle_jitter: with ``angle``, each dab's angle is ``angle`` plus a uniform draw
+        from ``[-angle_jitter, angle_jitter]`` degrees. Needs ``angle``.
+    Positions, sizes, shapes and colours come from the same draws whatever the angle.
     """
     params = _key_args(locals())
     if shape not in ("rect", "ellipse", "mixed"):
         raise ValueError(f"shape must be 'rect', 'ellipse' or 'mixed', not {shape!r}")
+    if angle_jitter < 0.0:
+        raise ValueError("angle_jitter must be non-negative")
+    if angle is None and angle_jitter != 0.0:
+        raise ValueError("angle_jitter applies only when angle is given")
+    if angle is None:                       # keep the default key, so default output is unchanged
+        del params["angle"]
+    if angle_jitter == 0.0:
+        del params["angle_jitter"]
     base, marks = _split(palette)
     rng = random.Random(seed)
     pad = length * size
@@ -189,10 +203,14 @@ def dabs(seed: int, size: float, palette: Sequence[str], *,
         y = rng.uniform(-pad, size + pad)
         big = size * length * rng.uniform(0.7, 1.2)
         wide = min(size * width * rng.uniform(0.7, 1.2), big)
-        angle = rng.uniform(0.0, 360.0)
+        turn = rng.uniform(0.0, 360.0)      # drawn even when angle is fixed, so the stream is the same
+        if angle is None:
+            rot = turn
+        else:
+            rot = angle + (turn / 180.0 - 1.0) * angle_jitter   # turn/180 - 1 is uniform in [-1, 1)
         kind = shape if shape != "mixed" else rng.choice(("rect", "ellipse"))
         color = rng.choice(marks)
-        xf = f"translate({_f(x)} {_f(y)}) rotate({_f(angle)})"
+        xf = f"translate({_f(x)} {_f(y)}) rotate({_f(rot)})"
         if kind == "rect":
             parts.append(
                 f'<rect x="{_f(-big / 2)}" y="{_f(-wide / 2)}" width="{_f(big)}" '
@@ -743,7 +761,7 @@ def march_mask(seed: int, size: float, palette: Sequence[str] | None = None,
 
 
 MOTIF_KINDS = ("disc", "ring", "silhouette_bird", "leaf", "fish", "boat",
-               "window", "star", "drop", "hull", "fleck")
+               "window", "star", "drop", "hull", "fleck", "flower", "moon")
 _MOTIF_ROTATIONS = ("none", "any", "flip")
 _MOTIF_MARGIN = 0.08   # minimum gap between a motif and any cell edge, as a fraction of size
 
@@ -805,6 +823,23 @@ def _motif_unit(kind: str, fill: str, ink: str) -> str:
         d = "M0-1C0.35-0.45 0.7-0.1 0.7 0.3A0.7 0.7 0 0 1-0.7 0.3C-0.7-0.1-0.35-0.45 0-1Z"
         return (f'<path d="{d}" fill="{fill}"/>'
                 f'<ellipse cx="-0.3" cy="0.22" rx="0.11" ry="0.2" fill="{ink}" fill-opacity="0.8"/>')
+    if kind == "flower":
+        # Five radial elliptical petals, centred at radius 0.56 (outer tip at 0.94), and a
+        # centre disc in the base colour. The 24-degree gaps between petals read at 40 px.
+        petals = []
+        for k in range(5):
+            deg = -90.0 + k * 72.0
+            a = math.radians(deg)
+            x, y = 0.56 * math.cos(a), 0.56 * math.sin(a)
+            petals.append(f'<ellipse cx="{_f(x)}" cy="{_f(y)}" rx="0.38" ry="0.25" '
+                          f'transform="rotate({_f(deg)} {_f(x)} {_f(y)})" fill="{fill}"/>')
+        return "".join(petals) + f'<circle cx="0" cy="0" r="0.2" fill="{ink}"/>'
+    if kind == "moon":
+        # Crescent: the unit disc minus a disc of radius 0.95 centred 0.35 toward upper right.
+        # The two circles meet at P and Q (fixed constants below), so the path is two arcs.
+        # Outer arc P->Q is large and clockwise on screen; inner arc Q->P is small.
+        d = ("M0.8935 0.4490A1 1 0 1 1-0.4490-0.8935A0.95 0.95 0 0 0 0.8935 0.4490Z")
+        return f'<path d="{d}" fill="{fill}"/>'
     raise ValueError(f"kind must be one of {MOTIF_KINDS}, not {kind!r}")
 
 

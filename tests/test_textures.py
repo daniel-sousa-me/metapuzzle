@@ -299,6 +299,87 @@ def test_fleck_is_a_soft_blob():
     assert 'fill-opacity="0.92"' in frag and frag.count("<path") == 1
 
 
+# ------------------------------------------------------------------ dabs angle
+
+_ROTATE = re.compile(r"rotate\((-?[\d.]+)\)")
+_TRANSLATE = re.compile(r"translate\(([-\d.]+) ([-\d.]+)\) rotate")
+
+
+def test_dabs_angle_keeps_every_rotation_within_the_jitter_range():
+    for seed in range(5):
+        frag = tx.dabs(seed, 100.0, PALETTE, count=120, shape="ellipse",
+                       angle=0.0, angle_jitter=8.0)
+        rots = [float(v) for v in _ROTATE.findall(frag)]
+        assert len(rots) > 100
+        assert all(abs(r) <= 8.0 + 1e-3 for r in rots), seed
+        assert min(rots) < -4.0 and max(rots) > 4.0, seed   # the jitter is used, not zeroed
+
+
+def test_dabs_angle_without_jitter_sets_every_rotation_exactly():
+    frag = tx.dabs(3, 100.0, PALETTE, count=40, angle=90.0)
+    assert {float(v) for v in _ROTATE.findall(frag)} == {90.0}
+
+
+def test_dabs_angle_changes_only_the_orientation():
+    # Positions, sizes and colours come from the same draws whatever the angle.
+    random_angle = tx.dabs(4, 100.0, PALETTE, count=50, shape="ellipse")
+    fixed = tx.dabs(4, 100.0, PALETTE, count=50, shape="ellipse", angle=0.0, angle_jitter=8.0)
+    assert _TRANSLATE.findall(random_angle) == _TRANSLATE.findall(fixed)
+    sizes = re.compile(r'(rx|ry|fill)="([^"]+)"')
+    assert sizes.findall(random_angle) == sizes.findall(fixed)
+
+
+def test_dabs_default_angle_is_still_random():
+    rots = [float(v) for v in _ROTATE.findall(tx.dabs(5, 100.0, PALETTE, count=200))]
+    assert min(rots) < 45.0 and max(rots) > 315.0
+
+
+def test_dabs_angle_arguments_are_checked():
+    with pytest.raises(ValueError):
+        tx.dabs(1, 100.0, PALETTE, angle=0.0, angle_jitter=-1.0)
+    with pytest.raises(ValueError):
+        tx.dabs(1, 100.0, PALETTE, angle_jitter=5.0)
+
+
+# ------------------------------------------------------------------ flower and moon
+
+def _is_color(rgb, color: str, tol: int = 2) -> bool:
+    return max(abs(a - b) for a, b in zip(rgb, tx._hex_to_rgb(color))) <= tol
+
+
+def _unit_px(px, u: float, v: float, size: int = 100, radius_px: float = 25.0):
+    """Pixel at unit coordinates (u, v) from the centre, for a motif at scale 0.5 and jitter 0."""
+    return px[int(size / 2 + u * radius_px), int(size / 2 + v * radius_px)]
+
+
+def test_flower_has_a_base_coloured_centre_and_gaps_between_petals():
+    frag = tx.motif(1, 100.0, PALETTE, kind="flower", scale=0.5, jitter=0.0)
+    px = _render_cell(frag, 100).load()
+    assert _is_color(_unit_px(px, 0.0, 0.0), PALETTE[0])            # centre disc
+    assert _is_color(_unit_px(px, 0.0, -0.56), PALETTE[1])          # top petal
+    # Radius 0.7, midway between the top and upper-right petals: a gap.
+    assert _is_color(_unit_px(px, 0.7 * math.cos(math.radians(-54)),
+                              0.7 * math.sin(math.radians(-54))), PALETTE[0])
+
+
+def test_moon_is_a_crescent_with_its_hollow_toward_the_upper_right():
+    frag = tx.motif(1, 100.0, PALETTE, kind="moon", scale=0.5, jitter=0.0)
+    px = _render_cell(frag, 100).load()
+    assert _is_color(_unit_px(px, -0.566, 0.566), PALETTE[1])       # thick lower-left arm
+    assert _is_color(_unit_px(px, 0.424, -0.424), PALETTE[0])       # inside the cut-out disc
+    marks = sum(1 for x in range(100) for y in range(100) if _is_color(px[x, y], PALETTE[1]))
+    assert 0.15 < marks / (math.pi * 25.0 ** 2) < 0.30               # about 22% of the disc
+
+
+@pytest.mark.parametrize("kind", ["flower", "moon"])
+def test_flower_and_moon_render_deterministically_inside_the_margin(kind):
+    for seed in (1, 2, 3):
+        frag = tx.motif(seed, 100.0, PALETTE, kind=kind, scale=0.68, rotation="any")
+        assert tx.motif(seed, 100.0, PALETTE, kind=kind, scale=0.68, rotation="any") == frag
+        ET.fromstring(tx.cell_svg(frag, 100.0))
+        assert _dirty_pixels(frag, 100, EDGES) == [], (kind, seed)
+
+
 # ------------------------------------------------------------------ blotch inset
 
 INSET = 0.08

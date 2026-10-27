@@ -2,7 +2,7 @@
 
 Tiers D, M, L are copied from classes.json. New: S (navy chips on cream), W (M with
 cream lenses). Every ordered pair of D/M/L/W gets four march_mask transitions
-(s, c, i, p); the D/L pair gets two dots. Five motif classes sit on L.
+(s, c, i, p); the D/L pair gets two dots. Six motif classes sit on L.
 
 The transition convention matches gallery/march-demo.py: the own tier is the base
 (background included), the neighbour tier is the mass, clipped by a named march_mask.
@@ -39,16 +39,22 @@ PATTERNS = {"s": "straight", "c": "corner", "i": "corner_in", "p": "cap"}
 
 # Tuned by measured alpha coverage over 8 seeds (see measure_coverage).
 S_CHIPS = {"kinds": ["leaf", "blob"], "count": 200, "scale": 0.06}        # ~55%
-W_LENSES = {"shape": "ellipse", "count": 34, "length": 0.25, "width": 0.06}  # ~15%
+# Lenses lie horizontal: angle 0, each within 8 degrees.
+W_LENSES = {"shape": "ellipse", "count": 34, "length": 0.25, "width": 0.06,
+            "angle": 0.0, "angle_jitter": 8.0}                                # ~15%
 
-# kind, scale, colour for each motif class on L. "star" is the closest kind to a flower.
+# kind, scale, colour for each motif class on L.
 MOTIFS = {
     "SUN": ("disc", 0.6, "rust"),
-    "FLO": ("star", 0.45, "rust"),
-    "FLB": ("star", 0.45, "pale_blue"),
+    "FLO": ("flower", 0.45, "rust"),
+    "FLB": ("flower", 0.45, "slate"),
     "CLD": ("fleck", 0.5, "pale_blue"),
     "LEF": ("leaf", 0.45, "olive"),
+    "MOON": ("moon", 0.6, "cream"),
 }
+# Motifs drawn with a thin outline: a same-shape layer in this colour, a little larger,
+# goes under the fill. Both layers use jitter 0, so their centres match.
+OUTLINED = {"MOON": ("indigo", 0.08)}
 
 
 def _cls(layers: list, masks: dict | None = None) -> dict:
@@ -101,17 +107,30 @@ def build(src: dict) -> dict:
         classes[f"{nbr}{own}d"] = _cls(copy.deepcopy(tiers[nbr]) + dot_layers,
                                        masks={"dot": _march("dot")})
 
+    def motif_layer(kind: str, scale: float, color: str, jitter: float | None = None) -> dict:
+        # palette[2] is the halo colour; the motif checks it exists even with no halo.
+        params = {"kind": kind, "scale": scale}
+        if jitter is not None:
+            params["jitter"] = jitter
+        return {"primitive": "motif", "palette": ["cream", color, "cream"],
+                "background": False, "params": params}
+
     for name, (kind, scale, color) in MOTIFS.items():
-        classes[name] = _cls(copy.deepcopy(tiers["L"]) + [
-            # palette[2] is the halo colour; the motif checks it exists even with no halo.
-            {"primitive": "motif", "palette": ["cream", color, "cream"], "background": False,
-             "params": {"kind": kind, "scale": scale}}])
+        layers = copy.deepcopy(tiers["L"])
+        if name in OUTLINED:
+            outline, grow = OUTLINED[name]
+            layers.append(motif_layer(kind, round(scale + grow, 3), outline, jitter=0.0))
+            layers.append(motif_layer(kind, scale, color, jitter=0.0))
+        else:
+            layers.append(motif_layer(kind, scale, color))
+        classes[name] = _cls(layers)
 
     return {
         "_note": ("v4 (005). Plain D/M/L from v3; S = navy chips on cream; W = M plus "
                   "cream lenses. Transitions <own><nbr><s|c|i|p>: own base, nbr mass under "
                   "a march_mask named 'edge'; canonical orientation puts nbr on top. Dots "
-                  "<nbr><own>d for the D/L pair. Motifs SUN FLO FLB CLD LEF sit on L."),
+                  "<nbr><own>d for the D/L pair. Motifs SUN FLO FLB CLD LEF MOON sit on L; "
+                  "MOON has an indigo outline."),
         "ref_size": src["ref_size"],
         "palette": copy.deepcopy(src["palette"]),
         "classes": classes,

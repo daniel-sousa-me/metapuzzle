@@ -1,5 +1,5 @@
 {
-  "_note": "v4 (005). Plain D/M/L from v3; S = navy chips on cream; W = M plus cream lenses. Transitions <own><nbr><s|c|i|p>: own base, nbr mass under a march_mask named 'edge'; canonical orientation puts nbr on top. Dots <nbr><own>d for the D/L pair. Motifs SUN FLO FLB CLD LEF sit on L.",
+  "_note": "v4 (005). Plain D/M/L from v3; S = navy chips on cream; W = M plus cream lenses. Transitions <own><nbr><s|c|i|p>: own base, nbr mass under a march_mask named 'edge'; canonical orientation puts nbr on top. Dots <nbr><own>d for the D/L pair. Motifs SUN FLO FLB CLD LEF MOON sit on L; MOON has an indigo outline.",
   "ref_size": 100,
   "palette": {
     "indigo": "#2b3262",
@@ -164,7 +164,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         }
       ],
@@ -725,7 +727,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -801,7 +805,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -877,7 +883,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -953,7 +961,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -1525,7 +1535,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -1601,7 +1613,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -1677,7 +1691,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -1753,7 +1769,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -2325,7 +2343,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -2401,7 +2421,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -2477,7 +2499,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -2553,7 +2577,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           },
           "mask": "edge"
         }
@@ -2608,7 +2634,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -2683,7 +2711,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -2758,7 +2788,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -2833,7 +2865,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -2908,7 +2942,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -2983,7 +3019,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -3058,7 +3096,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -3133,7 +3173,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -3208,7 +3250,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -3283,7 +3327,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -3358,7 +3404,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -3433,7 +3481,9 @@
             "shape": "ellipse",
             "count": 34,
             "length": 0.25,
-            "width": 0.06
+            "width": 0.06,
+            "angle": 0.0,
+            "angle_jitter": 8.0
           }
         },
         {
@@ -3675,7 +3725,7 @@
           ],
           "background": false,
           "params": {
-            "kind": "star",
+            "kind": "flower",
             "scale": 0.45
           }
         }
@@ -3714,12 +3764,12 @@
           "primitive": "motif",
           "palette": [
             "cream",
-            "pale_blue",
+            "slate",
             "cream"
           ],
           "background": false,
           "params": {
-            "kind": "star",
+            "kind": "flower",
             "scale": 0.45
           }
         }
@@ -3809,6 +3859,65 @@
           "params": {
             "kind": "leaf",
             "scale": 0.45
+          }
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    "MOON": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "cream",
+            "sand",
+            "cream",
+            "pale_blue",
+            "sand",
+            "cream",
+            "pale_blue",
+            "cream"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "indigo",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "moon",
+            "scale": 0.68,
+            "jitter": 0.0
+          }
+        },
+        {
+          "primitive": "motif",
+          "palette": [
+            "cream",
+            "cream",
+            "cream"
+          ],
+          "background": false,
+          "params": {
+            "kind": "moon",
+            "scale": 0.6,
+            "jitter": 0.0
           }
         }
       ],

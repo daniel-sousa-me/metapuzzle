@@ -13,3 +13,6 @@
 - No motif is a flower; FLO and FLB use the five-point `star`.
 - CLD uses the `fleck` kind, not a blob.
 - Chips do not cross cell cuts; only the boundary joins.
+
+
+Update: dabs now accept an angle, so W lenses are horizontal; FLO/FLB use the new flower motif kind; a MOON crescent motif was added.
