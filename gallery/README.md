@@ -1,15 +1,15 @@
 # Prototype gallery
 
-**Current direction.** The working grammar is the hybrid tone-field: three tiers per cell, with every tier boundary inside a transition piece, and the boundaries drawn as marching tiles (ink mode shows them as black strokes). The working grid is 27x38 (1026 pieces), adopted in `docs/DECISIONS.md`. The subject set "Field, Wood and Water" (`experiments/011-subjects`) is a hare at dawn, an owl at dusk and a swan at midnight, drawn in value inversion. Uniqueness comes from the artwork, not from connector algebra (`docs/DECISIONS.md`, last entries). The current best full render is 011 `27x38-v2/run-full` and the current best ink render is 011 `27x38-v2/run-ink`; their blind tests are pending.
+**Current direction.** The working grammar is the hybrid tone-field: three tiers per cell, with every tier boundary inside a transition piece, and the boundaries drawn as marching tiles (ink mode shows them as black strokes). The working grid is 27x38 (1026 pieces), adopted in `docs/DECISIONS.md`. The subject set "Field, Wood and Water" (`experiments/011-subjects`) is a hare at dawn, an owl at dusk and a swan at midnight, drawn in value inversion. Uniqueness comes from the artwork, not from connector algebra (`docs/DECISIONS.md`, last entries). The current best full render is 011 `27x38-v2/run-full` and the current best ink render is 011 `27x38-v2/run-ink`; their blind test is `experiments/011-subjects/blind-test-v2.md` (below). The v5 motif renders (`27x38-v2/run-ink-v5`, `run-full-v5`) were still being written at 10:10 UTC and are not evaluated.
 
-Visual index of the `experiments/` runs that produced a `triptych.png`. Figures come from each run's `summary.md` and the experiment README. Distinctiveness and grid scores come from the latest `blind-test-*.md` in the folder. A dash means not recorded. Folders 001, 003 and 007 have no triptych and are not listed. 003 also has no README.
+Visual index of the `experiments/` runs that produced a `triptych.png`. Figures come from each run's `summary.md` and the experiment README. Distinctiveness and grid scores come from the latest `blind-test-*.md` in the folder. A dash means not recorded. Folders 001, 003 and 007 have no triptych and are not listed. 003 has a README stub with its metrics only.
 
 ## At a glance
 
 | Experiment | Run | Size (cols x rows) | Rotation | Shared AB / AC / BC | Piece gates | Scene gates | Distinctiveness | Grid score (A / B / C) |
 |---|---|---|---|---|---|---|---|---|
-| 002 | run-none | 8x10 | none | 13 / 11 / 15 | FAIL\* | FAIL\* | - | - |
-| 002 | run-none-v2 | 8x10 | none | 10 / 13 / 14 | FAIL | FAIL | - | - |
+| 002 | run-none | 8x10 | none | 13 / 11 / 15 | FAIL\* | FAIL\* | 3 (blind test 1) | 1 / 4 / 3 |
+| 002 | run-none-v2 | 8x10 | none | 10 / 13 / 14 | FAIL | FAIL | - | 3 / 4 / - (review 2) |
 | 002 | run-quarter | 8x10 | quarter | 4 / 5 / 4 | PASS | FAIL | 2/5 | 3 / 4 / 3 |
 | 004 | run-none | 20x25 | none | 0 / 1 / 0 | PASS | FAIL | - | - |
 | 004 | run-quarter | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | 4/5 | 5 / 5 / 5 |
@@ -28,7 +28,7 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 005 | run-full-v6 (diagonal tiles) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 005 | run-ink-v6 (diagonal tiles, black contour) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 006 | run-none | 8x10 | none | 7 / 2 / 4 | PASS | PASS | - | - |
-| 006 | run-quarter | 8x10 | quarter | 1 / 0 / 0 | PASS | PASS | - | - |
+| 006 | run-quarter | 8x10 | quarter | 1 / 0 / 0 | PASS | PASS | 2 (blind test 1) | 3 / 4 / 5 |
 | 008 | run-quarter | 20x24 / 30x16 / 40x12 | quarter | 0 / 0 / 0 | PASS (invalid) | FAIL | not evaluated; runs invalid | not evaluated; runs invalid |
 | 008 | run-flat | 20x24 / 30x16 / 40x12 | none | 0 / 0 / 0 | PASS (invalid) | FAIL | not evaluated; runs invalid | not evaluated; runs invalid |
 | 008 | run-quarter-v2 (round 2, valid) | 20x24 / 30x16 / 40x12 | quarter | 0 / 0 / 0 | PASS | FAIL | not evaluated | not evaluated |
@@ -40,15 +40,21 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 | 011 | 27x38/run-ink-v2 (S-L transitions) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 011 | 27x38/run-full-v3 (surplus placement) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 011 | 27x38/run-ink-v3 (surplus placement) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
-| 011 | **27x38-v2/run-full** (current best full render) | 27x38 | quarter | 0 / 0 / 1 | PASS | FAIL | - | - |
-| 011 | **27x38-v2/run-ink** (current best ink render) | 27x38 | quarter | 0 / 0 / 1 | PASS | FAIL | - | - |
+| 011 | **27x38-v2/run-full** (current best full render) | 27x38 | quarter | 0 / 0 / 1 | PASS | FAIL | 4 (blind-test-v2) | 2 / 2 / 3 |
+| 011 | **27x38-v2/run-ink** (current best ink render) | 27x38 | quarter | 0 / 0 / 1 | PASS | FAIL | 4 (blind-test-v2) | - |
+| 011 | 27x38-v2/run-full-v4 (chip sub-classes) | 27x38 | quarter | 0 / 1 / 0 | PASS | FAIL (2x2 reuse 36.5 to 40.0%) | 2 (T9, `ambiguity-v4.md`) | - |
+| 011 | 27x38-v2/run-ink-v4 (chip sub-classes) | 27x38 | quarter | 0 / 1 / 0 | PASS | FAIL (as run-full-v4) | - | - |
+| 011 | 27x38-v2/run-full-v5 (motif classes; in progress at 10:10 UTC) | 27x38 | quarter | not yet recorded | not yet recorded | PASS (`scene-metrics.txt`) | - | - |
+| 011 | 27x38-v2/run-ink-v5 (motif classes; in progress at 10:10 UTC) | 27x38 | quarter | 0 / 1 / 1 | PASS | PASS (`summary.md`) | - | - |
+| 011 | border-check/run-standard-x20, x40, x80 (standard border, invalid) | 27x38 | quarter | not recorded (10 mismatched contacts each) | FAIL (invalid) | - | - | - |
 | 013 | g20x25 run-full / run-ink | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 013 | g25x30 run-full / run-ink | 25x30 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
-| 013 | g27x38 run-full / run-ink | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
+| 013 | g27x38 run-full / run-ink (placeholder subjects) | 27x38 | quarter | 0 / 0 / 0 | PASS | FAIL | 4 (run-full) | 3 / 2 / 2 |
+| 013 | port-check-g20x25 run-full / run-ink (port of 005 at 20x25) | 20x25 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 | 013 | g32x48 run-full / run-ink | 32x48 | quarter | 0 / 0 / 0 | PASS | FAIL | - | - |
 
 - Shared counts are piece-level adjacencies: pieces touching in both solutions of the pair.
-- Blind tests cover these runs: 002 `blind-test-2`, 004 `blind-test-1`, 005 `blind-test-1` (run-quarter), 005 `blind-test-2` (run-full-v5), 005 `blind-test-3` (run-full-v5eq2) and 005 `blind-test-ink-1` (run-ink-v5), and 011 `blind-test-full-1` and `blind-test-ink-1` (27x38/run-full and run-ink). All other runs, including the 005 v3b, v5eq, v6 and run-ink-v5eq2 renders, the 011 v2 and v3 renders, 27x38-v2 and every other 013 render, have no evaluation of their own.
+- Blind tests cover these runs: 002 `blind-test-1` (run-none) and `blind-test-2` (run-quarter), 006 `blind-test-1` (run-quarter), 013 `blind-test-g27x38` (run-full, placeholder subjects), 004 `blind-test-1`, 005 `blind-test-1` (run-quarter), 005 `blind-test-2` (run-full-v5), 005 `blind-test-3` (run-full-v5eq2) and 005 `blind-test-ink-1` (run-ink-v5), 011 `blind-test-full-1` and `blind-test-ink-1` (27x38/run-full and run-ink), and 011 `blind-test-v2` (27x38-v2 run-full and run-ink). T9 is in `ambiguity-and-grid-v2.md` (27x38-v2 run-full) and `ambiguity-v4.md` (run-full-v4). All other runs, including the 005 v3b, v5eq, v6 and run-ink-v5eq2 renders, the 011 v3 renders, the 27x38-v2 v4 and v5 renders, the border check and the port check, have no evaluation of their own.
 - 008 round 1 runs are invalid (see its section), so their piece and scene gates are indicative only. Round 2 runs are valid.
 - \* 002 run-none's `summary.md` has no Gates section. Its gate values come from the round 2 table in `experiments/002-direction-a/README.md`.
 
@@ -192,9 +198,9 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 
 ## 006: Direction B (Garden Terrazzo)
 
-**Goal:** no README.md in this folder. `NOTES.md` describes the Direction B class spec: 14 non-directional classes with four rotations, built from `docs/design/alt-b/02-piece-classes.md`.
+**Goal:** see `experiments/006-direction-b/README.md`. `NOTES.md` describes the Direction B class spec: 14 non-directional classes with four rotations, built from `docs/design/alt-b/02-piece-classes.md`.
 
-**Blind test:** none in this folder.
+**Blind test:** `blind-test-1.md` (run-quarter): distinctiveness 2/5, no subject named; tile grid A 3, B 4, C 5. **Grid visibility:** `grid-visibility-1.md`: A 3/5, C 5/5.
 
 ### run-none
 
@@ -250,7 +256,7 @@ Visual index of the `experiments/` runs that produced a `triptych.png`. Figures 
 
 ![011 prev-attempt run-quarter triptych](../experiments/011-subjects/prev-attempt/run-quarter/triptych.png)
 
-**Latest blind tests** (first 27x38 run, `blind-test-full-1.md` and `blind-test-ink-1.md`). Colour: distinctiveness 4/5, grid 3 / 3 / 3; the owl is recognized (4/5), the hare reads as a creature (2/5) and the swan is partly read (2/5). Ink: distinctiveness 5/5; hare ears 4/5, owl face 4/5, swan 2/5. No blind test covers 27x38-v2 yet.
+**Blind tests of the first 27x38 run** (`blind-test-full-1.md` and `blind-test-ink-1.md`). Colour: distinctiveness 4/5, grid 3 / 3 / 3; the owl is recognized (4/5), the hare reads as a creature (2/5) and the swan is partly read (2/5). Ink: distinctiveness 5/5; hare ears 4/5, owl face 4/5, swan 2/5. The 27x38-v2 test is `blind-test-v2.md`. Colour: hare 4/5 (recognized), owl read as a skull 4/5, swan 3/5; distinctiveness 4/5; grid 2 / 2 / 3. Ink: hare 2/5, owl face 4/5 (creature 2/5), swan 2/5; distinctiveness 4/5.
 
 Scene gates below are 2x2 window reuse for A-B / A-C / B-C (limit 30%). Left triptych full, right ink.
 
@@ -262,14 +268,22 @@ Scene gates below are 2x2 window reuse for A-B / A-C / B-C (limit 30%). Left tri
 
 **27x38-v2, all three animals redrawn natively.** The hare, owl and swan are drawn at 27x38 rather than resampled, with the W and S budgets matched. Shared 0/0/1 (one BC pair, cluster 2), piece gates PASS, scene gates FAIL (71.3 / 64.3 / 68.3%; transferable blob 10.3% and 11.5% of A for A-B and A-C). **Current best full render** (`run-full`) and **current best ink render** (`run-ink`). ![011 27x38-v2 full](../experiments/011-subjects/27x38-v2/run-full/triptych.png) ![011 27x38-v2 ink](../experiments/011-subjects/27x38-v2/run-ink/triptych.png)
 
+**27x38-v2 with chip sub-classes (pipeline v4).** `run-full-v4` and `run-ink-v4` each share one contact (AC; 0/1/0). Scene gates still fail, but 2x2 window reuse falls to 36.5 to 40.0% (from 64 to 71%). T9 is 2/5 (`ambiguity-v4.md`): about 70% of pieces still look interchangeable. ![011 27x38-v2 v4 full](../experiments/011-subjects/27x38-v2/run-full-v4/triptych.png) ![011 27x38-v2 v4 ink](../experiments/011-subjects/27x38-v2/run-ink-v4/triptych.png)
+
+**27x38-v2 with motif classes (pipeline v5), in progress.** At 10:10 UTC `run-ink-v5` is written: shared 0/1/1, piece gates PASS, scene gates PASS (larger-of 2x2 reuse 17 to 22%, same position 1 to 3%). `run-full-v5` has a triptych, but its summary is still being written. Neither has a blind test or T9 yet. ![011 27x38-v2 v5 full](../experiments/011-subjects/27x38-v2/run-full-v5/triptych.png) ![011 27x38-v2 v5 ink](../experiments/011-subjects/27x38-v2/run-ink-v5/triptych.png)
+
+**Border check (standard border, invalid).** The runs with 20, 40 and 80 extra flat pieces are all invalid (10 mismatched contacts each), so the tray stays (`docs/FINDINGS.md`, entry 29). ![011 border-check x20](../experiments/011-subjects/border-check/run-standard-x20/triptych.png) ![011 border-check x40](../experiments/011-subjects/border-check/run-standard-x40/triptych.png) ![011 border-check x80](../experiments/011-subjects/border-check/run-standard-x80/triptych.png)
+
 ## 013: Scale study, 500 to 1536 pieces
 
-Seed 0, one run per size, the same placeholder scenes (cat, sailboat, tree), no blind test. Figures come from `experiments/013-scale/README.md` and each run's `summary.md`. Every run has piece shared 0 / 0 / 0 and piece gates PASS; scene gates FAIL at every size. Left triptych full, right ink.
+Seed 0, one run per size, the same placeholder scenes (cat, sailboat, tree). The blind test is at 27x38 only (`blind-test-g27x38.md`, below). Figures come from `experiments/013-scale/README.md` and each run's `summary.md`. Every run has piece shared 0 / 0 / 0 and piece gates PASS; scene gates FAIL at every size. Left triptych full, right ink.
 
 **20x25 (500 pieces).** Mean surplus 43%, 2x2 reuse A-C 76.5%. Visual read: cat recognisable, sail steps visible at 32 px. ![013 g20x25 full](../experiments/013-scale/g20x25/run-full/triptych.png) ![013 g20x25 ink](../experiments/013-scale/g20x25/run-ink/triptych.png)
 
 **25x30 (750 pieces).** Mean surplus 43%, 2x2 reuse A-C 86.5%. Visual read: cat recognisable, tail reads as a boxy loop. ![013 g25x30 full](../experiments/013-scale/g25x30/run-full/triptych.png) ![013 g25x30 ink](../experiments/013-scale/g25x30/run-ink/triptych.png)
 
-**27x38 (1026 pieces), working grid.** Placeholder scenes; the working grid adopted in `docs/DECISIONS.md`. The best full render is now 011 `27x38-v2/run-full`. Mean surplus 36%, the lowest of the four; 2x2 reuse A-C 90.2%; pipeline 162 s. Visual read: cat recognisable with ears and tail, sail steps finer. ![013 g27x38 full](../experiments/013-scale/g27x38/run-full/triptych.png) ![013 g27x38 ink](../experiments/013-scale/g27x38/run-ink/triptych.png)
+**27x38 (1026 pieces), working grid.** Placeholder scenes; the working grid adopted in `docs/DECISIONS.md`. The best full render is now 011 `27x38-v2/run-full`. Blind test (`blind-test-g27x38.md`): boat 5/5, tree 3/5, cat not named (pose), distinctiveness 4/5, grid 3 / 2 / 2. Mean surplus 36%, the lowest of the four; 2x2 reuse A-C 90.2%; pipeline 162 s. Visual read: cat recognisable with ears and tail, sail steps finer. ![013 g27x38 full](../experiments/013-scale/g27x38/run-full/triptych.png) ![013 g27x38 ink](../experiments/013-scale/g27x38/run-ink/triptych.png)
 
 **32x48 (1536 pieces).** Mean surplus 45%, 2x2 reuse A-C 88.3%; pipeline 256 s. Visual read: cat broken, tail a thin line; surplus does not shrink relative to the figure. ![013 g32x48 full](../experiments/013-scale/g32x48/run-full/triptych.png) ![013 g32x48 ink](../experiments/013-scale/g32x48/run-ink/triptych.png)
+
+**Port check at 20x25.** `port-check-g20x25` reproduces the 005 pipeline at 20x25 before the tier-label change (`experiments/013-scale/README.md`): shared 0/0/0, scene gates FAIL. ![013 port check full](../experiments/013-scale/port-check-g20x25/run-full/triptych.png) ![013 port check ink](../experiments/013-scale/port-check-g20x25/run-ink/triptych.png)

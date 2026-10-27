@@ -13,6 +13,8 @@ Decisions made with the project owner. Later entries may refine earlier ones.
 
 The owner asked that unconventional piece shapes (which permit more rotations, e.g. hexagons or triangles) be explored rather than ruled out at the start. Consequence: the arrangement engine is built geometry-agnostic (slots + adjacency graph + slot/piece type compatibility + orientation group), so square-no-rotation, square-with-rotation, hexagonal and other tilings can be compared on identical metrics. A narrowing decision on geometry will be made after the first round of prototype results, not before. See docs/design/05-piece-geometry.md.
 
+*Superseded by 2026-10-27 for the piece count ("Piece count is free", "Working grid: 27×38") and, for item 4, by "Mechanical uniqueness: rely on artwork" (quarter rotation is kept).*
+
 ## Working method
 
 Think broadly during experiments, then make explicit narrowing decisions and record them here, so scope converges on a workable result.
@@ -29,6 +31,8 @@ The three images need not share an aspect ratio; only the piece count is fixed. 
 - Piece counts with several factorizations become attractive: 96 = 8×12 = 12×8 = 16×6 for prototypes; 480 = 20×24 = 30×16 = 40×12 or 504 = 21×24 = 28×18 = 36×14 near the 500 target. Final count is open; "500" is a target, not a contract.
 - Plan: prototype 1 uses identical frames (simplest, isolates the visual-grammar question); prototype 2 varies frames (portrait / landscape / panorama) and compares distinctiveness and border cost.
 
+*Superseded by 2026-10-27 ("Piece count is free") for the 480 and 504 counts and the 500 target, and by "Product form: tray" for the identical-frame plan of the subject set; the plan stands for the prototypes.*
+
 ## 2026-10-26 — Image-generation models as an occasional reference channel (owner)
 
 Image models are not used by the toolkit. Once style, elements and scenes are settled, the owner can run a small number of prompts manually and return the images as creative reference for the design. This is a slow channel: use it rarely (a batch of two or three prompts at a milestone), never block work on it, and record the prompts sent in docs/IDEAS.md or the experiment log.
@@ -42,6 +46,8 @@ After three grammars were rendered and blind-tested (direction A "Dapple Mosaic"
 - Quarter rotation is used; all classes are non-directional.
 First render at 20×25: piece-level shared adjacencies 0/0/0; distinctiveness 4/5; the tree was recognized blind, the cat and boat were not (silhouette fixes in progress). Directions A and B are retired as scene designs; their lexicon mechanisms (masked transitions, context-dependent readings, role maps) are kept.
 
+*Superseded by 2026-10-27 ("Working grid: 27×38") for the piece count; the grammar decision stands.*
+
 ## 2026-10-26 — Scene-level gates are difficulty indicators, not hard gates, for the tone-field grammar
 
 The scene-level metrics (same-position overlap, 2×2 window reuse, transferable blob) were built to catch the class-layout carry-over of direction A. For a tone-field picture they are inherently high because 40–60% of pieces are near-identical background. Whether that lets a player transfer assembled chunks between solutions depends on the physical connectors:
@@ -49,11 +55,15 @@ The scene-level metrics (same-position overlap, 2×2 window reuse, transferable 
 - With fully interchangeable connectors, chunk transfer becomes possible and the scene-level gates would matter again.
 Decision: plan for distinct conventional cuts; keep reporting the scene-level metrics as difficulty indicators; the hard gates for the tone-field grammar are piece-level shared adjacency (< 5%, stretch 0), the blind recognition test and the grid review. Open question for the engine: three solutions force side shapes into mating classes (a side meets up to three different partners), which limits how distinct connectors can be; this is being analysed (connector mating classes).
 
+*Superseded by 2026-10-27 ("Owner steers", item 3) for the hard gate: piece-level shared adjacency is below 10% per pair, with zero a stretch. The connector minimum in the same entry is superseded by "Mechanical uniqueness: rely on artwork".*
+
 ## 2026-10-27 — Owner steers: lines first, unique solutions, relaxed adjacency target
 
 1. **Lines first.** Explore shape and piece mapping with black lines on a white background (contours only), and add fills, textures and details afterwards. The marching-tile boundary paths become stroked lines in an "ink" class spec; every scene can be rendered in ink or in full.
 2. **Each image must have a unique solution, with few wrong local solutions.** Pieces must be different enough, mechanically (connector mating classes as small as possible; see experiment 010) and visually (distinguishing marks within a region), that a player cannot assemble a plausible wrong patch. This becomes an evaluation item: false-fit ratio from `metapuzzle connectors`, plus a visual-ambiguity check.
 3. **Shared adjacency: "not practically reusable" replaces "zero".** It is not required that most adjacent pairs become non-adjacent; it is enough that a finished image cannot be deduced from or worked from another in practice. Working target: no transferable cluster larger than 3 pieces and shared adjacencies below about 10% per pair; the solver may trade a few shared adjacencies for distinct connectors.
+
+*Superseded in part by "Mechanical uniqueness: rely on artwork, not connector algebra" (same date): connector mating classes need not be minimal; T9 decides uniqueness.*
 
 ## 2026-10-27 — Piece count is free; working grid moves to about 1000 pieces (owner)
 

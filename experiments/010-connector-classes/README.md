@@ -1,5 +1,8 @@
 # 010 connector classes
 
+**Goal:** measure the mating classes and false fits of the solution sets.
+**Result:** the classes are far from minimal (largest class 46 to 91% of sides; false-fit ratio 60 to 530). The mating penalty of round 2 barely moves them; the constructions of 012 are the follow-up. The connector minimum is no longer a gate (DECISIONS, 2026-10-27).
+
 Mating classes of a solution set (`metapuzzle connectors SOLUTION.json`, `connectors.py`). Nodes are non-flat sides; each contact in any solution is an edge; components are classes. False fits are possible tab-blank pairs inside a class that never touch. Ratio = false fits / intended contacts (3 x internal adjacencies).
 
 | run | sides | classes | size min / median / max | largest | false fits | ratio | all pairs | ratio |

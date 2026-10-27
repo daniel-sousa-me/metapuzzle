@@ -4,6 +4,8 @@
 
 First end-to-end render of design direction A ("Dapple Mosaic") with its three scenes: The Lone Tree (A), Isle and Sail (B), Snow Peak (C). Board is 8x10 (80 pieces), no rotation, standard border.
 
+**Result:** run-quarter passes the piece gate (2.8 to 3.5% shared) but fails the scene gates, and distinctiveness is 2/5. Retired.
+
 ## Setup
 
 - `classes.json`: the 15 classes from 02-piece-classes.md, keyed to `docs/design/scenes-8x10.txt`. `NOTES.md` covers how it was built.

@@ -1,5 +1,7 @@
 # 012 constructive placements
 
+**Result:** exact minimal classes (K(3,3)) exist for boards with both dimensions = 1 (mod 3) and no rotation; a same-shape K4 at practical sizes is still open, and SAT with class maps is unsatisfiable on 7x7 and 10x10 boards unless the maps are derived from a construction. Uniqueness therefore moved to the artwork (DECISIONS, 2026-10-27).
+
 Question: can three placements be built algebraically so that every mating class is minimal (K(3,3) for tab/blank, K4 for andro), and can such placements respect three class maps? Design write-up: `docs/design/09-constructive-placements.md`.
 
 Requirements: the repo's package (editable install), numpy and Pillow (PNG only). The SAT scripts (`oned.py` when run as a script, `satschemes.py`, `sat_classes.py`, `k4.py`, `k4_periodic.py`) also need `pip install python-sat`. `construct.py`, `compat.py`, `perturb.py`, `artwork.py` and `k4_families.py` run in under a minute without it.

@@ -1,5 +1,7 @@
 # 008 mixed frames
 
+**Result:** round 1 is invalid (3 and 41 mismatched contacts). Round 2 is valid: 0/0/0 shared with quarter rotation (127 flat-sided pieces, 15 to 23 seams per board), 2/0/0 without rotation (245 flat-sided pieces, 70 to 82 seams). Scene gates fail; not evaluated.
+
 **Question.** Can three images with different aspect ratios share one 480-piece set? A tree 20x24 (portrait), B sailboat 30x16 (landscape), C panorama 40x12.
 
 **Setup.** `make_targets.py` draws the tone maps. `quantize.py` ranks each map into T0..T5 with counts 58/86/96/96/86/58. The brief's 60/90/100/100/90/60 sums to 500, not 480, so it was scaled. No shared frame is computed: `validate_scenes` checks border counts only for equal shapes. `scenes.txt` holds three blocks of different sizes, and `load_scenes` accepts it. Class spec: `classes.json` from 004.

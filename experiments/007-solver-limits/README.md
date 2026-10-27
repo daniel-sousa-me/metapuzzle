@@ -2,6 +2,8 @@
 
 Question: is the residual shared adjacency a search limit or a constraint limit?
 
+**Result:** a constraint limit. About seven times the iterations and five seeds leave the totals unchanged (37 with no rotation, 13 with quarter rotation).
+
 Run `python3 study.py` (about 3.5 min). Details: `grid.md`, `class-bottlenecks.md`, `results.json`. Totals are AB+AC+BC of 142 adjacencies per board.
 
 ## Results (5 seeds per row)

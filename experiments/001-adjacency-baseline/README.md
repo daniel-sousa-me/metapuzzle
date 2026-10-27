@@ -1,6 +1,7 @@
 # 001: adjacency baseline
 
 Question: how many adjacencies do the three solutions share after optimization, per board, border and rotation mode (no class maps)?
+Result: 0/0/0 shared in every configuration (seed 0, under 0.5 s each); random starts share 6 to 16 pairs, which this table does not show.
 Setup: `solve` with seed 0 and default iterations (300k, early stop at zero). Sizes are cols x rows. Reproduce with `python3 experiments/001-adjacency-baseline/run.py`. The solution JSON of each seed-0 run is in this folder (`<size>-<border>-<rotation>.json`).
 
 | Board (cols x rows) | Border | Rotation | Shared AB/AC/BC | Iterations (seed 0) | Wall time s | Mean iterations, 5 seeds | Mean time s, 5 seeds |

@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-Every prototype run is scored the same way, so runs and design directions can be compared. A run passes only when every check below passes. Counts assume the 8x10 layout (80 cells, 142 adjacencies per solution).
+Every prototype run is scored the same way, so runs and design directions can be compared. A run passes only when every check below passes. Counts assume the 8x10 layout (80 cells, 142 adjacencies per solution). The working 27x38 layout has 1026 cells and 1987 adjacencies per solution.
 
 ### Ink mode
 
@@ -59,6 +59,8 @@ Each image must have one intended solution, with few wrong local solutions (docs
 ### T8 mechanical uniqueness
 
 Run `metapuzzle connectors SOLUTION.json` on the run's solution file. Record the largest mating class (sides, and percent of all non-flat sides) and the false-fit ratio (false fits / intended contacts), in the same form as `experiments/010-connector-classes/README.md`.
+
+*Since 2026-10-27 T8 is recorded but is not a pass gate for the subject set; T9 decides (DECISIONS, 2026-10-27, mechanical uniqueness).*
 
 **Pass:** every class at the minimum size (6 sides for asymmetric connectors, 3 tabs and 3 blanks; 4 sides for symmetric connectors), and false-fit ratio 0.
 

@@ -4,6 +4,8 @@
 
 First render of design direction B, "Garden Terrazzo": 14 non-directional piece classes (`docs/design/alt-b/02-piece-classes.md`) fill three 8x10 scenes: A The Sunflower (radial), B Sunset Bay (bands), C Koi Pond (top-down). It tests the gates and recognisability.
 
+**Result:** passes the scene gates (9 to 14% same position) and the piece gate at quarter rotation (1/0/0), but distinctiveness is 2/5 and no subject is named. Retired.
+
 ## Setup
 
 - Scenes: `docs/design/alt-b/scenes-8x10-b.txt`. Classes: `classes.json` (see `NOTES.md`).

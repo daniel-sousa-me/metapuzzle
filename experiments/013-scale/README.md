@@ -1,5 +1,8 @@
 # 013: how much does piece count buy?
 
+**Goal:** how recognition, surplus and solve time change with piece count (500 to 1536, placeholder scenes).
+**Result:** recognition improves clearly from 750 pieces, but surplus does not shrink with size, so 27x38 (1026 pieces) became the working grid. The blind test at 27x38 names the boat (5/5) but not the cat.
+
 The 005 pipeline at 500, 750, 1026 and 1536 pieces (cells). Code: `gridcfg.py` (`GRID=COLSxROWS`), ported scripts, `run_grid.sh COLSxROWS CELL_PX`. Outputs: `g<COLS>x<ROWS>/` (`timings.txt`, `make-targets-report.txt`, `run-full/`, `run-ink/`). At 20x25 the port matched 005 exactly before the label change (`port-check-g20x25/`).
 
 ## Changes versus 005 (all sizes)

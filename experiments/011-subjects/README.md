@@ -1,5 +1,8 @@
 # 011 subjects: "Field, Wood and Water"
 
+**Goal:** hare, owl and swan in value inversion on a tray border with quarter rotation (the subject set).
+**Result:** the 27x38-v2 renders share 0/0/1 and pass the piece gate. Blind test: distinctiveness 4/5, hare 4/5, owl 4/5 (read as a skull), swan 3/5. T9 is 2/5 on v2 and v4. The v5 motif render is in progress (see `docs/HANDOVER.md`).
+
 Hare at dawn (vertical), owl at dusk (moon halo, radial), swan at midnight (horizontal). Value
 inversion: D = field / owl / night sky, M = hare / dusk sky / lake, L = sky / moon and snow /
 swan. S (chips on L, always enclosed by L): flock, bramble, wing feathers. W: cloud bank, cloud

@@ -1,5 +1,8 @@
 # 005 hybrid tones
 
+**Goal:** three-tier tone maps (cat, sailboat, tree) at 20x25 with one piece histogram and every tier boundary inside a transition piece.
+**Result:** 0/0/0 shared (quarter rotation). Distinctiveness 4/5. The tree is recognized (5/5 at v5), the boat partly, the cat never. Stray surplus blocks were the main defect; equalizer v2 cut them to 2 to 5 per image (run-full-v5eq2). Scene gates fail by design.
+
 **Idea.** Each cell has a tier: D (tone < 0.35), M (0.35 to 0.65), L (> 0.65). A tier-boundary cell carries its own tier plus the neighbour's tier on one side, so the boundary falls inside a piece. One rotatable class serves all four sides.
 
 **Targets** (`make_targets.py`): cat in profile on a mid floor, sailboat with mid sea, tree with mid ground. Shape sizes are searched in code until counts match.

@@ -1,5 +1,8 @@
 # 004 density-field mosaic
 
+**Goal:** three tone maps (cat, sailboat, tree) at 20x25 that share one exact class histogram from six rank-quantized classes.
+**Result:** quarter rotation gives 0/0/0 shared and distinctiveness 4/5; the tree is recognized, the cat is not, and the grid is fully visible (5/5).
+
 **Idea.** Every piece is a mixture of non-directional stipple dapples. The picture is a tone map, like a halftone. Six classes T0 (darkest) to T5 (lightest) step from navy and charcoal to khaki, sky and cream. Neighbours share mark colours. Three targets share one exact class histogram by rank-based quantization.
 
 **Targets** (`make_targets.py`, 25 x 20): cat (dark sitting silhouette, ears, curled tail, light ground), sailboat (light sky, mid sea, dark hull, light sail), tree (dark round canopy and trunk, light sky, mid ground band).

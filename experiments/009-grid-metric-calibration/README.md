@@ -1,5 +1,8 @@
 # 009 Grid metric calibration
 
+**Goal:** calibrate the automatic grid score (`grid_metric.py`) against human grid verdicts.
+**Result:** not calibrated. The metric ranks 004 last while humans rank it first, and no visibility ratio from 1.0 to 3.0 fixes the order. It is not a gate (FINDINGS 32).
+
 Automatic grid visibility: `metapuzzle grid-metric RUN_DIR` (`src/metapuzzle/grid_metric.py`).
 
 Method, as implemented: the metric reads `solution-{A,B,C}.png` (no grid overlay), cell size from
