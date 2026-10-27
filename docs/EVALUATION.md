@@ -4,6 +4,10 @@
 
 Every prototype run is scored the same way, so runs and design directions can be compared. A run passes only when every check below passes. Counts assume the 8x10 layout (80 cells, 142 adjacencies per solution).
 
+### Ink mode
+
+Every scene is first evaluated in ink mode: black lines on white, contours only. Shape and piece mapping are judged there, before fills, textures and details exist. The full render is evaluated after that, with the same gates. The T1 blind test may be run on the ink renders, the full renders, or both; record each run separately.
+
 ## 2. Automatic metrics and gates
 
 From the run's `summary.md`. Check scene-level gates on the scene file before rendering:
@@ -12,8 +16,8 @@ From the run's `summary.md`. Check scene-level gates on the scene file before re
 
 | Metric | Gate |
 |---|---|
-| Piece-level shared adjacency, per pair | < 5%; stretch 0 |
-| Largest shared cluster | < 4 pieces |
+| Piece-level shared adjacency, per pair | < 10%; stretch 0 |
+| Largest shared cluster (no transferable cluster larger than 3 pieces) | ≤ 3 pieces |
 | Scene-level same-position overlap, per pair | < 25% |
 | 2x2 window reuse, per pair (larger of plain and rotated) | < 30% |
 | Transferable blob, per pair | < 10% of cells |
@@ -48,19 +52,44 @@ No simulation exists yet. Use the section 2 proxies per pair: same-position over
 
 Manual check: a player who has finished solution A is shown the reference for B and names the groups of pieces they would keep in place. If one group holds more than 10% of pieces, the blob gate is too loose.
 
-## 6. Recording
+## 6. Uniqueness tests
+
+Each image must have one intended solution, with few wrong local solutions (docs/DECISIONS.md, 2026-10-27). T8 checks the connectors mechanically; T9 checks the pieces visually.
+
+### T8 mechanical uniqueness
+
+Run `metapuzzle connectors SOLUTION.json` on the run's solution file. Record the largest mating class (sides, and percent of all non-flat sides) and the false-fit ratio (false fits / intended contacts), in the same form as `experiments/010-connector-classes/README.md`.
+
+**Pass:** every class at the minimum size (6 sides for asymmetric connectors, 3 tabs and 3 blanks; 4 sides for symmetric connectors), and false-fit ratio 0.
+
+### T9 visual ambiguity
+
+Run by a fresh agent, on the full render, once per run. Show the evaluator `solution-pieces.png` (the piece contact sheet) and one solution image, `solution-X.png`.
+
+Prompt:
+
+> The first file, solution-pieces.png, is a contact sheet of the pieces of one puzzle. The second is one finished picture made from those pieces. Open only these two files. Sample 20 pieces from the sheet. For each sampled piece, say whether it looks interchangeable with at least one other piece in the same tone region (dark, mid or light), counting motifs and chips (small marks and dots) as part of its look; if so, name that other piece. Then give: (1) the number of sampled pieces that look interchangeable, out of 20; (2) whether any wrong local arrangement of pieces, a patch placed differently from the picture, would look plausible as part of the picture; describe the patch if so.
+
+**Pass:** fewer than 20% of sampled pieces interchangeable within their tone region (fewer than 4 of 20), with motifs and chips counted. Record the answer to (2) with the result.
+
+## 7. Recording
 
 - `experiments/NNN-name/blind-test-N.md` and `grid-visibility-N.md`: raw answers, invisible count, classified edges, pass or fail per criterion.
 - Scorecard: one table in the experiment README (or `NOTES.md` where there is none).
 
-| Check | Gate | Value | Result |
-|---|---|---|---|
-| Piece adjacency AB / AC / BC | < 5% each | | |
-| Largest shared cluster | < 4 | | |
-| Same-position overlap AB / AC / BC | < 25% each | | |
-| 2x2 window reuse | < 30% | | |
-| Transferable blob | < 10% | | |
-| T1 blind test | subjects 3+, distinct 4+, grid 2 or lower | | |
-| T2 grid visibility | verdict 2 or lower, 70%+ invisible | | |
+| Check | Gate | Ink value | Full value | Result |
+|---|---|---|---|---|
+| Piece adjacency AB / AC / BC | < 10% each; stretch 0 | — | | |
+| Largest shared cluster | ≤ 3 pieces | — | | |
+| Same-position overlap AB / AC / BC | < 25% each | — | | |
+| 2x2 window reuse | < 30% | — | | |
+| Transferable blob | < 10% | — | | |
+| T8 mechanical uniqueness | every class at minimum; false-fit ratio 0 | — | | |
+| T1 blind test | subjects 3+, distinct 4+, grid 2 or lower | | | |
+| T2 grid visibility | verdict 2 or lower, 70%+ invisible | — | | |
+| T9 visual ambiguity | fewer than 4 of 20 sampled pieces interchangeable | — | | |
+
+Automatic gates, T8 and T2 are recorded in the Full column only; they do not depend on render mode. T1 fills both columns where both modes were run. T9 runs on the full render.
+
 
 Record failures too. Use a new N rather than overwriting a result.
