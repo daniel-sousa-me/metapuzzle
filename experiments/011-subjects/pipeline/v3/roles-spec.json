@@ -1,0 +1,273 @@
+{
+  "_note": "Experiment 011 v3 roles: surplus transition pieces placed by class pair (S-edge oriented, D/M/W interior free rotation); target_counts = v2's (per-class max over images for transitions, common plain targets). Frame and edge roles fixed.",
+  "roles": {
+    "d_frame": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_near": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_far": {
+      "classes": [
+        "D"
+      ]
+    },
+    "s_frame": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_near": {
+      "classes": [
+        "S"
+      ]
+    },
+    "s_far": {
+      "classes": [
+        "S"
+      ]
+    },
+    "m_frame": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_near": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_far": {
+      "classes": [
+        "M"
+      ]
+    },
+    "w_frame": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_near": {
+      "classes": [
+        "W"
+      ]
+    },
+    "w_far": {
+      "classes": [
+        "W"
+      ]
+    },
+    "l_frame": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_near": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_far": {
+      "classes": [
+        "L"
+      ]
+    },
+    "d_fur_dl": {
+      "classes": [
+        "DLc",
+        "DLs",
+        "LDc"
+      ]
+    },
+    "d_fur_dm": {
+      "classes": [
+        "DMc",
+        "DMs",
+        "MDc"
+      ]
+    },
+    "l_fur_ml": {
+      "classes": [
+        "MLc",
+        "MLs",
+        "LMc"
+      ]
+    },
+    "l_fur_wl": {
+      "classes": [
+        "WLc",
+        "WLs",
+        "LWc"
+      ]
+    },
+    "m_fur_dm": {
+      "classes": [
+        "DMc",
+        "DMs",
+        "MDc"
+      ]
+    },
+    "m_fur_ml": {
+      "classes": [
+        "MLc",
+        "MLs",
+        "LMc"
+      ]
+    },
+    "m_fur_mw": {
+      "classes": [
+        "MWc",
+        "MWs",
+        "WMc"
+      ]
+    },
+    "se_lsc": {
+      "classes": [
+        "LSc"
+      ]
+    },
+    "se_slc": {
+      "classes": [
+        "SLc"
+      ]
+    },
+    "se_sls": {
+      "classes": [
+        "SLs"
+      ]
+    },
+    "w_fur_mw": {
+      "classes": [
+        "MWc",
+        "MWs",
+        "WMc"
+      ]
+    },
+    "w_fur_wl": {
+      "classes": [
+        "WLc",
+        "WLs",
+        "LWc"
+      ]
+    },
+    "edge_dmc": {
+      "classes": [
+        "DMc"
+      ]
+    },
+    "edge_dms": {
+      "classes": [
+        "DMs"
+      ]
+    },
+    "edge_dlc": {
+      "classes": [
+        "DLc"
+      ]
+    },
+    "edge_dls": {
+      "classes": [
+        "DLs"
+      ]
+    },
+    "edge_slc": {
+      "classes": [
+        "SLc"
+      ]
+    },
+    "edge_sls": {
+      "classes": [
+        "SLs"
+      ]
+    },
+    "edge_mdc": {
+      "classes": [
+        "MDc"
+      ]
+    },
+    "edge_mwc": {
+      "classes": [
+        "MWc"
+      ]
+    },
+    "edge_mws": {
+      "classes": [
+        "MWs"
+      ]
+    },
+    "edge_mlc": {
+      "classes": [
+        "MLc"
+      ]
+    },
+    "edge_mls": {
+      "classes": [
+        "MLs"
+      ]
+    },
+    "edge_wmc": {
+      "classes": [
+        "WMc"
+      ]
+    },
+    "edge_wlc": {
+      "classes": [
+        "WLc"
+      ]
+    },
+    "edge_wls": {
+      "classes": [
+        "WLs"
+      ]
+    },
+    "edge_ldc": {
+      "classes": [
+        "LDc"
+      ]
+    },
+    "edge_lsc": {
+      "classes": [
+        "LSc"
+      ]
+    },
+    "edge_lmc": {
+      "classes": [
+        "LMc"
+      ]
+    },
+    "edge_lwc": {
+      "classes": [
+        "LWc"
+      ]
+    }
+  },
+  "target_counts": {
+    "D": 175,
+    "DLc": 15,
+    "DLs": 46,
+    "DMc": 13,
+    "DMs": 35,
+    "L": 292,
+    "LDc": 20,
+    "LMc": 22,
+    "LSc": 3,
+    "LWc": 2,
+    "M": 228,
+    "MDc": 14,
+    "MLc": 20,
+    "MLs": 39,
+    "MWc": 1,
+    "MWs": 17,
+    "S": 23,
+    "SLc": 7,
+    "SLs": 16,
+    "W": 29,
+    "WLc": 3,
+    "WLs": 5,
+    "WMc": 1
+  }
+}
