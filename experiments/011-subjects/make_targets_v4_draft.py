@@ -1,26 +1,29 @@
-"""Tier targets for experiment 011, version 4 DRAFT: recognition cues added to the three animals.
+"""Tier targets for experiment 011, version 4 DRAFT: recognition cues and scene cues for the animals.
 
 Copy of make_targets.py (v2, natively drawn 27 x 38) with redrawn sketches after blind test v2
-(blind-test-v2.md); the method (locks, annealer on background lines, budget_v2 pairs) is unchanged.
-Outputs go to 27x38-v4-draft/ (tiers-A/B/C.txt, budgets.txt, targets-preview.png and
-contours-preview.png, both without text labels). Usage: python3 make_targets_v4_draft.py [27x38]
+(blind-test-v2.md) and evaluation-v6.md (all three read as maps). Method unchanged (locked figure, S and
+lower-case features; seeded annealer on background lines; budget_v2 pairs) except SOFT_RADIUS = 2 (cells
+within two of a drawn boundary may move). Outputs: 27x38-v4-draft/ (tiers-A/B/C.txt, tiers-X-animal.txt
+masks, budgets.txt, targets-preview.png and contours-preview.png without labels).
+Usage: python3 make_targets_v4_draft.py [27x38]
 
-        tier   A hare (dawn)                 B owl (dusk)                   C swan (midnight)
-        D      wood: crowns, trunks, shadow  owl, branch, pupils, bat dot   night sky, near bank, duck dots
-        M      hare                          dusk sky, beak                 lake, clouds, beak
-        L      sky, light between trunks,    moon disc, eyes, snow          swan, moon, star, glint
-               meadow
-        S      starlings (2x3, 2x2)          moon craters (2x3, 2x2)        moon craters (2x3, 2x2)
-        W      dawn cloud, mist              chest feathers, cloud          water band, reflections, cloud
+        tier   A hare (dawn)                  B owl (dusk)                  C swan (midnight)
+        D      hedge band, meadow shadows,    owl, branch, pupils, bat      night sky, near bank, ducks
+               foreground shadow, ear tips,
+               haunch and leg lines
+        M      hare                           dusk sky, beak                lake, clouds, beak
+        L      sky, sunlit meadow, tail       moon disc, eyes, snow         swan, moon, stars, glint
+        S      starling band (2 x 5)          moon crater band (2 x 5)      wing line (2 x 5)
+        W      cloud, meadow mist             wing lines, clouds            water band, reflection, cloud
 
-v4 changes (animals): B owl: two slanted ear tufts, 7-wide round eyes with single-cell pupils (dot
-pieces), a small pointed beak (4-4-2 cells), a barred W chest bounded by the wings, two legs gripping a
-dark branch that lies on the snow, the moon disc behind the head. A hare: unchanged figure with dark
-ear tips, cropped by mist at the feet; the dark tier is a wood of round crowns with light between
-the trunks and the hare's long shadow on the meadow. C swan: redrawn facing left with an S neck, an
-olive (M) beak, a raised wing bump and a pointed tail, floating in a W water band with reflections.
-Dots matched per picture: two D-on-L (A crows, B pupils, C eye and a duck on a glint) and one D-on-M
-(A hare eye, B bat, C duck). S is the same pair of shapes in every picture.
+Internal lines are bands at least two cells wide (one-cell strips are anomalies): hare: eye dot, dark
+ear tip, haunch line and front-leg line (D), white tail (L); owl: ear tufts, 7-wide round eyes with
+single-cell pupils, a 4-4-2 pointed beak (M), two stepped wing lines (W), legs gripping a branch that
+lies on the snow, moon disc behind the head; swan: eye dot, olive (M) beak, wing line (S), raised wing
+bump, pointed tail, a two-to-three-row W water band with a reflection drip. Dots matched per picture:
+two D-on-L (A crows, B pupils, C eye and a duck on a glint) and one D-on-M (A hare eye, B bat, C duck).
+animal_mask(): the figure with its holes, plus locked cells touching it (A ear tips, leg line, tail;
+C beak); B without the branch rows.
 """
 import os
 import sys
@@ -46,7 +49,7 @@ SEED = 11         # base seed; SEEDS runs are made and the lowest energy kept
 SEEDS = 4
 ITERS_PER_CELL = 400
 POLISH_T0 = 1.0   # second, cooler annealing pass started from the best first-pass result
-SOFT_RADIUS = 1   # 1 = only cells on a drawn boundary; 2 = also their neighbours
+SOFT_RADIUS = 2   # v4 draft: 2 = cells on a drawn boundary and their neighbours (v2: 1)
 
 SKETCHES = {}  # filled below
 
@@ -123,9 +126,9 @@ MMMMDDDDDDDDDmmDDDDDDDDDMMM
 MMMMDDDDDDDDDDDDDDDDDDDDwww
 wwwDDDwwDDDDDDDDDDDDwwDDwww
 wwwDDDwwDDDDDDDDDDDDwwDDwww
-wwwDDDwwDDDDDDDDDDDDwwDDwww
+wwwDDDDwwDDDDDDDDDDwwDDDwww
 wwMMDDDwwDDDDDDDDDDwwDDDMMM
-wwMMDDDwwDDDDDDDDDDwwDDDMMM
+wwMMDDDDDDDDDDDDDDDDDDDDMMM
 MMMMMDDDDDDDDDDDDDDDDDDMMMM
 MMMMMMMDDDDDDDDDDDDDDMMMMMM
 .....MMMMMDDDMMDDDMMMMMMMMM
@@ -148,7 +151,7 @@ ddddd.......DDDDD..........
 DDDDDD.....DDDDDDD........D
 DDDDDDD....DDDDDDDD......DD
 D..DDDDD....DDDDDDDDDDDDDDD
-D..DDDDDD....DDmmmmDDDwwwww
+D..DDDDDD....DDmmmmDDDDDDDD
 DDDDDDDDD....DDmmmmDDDwwwww
 DDDDDDDDD....DDDDDDDDDwwwww
 mmmmmDDDD....DDDDDDDDDDDDDD
@@ -622,10 +625,38 @@ def extra_rows(maps):
     return f"{'tips (1-cell caps)':24s}" + "".join(f"{v:9d}" for v in vals) + f"{max(vals) - min(vals):9d}"
 
 
+ANIMAL_FLOOD = {"A": "DL", "B": "", "C": "M"}   # locked tiers that belong to the animal when touching it
+BRANCH_ROWS = (34, 35)                           # B: the branch rows of the owl's figure region
+LEG_ROWS = slice(32, 34)                         # B: the legs; the sky between them is not the owl
+
+
+def animal_mask(n, t, locked):
+    """The animal only: figure plus enclosed holes (eyes, beak, lines), plus locked cells of the
+    listed tiers 4-connected to it (A ear tips, leg line and tail; C beak); B minus the branch."""
+    _, a = figure_mask(t, FIGURE[n])
+    a = a.copy()
+    if n == "B":
+        a[list(BRANCH_ROWS)] = False
+        a[LEG_ROWS] &= t[LEG_ROWS] == CODE["D"]
+    R, C = t.shape
+    grow = True
+    while grow:
+        grow = False
+        for r, c in zip(*np.nonzero(locked & ~a)):
+            if CHARS[t[r, c]] in ANIMAL_FLOOD[n] and any(
+                    0 <= r + dr < R and 0 <= c + dc < C and a[r + dr, c + dc] for dr, dc in SIDE4):
+                a[r, c] = grow = True
+    return a
+
+
 def write_outputs(start, maps, out, rows, cols, run_limit):
     out.mkdir(parents=True, exist_ok=True)
     for n in NAMES:
         write_tiers(maps[n], out / f"tiers-{n}.txt")
+        if (rows, cols) == (SKETCH_ROWS, SKETCH_COLS):
+            a = animal_mask(n, maps[n], parse(SKETCHES[n])[1])
+            (out / f"tiers-{n}-animal.txt").write_text(
+                "\n".join(" ".join("A" if v else "." for v in row) for row in a) + "\n")
     named = {TITLES[n].split(" (")[0]: budgets(CHARS[maps[n]]) for n in NAMES}
     moved = {n: int((maps[n] != start[n]).sum()) for n in NAMES}
     report = [
