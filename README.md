@@ -112,5 +112,5 @@ Early prototyping on the tone-field grammar. The piece-level gate passes at abou
 
 - **Connectors (T8) fail.** The 005 v3 solution has one mating class holding 91% of sides, with a false-fit ratio of 530. The solver needs an objective that closes partner sets into minimal blocks.
 - **Subjects.** The cat and boat were not named in the first blind test. The v2 and v3 subject fixes and the v5 boundary budgets have no blind test yet, and there is no `scenes-v5.txt`.
-- **Engine.** `validate_scenes` rejects transition suffixes on frame cells, so frame boundaries are coded plain.
+- **Engine.** In quarter mode, frame cells can carry transition codes (`cls@R`, matched to a piece whose flat faces the edge). Without rotation, a nonzero suffix on a frame cell is still rejected, so frame boundaries are coded plain.
 - **Evaluation.** T9 (visual ambiguity) is not yet recorded for any run, and the grid metric is not calibrated.
