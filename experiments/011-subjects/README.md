@@ -125,3 +125,16 @@ them and the ear tops are locked; no move may add an anomaly or touch S to D, M 
 stall. Result: surplus 193 to 78 (A 42, B 22, C 14), target under 30 not met. Figure cells changed
 7/13/15. Tier totals drift (W 36/30/36). The block-move run (`--block`, `27x38-v4-blocks/`) gives 83 and does
 not help. Outputs: `27x38-v4/` and `27x38-v4-blocks/`; log: `27x38-v4/budgets.txt`.
+
+## v4 draft through pipeline v6
+
+`pipeline/run_from_tiers_v6_v4draft.py` with `motifs/make_motif_maps_v2_v4draft.py` (copies with three
+fixes: a rebound tier label in the motif class test, heroes re-anchored to the nearest cell of their v2
+class because the redraw moved the classes under them, and a 1-cell motif halo because the draft M tier
+has 271 cells against 396 in v2). Outputs in `27x38-v4-draft/{pipeline-out-v6,run-full,run-ink}`; tray,
+quarter rotation, cell 21, v12 specs. Valid, 0 violations; piece and scene gates pass in both renders;
+shared adjacency AB/AC/BC 1/2/3. Class surplus after the equalizer 229 (A 109, B 44, C 76), far above
+v2's 127 even though the draft's edge and corner pools are matched within a spread of 6: the design
+annealer's pools and the pipeline's transition classes are different counts (FINDINGS 41). Visual: the
+owl reads (eyes, beak); the hare's hedge and shadow bands show but the hare does not; the swan is hard
+to read; internal lines and cues are specks at cell 21; hedge and moon edges are stepped.
