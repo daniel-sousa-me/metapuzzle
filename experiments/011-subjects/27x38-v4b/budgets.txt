@@ -1,0 +1,55 @@
+# Boundary budgets, experiment 011 (Field, Wood and Water), 27 columns x 38 rows.
+# Columns: A hare, B owl, C swan. edges = 4-neighbour cell edges between the two tiers;
+# corners = cells with the other tier on two adjacent sides (convex) or on a diagonal only
+# (concave), both tiers counted. W and S are full tiers (budget_v2.py, as pipeline v2 and
+# classes-v9): S-L is a budget pair, S-D, S-M and S-W contacts (8-neighbourhood) must be 0.
+# Anomalies need rare tiles (target 0; the dots are designed: one D-on-L and one D-on-M dot per
+# picture). Tips = 1-cell protrusions (caps). 45deg-run cells =
+# convex corners chained diagonally (staircases of single steps, 2+ cells), per pair.
+# Straight runs are penalized above 7 edges. Cells moved by the balancer from the
+# start map (sketch or resampled map): A 57, B 56, C 105
+
+                           A hare    B owl   C swan   spread
+cells D                       374      371      372        3
+cells M                       322      324      323        2
+cells W                        56       60       60        4
+cells L                       274      271      271        3
+cells S                         0        0        0        0
+D-M edges                     125      127      126        2
+D-M corners                   122      130      125        8
+  convex/concave            63/59    59/71    64/61
+D-M 45deg-run cells            13       33       18       20
+D-W edges                      33       38       33        5
+D-W corners                    24       28       26        4
+  convex/concave            12/12    16/12    13/13
+D-W 45deg-run cells             4        0        0        4
+D-L edges                      86       89       89        3
+D-L corners                    90       92       91        2
+  convex/concave            43/47    41/51    43/48
+D-L 45deg-run cells            24       40       16       24
+M-W edges                      15       16       18        3
+M-W corners                     6       13       11        7
+  convex/concave              0/6      4/9      5/6
+M-W 45deg-run cells             0        0        0        0
+M-L edges                      42       41       45        4
+M-L corners                    38       40       39        2
+  convex/concave            15/23    17/23    18/21
+M-L 45deg-run cells             6        4       13        9
+W-L edges                      14       10       10        4
+W-L corners                     8        7        2        6
+  convex/concave              4/4      2/5      0/2
+W-L 45deg-run cells             0        0        0        0
+L-S edges                       0        0        0        0
+L-S corners                     0        0        0        0
+  convex/concave              0/0      0/0      0/0
+L-S 45deg-run cells             0        0        0        0
+D-S contacts (8-nb)             0        0        0        0
+M-S contacts (8-nb)             0        0        0        0
+W-S contacts (8-nb)             0        0        0        0
+anomaly cap                     0        0        0        0
+anomaly strip                   0        0        0        0
+anomaly dot                     3        3        3        0
+anomaly pinch                   0        0        0        0
+junction cells                 58       60       47       13
+longest straight run           13       19       17        6
+tips (1-cell caps)              0        0        0        0

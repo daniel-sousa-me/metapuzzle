@@ -43,7 +43,7 @@ FIGURE = {"A": "M", "B": "D", "C": "L"}
 BACKGROUND = {"A": "DLW", "B": "MLW", "C": "DMLW"}   # v2: W (mist, clouds, water) is background too
 SEED = 11         # base seed; SEEDS runs are made and the lowest energy kept
 SEEDS = 4
-ITERS_PER_CELL = 400
+ITERS_PER_CELL = 800   # v4b: twice the v2 effort
 POLISH_T0 = 1.0   # second, cooler annealing pass started from the best first-pass result
 SOFT_RADIUS = 2   # v4 draft: 2 = cells on a drawn boundary and their neighbours (v2: 1)
 
@@ -54,44 +54,44 @@ SKETCHES = {}  # filled below
 # (the hare's tree, the swan's clouds, the dots and their neighbours). The figure and S are always
 # locked.
 SKETCHES["A"] = """
-...........................
-...,,,.....................
-...,d,...........wwwwww....
-...,,,...........wwwwww....
-..........dd..dd...........
-..........dd..dd.....,,,...
-..........MM..MM.....,d,...
-..........MM..MM.....,,,...
-..........MM..MM...........
-..........MM..MM...........
-.........MMMMMMMMMMM....DD.
-.DD......MMMMMMMMMMM....DD.
-.DDD.....MMMMMMMMdMMM..DDDD
-.DDD.....MMMMMMMMMMMMMDDDDD
-DDDD......MMMMMMMMMMMMDDDDD
-DDDDDD....MMMMMMMMMMMMDDDDD
-DDDDDDDDDDDDMMMMMMMMDDDDDDD
-DDDDDDDDDDDDMMMMMMDDDDDDDDD
-DDDDDDDDDDDMMMMMMMDDDDDDDDD
-DDDDDDDDDDMMMMMddMMDDDDDDDD
-DDDDDDDDDMMMMddddMMMDDDDDDD
-DDDDDDDDDMMMMddddMMMDDDDDDD
-DDDDDDDMMMMMddMMMMMMMDDDDDD
-DDDDDDMMMMMMddMMMMMMMDDDDDD
-DDDDDMMMMMMddMMMMMMMMwwwwww
-DDDDDMMMMMMddMMMMMMMMwwwwww
-DDDD,,MMMMddMMMMMMMMMwwwwww
-DDDD,,MMMMddMMMMMMMMDDwwwww
-DDDMMMMMMMMMMMMMMMMMDDwwwww
-wwwMMMMMMMMMMMMddMMMDDDDDDD
-wwwMMMMMMMMMMMMddMMMDDDDDDD
-DDDMMMMMMMMMMMMddMMMDDDDDDD
-DDDMMMMMMMMMMMMMMMMMDDDDDDD
-DDDDMMMMMMMMMMMMMMMMDDDDDDD
-DDDDMMMMMMMMMMMMMMMMMDDDDDD
-DDDDDMMMMMMMMMMMMMMMMDDDDDD
-DDDDDwwwwwwwwwwwwwwwDDDDDDD
-DDDDDwwwwwwwwwwwwwwwDDDDDDD
+......,,,,,,,,,,,,,,,,.....
+...,,,,,,,,,,,,,,,,,,,.....
+...,d,,,,,,,,,,,,,wwww.....
+...,,,,,,,,,,,,,,,wwww.....
+......,,,,dd,,dd,,,,,,.....
+......,,,,dd,,dd,,,,,,,,...
+......,,,,MM,,MM,,,,,,d,...
+......,,,,MM,,MM,,,,,,,,...
+......,,,,MM,,MM,,,,,,.....
+......,,,,MM,,MM,,,,,,.....
+......,,,MMMMMMMMMMM,,..DD.
+.DD...,,,MMMMMMMMMMM,,..DD.
+.DDD..,,,MMMMMMMMdMMM,.DDDD
+.DDD..,,,MMMMMMMMMddMMDDDDD
+DDDD..,,,,MMMMMMMMddMMDDDDD
+DDDDDDD....MMMMMMMMMMMDDDDD
+DDDDDDDD...MMMMMMMMMDDDDDDD
+DDddDDDDDDDMMMMMMMDDDDDddDD
+ddddddddDDDMMMMMMMDdddddddd
+dddddddddDMMMMMddMMdddddddd
+dddddddddMMMMddddMMMddddddd
+wwwDdddddMMMMddddMMMddddddd
+wwwDdddMMMMMddMMMMMMMdddddd
+wwddddMMMMMMddMMMMMMMdddddd
+dddddMMMMMMddMMMMMMMMwwwwww
+dddddMMMMMMddMMMMMMMMwwwwww
+dddd,,MMMMddMMMMddMMMddwwww
+dddd,,MMMMddMMMMddMMddddddd
+dddMMMMMMMMMMMMMddMMddddddd
+wwwMMMMMMMMMMMMddMMMddddddd
+wwwMMMMMMMMMMMMddMMMddddddd
+dddMMMMMMMMMMMMddMMMddddddd
+dddMMMMMMMMMMMMMMMMMddddddd
+ddddMMMMMMMMMMMMMMMMddddddd
+ddddMMMMMMMMMMMMMMMMMdddddd
+ddddddddMMMMMMMMMMMMMdddddd
+ddddddddwwwwwwwwwwwwddddddd
+ddddddddwwwwwwwwwwwwddddddd
 """
 
 SKETCHES["B"] = """
@@ -121,8 +121,8 @@ wwwDDDDDDDDDDDDDDDDDDDDDDww
 wwwDDDwwDDDDDDDDDDDDwwDDDww
 wwwDDDwwDDDDDDDDDDDDwwDDDww
 wwwDDDDwwDDDDDDDDDDwwDDDDww
-wwwwDDDwwDDDDDDDDDDwwDDDwww
-wwwwDDDDDDDDDDDDDDDDDDDDwww
+wwwDDDDwwDDDDDDDDDDwwDDDDww
+MMMMDDDDDDDDDDDDDDDDDDDDMMM
 MMMMMDDDDDDDDDDDDDDDDDDMMMM
 MMMMMMMDDDDDDDDDDDDDDDDMMMM
 MMMMMMMMMMDDDMMDDDMM.......
@@ -136,23 +136,23 @@ DDDDDDDDDDDDDDDDDDD........
 """
 
 SKETCHES["C"] = """
-DDDDDDDDDDDmmmmmmDDDD..DDDD
-DDDDDDDDDDDmmmmmmDD......DD
-DDDDDDDDDDDDDDDDDDD......DD
-DDDDDDDDDDDDDDDDDDD.......D
-DDDDD......DDDDDDDD.......D
-DDmm........DDDDDDD......DD
-Dmmm....d...DDDDDDD......DD
-Dmmm........DDDDDDDDD..DDDD
+~~~~~DDDDDDmmmmmmDDDDDDDDDD
+~~~~~DDDDDDmmmmmmDDDDDDDDDD
+~~~DDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDD......DDDDmmmmDDDDDDDD
+DDmm........DDmmmmmmDDDDDDD
+Dmmm....d...DDmmmmmmDDDDDDD
+Dmmm........DDDmmmmDDDDDDDD
 DDDDD......DDDDDDDDDDDDDDDD
-DDDDDDDD..DDDDDDDDDDDDDDDDD
+DDDDDDDD..DDDDDDDDDmmmmDDDD
 DDDDDDDD..DDDDDDDDmmmmmmDDD
 DDDDDDDDD..DDDDDDDmmmmmmDDD
 mmmmmDDDD..DDDDDDDDDDDDDDDD
-mmmmmDDDD..DDDDDDDDDwwwwwww
-DDDDDDDDD..DDDDDDDDDwwwwwww
-DDDDDDDD..DDDDDDDDDDDwwwwww
-DDDDDDDD..DDDDDDDDDDDDDDDDD
+mmmmmmDDD..DDDDDDDDDDDDDDDD
+mmmmmmDDD..DDDDDDDDDD~~~~~~
+DDDDDDDD..DDDDDDDDDD~~~~~~~
+DDDDDDDD..DDDDDDDDDD~~~DDDD
 DDDDDDD..DDDDDDDDDDDDDDDDDD
 DDDDDDD..DDDDDDDDDDDDDD..DD
 DDDDDD..DDDDD......DDD...DD
@@ -166,14 +166,14 @@ MMMMMM................MMMMM
 MMMMMM................MMMMM
 MMMMwwwwwwwwwwwwwwwwwwwwMMM
 MMMMwwwwwwwwwwwwwwwwwwwwMMM
-MMMMMMMMMMMMMMMMMMMM.....MM
-MMMmmmMMMMMMMMMMMMMM.,,,.MM
-MMMmdmMMMwwwwwwwMMMM.,d,.MM
-MMMmmmMMMwwwwwwwMMMM.,,,.MM
-MMMMMMMMMMMMMMMMMMMM.....MM
-MMMMMMMMMMMMMMMMMMMMMMMMMMM
-DDDDDMMMMMMMMMMMMMMMMMMMMDD
-DDDDDDDDMMMMMMMMMMMMMMMMMDD
+MMMMMMMMMMwwwwMMMMMMMMMMMMM
+MMMmmmMMMMwwwwMMMMMMMMMMMMM
+MMMmdmMMMMMMMMMMMMMMMMMMMMM
+MMMmmmMMMMMMMMMMMMMMMM.....
+MMMMMMMMMMMMMMMMMMMMMM.,,,.
+DDMMMMMMMMMMMMMMMMMMMM.,d,.
+DDDDDMMMMMMMMMMMMMMMMM.,,,.
+DDDDDDDDMMMMMDDDDDDDMM.....
 """
 
 
@@ -399,8 +399,9 @@ def run_excess(b, limit):
     return ex
 
 
-ANOMALY_W = 1000.0   # v2: the drawings have no anomalies but the locked dots; the balancer adds none
+ANOMALY_W = 5000.0  # v4b: above the raised edge weight, so no anomaly is traded for budgets   # v2: the drawings have no anomalies but the locked dots; the balancer adds none
 DIAG_TOL, DIAG_W = 4, 0.3   # 45-degree runs are tracked, matched more loosely than edges and corners
+EDGE_W = 8.0     # v4b: edge and corner spreads weighted 8 (v2: 3)
 RUN_W = 25.0      # v2: per edge of a straight run above the limit (6 in v1; W cells now move)
 
 
@@ -412,7 +413,7 @@ def energy(st, changes, ref_regions):
     K = np.array([s.corners[:NB] for s in st])
     G = np.array([s.diag[:NB] for s in st])
     N = np.array([s.counts for s in st])
-    for arr, tol, w in ((E, 2, 3.0), (K, 2, 3.0), (G, DIAG_TOL, DIAG_W), (N, 1, 4.0)):
+    for arr, tol, w in ((E, 2, EDGE_W), (K, 2, EDGE_W), (G, DIAG_TOL, DIAG_W), (N, 1, 4.0)):
         spread = arr.max(0) - arr.min(0)
         e += w * (np.maximum(0, spread - tol) ** 2).sum() + 0.3 * spread.sum()
     J = np.array([s.junction for s in st])
@@ -623,7 +624,10 @@ def extra_rows(maps):
 
 BRANCH_ROWS_V4B = (32, 33)
 LEG_ROWS_V4B = slice(30, 32)
-ANIMAL_FLOOD = {"A": "DL", "B": "", "C": "M"}   # locked tiers that belong to the animal when touching it
+ANIMAL_FLOOD = {"A": "", "B": "", "C": ""}   # v4b: no flood (the locked field and sky touch the hare); see ANIMAL_EXTRA
+# v4b: cells outside the figure region that belong to the animal: A ear tips and tail, C beak
+ANIMAL_EXTRA = {"A": [(4, 10), (4, 11), (5, 10), (5, 11), (4, 14), (4, 15), (5, 14), (5, 15), (26, 4), (26, 5), (27, 4), (27, 5)],
+                "B": [], "C": [(5, 2), (5, 3), (6, 1), (6, 2), (6, 3), (7, 1), (7, 2), (7, 3)]}
 BRANCH_ROWS = BRANCH_ROWS_V4B                           # B: the branch rows of the owl's figure region
 LEG_ROWS = LEG_ROWS_V4B                         # B: the legs; the sky between them is not the owl
 
@@ -636,6 +640,8 @@ def animal_mask(n, t, locked):
     if n == "B":
         a[list(BRANCH_ROWS)] = False
         a[LEG_ROWS] &= t[LEG_ROWS] == CODE["D"]
+    for r, c in ANIMAL_EXTRA[n]:
+        a[r, c] = True
     R, C = t.shape
     grow = True
     while grow:

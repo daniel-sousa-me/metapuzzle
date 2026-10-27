@@ -138,3 +138,31 @@ v2's 127 even though the draft's edge and corner pools are matched within a spre
 annealer's pools and the pipeline's transition classes are different counts (FINDINGS 41). Visual: the
 owl reads (eyes, beak); the hare's hedge and shadow bands show but the hare does not; the swan is hard
 to read; internal lines and cues are specks at cell 21; hedge and moon edges are stepped.
+
+## v4b (27x38-v4b)
+
+`python3 make_targets_v4b.py` (about 5 min) redraws the hare and the swan after
+blind-test-v4-draft.md (finding 39). It is a copy of the v4 draft with these annealer changes:
+- edge and corner spreads weigh 8 (was 3) and anomalies weigh 5000 (was 1000);
+- 800 iterations per cell (was 400);
+- locks on key scene shapes.
+
+S is 0 in all three pictures, because the stippled patches read as signs.
+- **Owl (B):** unchanged, except that the moon is now a disc in the upper right corner, clear of
+  the tufts.
+- **Hare (A):** the v2 pose with two upright ears 2 cells wide and 6 tall (dark tips). It keeps the
+  eye, mouth, white tail, and the haunch, shoulder and stepped leg lines. The hedge is gone, and the
+  hare is the only olive mass. The dark tier is a field behind and below it, with a few far trees.
+- **Swan (C):** an S neck 2 cells wide, a larger head with a wedge beak (M), a rounded body with a
+  raised wing and a pointed tail, and a straight 2-row W band under the body. The reflection is a
+  thin W streak. The moon is removed.
+- **Budgets:** counts D/M/W/L are 374/322/56/274 (spread 4 or less). Edge spreads are 5 or less for
+  every pair; corner spreads are 6 or less, except D-M corners (8) and M-W corners (7). There are no
+  caps, strips or pinches.
+- **Animal masks:** `tiers-X-animal.txt`. Each is the figure with its holes, plus explicit extras
+  (hare ear tips and tail, swan beak). The owl's mask excludes the branch and the sky between its legs.
+- **Risks:**
+  - D must be about a third of every picture, so the hare's dark field rises to its ears on the
+    left. The horizon is therefore not low.
+  - The swan's neck is thin, and the corner glint (L, holding the second D-on-L dot) is a pale block.
+  - The annealer moved 57/56/105 cells.
