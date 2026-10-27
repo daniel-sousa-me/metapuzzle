@@ -48,7 +48,9 @@ Status as of 2026-10-27, 14:30 UTC. Sources are given in each item.
 - **Standard border is feasible again.** Cross-class seams (`docs/engine-spec.md`) seat surplus
   flat-sided pieces in small blocks across classes; the subject set solves with a standard border,
   0 mismatches, shared 0/1/1 (`experiments/011-subjects/border-check/round2/run-standard`). The
-  tray stays the default until a side-by-side on the v4 tiers (DECISIONS, 14:30 UTC).
+  tray stays the default until a side-by-side on the v4 tiers (DECISIONS, 14:30 UTC). The
+  `--cut-overlay` render draws piece outlines and reports straight seam runs for that comparison
+  (one run of 3 on the standard-border check).
 - **Pipeline v7 (motif density gradient) is a negative result:** the tone tiers cannot separate the
   animal from its landmass, and the fallback reached 5.2% coverage. v6 stays the motif baseline;
   the design pass now exports an animal mask (FINDINGS 38).
