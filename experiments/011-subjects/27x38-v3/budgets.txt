@@ -1,0 +1,148 @@
+# Boundary budgets, experiment 011 (Field, Wood and Water), 27 columns x 38 rows, v3.
+# Columns: A hare, B owl, C swan. v3 matches the transition CLASSES (budget_v3.py, the pipeline's
+# classify stage): per ordered tier pair and pattern s (straight), c (corner), p (cap), d (dot).
+# The surplus of a picture is the sum over classes of (max over pictures minus its own count);
+# v3 target: total under 30. The pair edges and corners below are reported, not matched.
+# Tier totals: target equal in the three pictures (spread in the cells rows; not exact in v3). Anomalies need rare tiles (target 0; the dots are
+# designed: one D-on-L and one D-on-M dot per picture). Tips = 1-cell protrusions (caps).
+# Straight runs are penalized above 7 edges. Cells moved by the balancer from the v2
+# picture: A 44, B 63, C 82
+# Class surplus, v2 start: A 73, B 58, C 62 (total 193); v3: A 51, B 26, C 30 (total 107)
+# Frame (border) surplus, v2 start: corner 15, edge 330; v3: corner 15, edge 258
+
+                           A hare    B owl   C swan   spread
+cells D                       285      287      286        2
+cells M                       396      394      394        2
+cells W                        37       37       37        0
+cells L                       281      281      282        1
+cells S                        27       27       27        0
+D-M edges                      66       69       80       14
+D-M corners                    64       68       75       11
+  convex/concave            27/37    29/39    34/41
+D-M 45deg-run cells             7        2        6        5
+D-W edges                       8        5        7        3
+D-W corners                     2        4        7        5
+  convex/concave              0/2      0/4      3/4
+D-W 45deg-run cells             0        0        2        2
+D-L edges                     110      104       98       12
+D-L corners                   123      113      107       16
+  convex/concave            63/60    66/47    53/54
+D-L 45deg-run cells            30       50       19       31
+M-W edges                      17       26       24        9
+M-W corners                    10       20       16       10
+  convex/concave              4/6     9/11      8/8
+M-W 45deg-run cells             0        0        0        0
+M-L edges                      81       95       84       14
+M-L corners                   102      113       99       14
+  convex/concave            50/52    55/58    50/49
+M-L 45deg-run cells            32       33       26        7
+W-L edges                      11       16       14        5
+W-L corners                    12       10       10        2
+  convex/concave              6/6      5/5      4/6
+W-L 45deg-run cells             0        0        0        0
+L-S edges                      26       27       26        1
+L-S corners                    20       20       20        0
+  convex/concave            10/10    10/10    10/10
+L-S 45deg-run cells             2        2        4        2
+D-S contacts (8-nb)             0        0        0        0
+M-S contacts (8-nb)             0        0        0        0
+W-S contacts (8-nb)             0        0        0        0
+anomaly cap                     0        0        0        0
+anomaly strip                   0        0        0        0
+anomaly dot                     2        2        2        0
+anomaly pinch                   0        0        0        0
+junction cells                 39       46       36       10
+longest straight run            7        7        8        1
+tips (1-cell caps)              0        0        0        0
+
+# Transition classes (merged, as the pipeline's classify stage counts them), interior cells:
+class   pair    A hare    B owl   C swan   maxsur_A haresur_B owlsur_C swan
+DMc       DM        14       13       15    15       1       2       0
+DMs       DM        29       38       31    38       9       0       7
+MDc       DM        11       14       11    14       3       0       3
+MDd       DM         1        1        1     1       0       0       0
+total     DM        55       66       58    68      13       2      10
+DWc       DW         0        0        1     1       1       1       0
+DWs       DW         4        5        4     5       1       0       1
+WDc       DW         0        0        2     2       2       2       0
+total     DW         4        5        7     8       4       3       1
+DLc       DL        23       34       23    34      11       0      11
+DLs       DL        39       32       42    42       3      10       0
+LDc       DL        30       28       28    30       0       2       2
+LDd       DL         1        1        1     1       0       0       0
+total     DL        93       95       94   107      14      12      13
+SLc       SL         7        8        7     8       1       0       1
+SLs       SL        12        9       12    12       0       3       0
+LSc       SL         3        2        3     3       0       1       0
+total     SL        22       19       22    23       1       4       1
+MWc       MW         2        2        3     3       1       1       0
+MWs       MW        13       15       15    15       2       0       0
+WMc       MW         4        4        4     4       0       0       0
+total     MW        19       21       22    22       3       1       0
+MLc       ML        25       25       21    25       0       0       4
+MLs       ML        31       33       35    35       4       2       0
+LMc       ML        25       24       26    26       1       2       0
+total     ML        81       82       82    86       5       4       4
+WLc       WL         2        3        2     3       1       0       1
+WLs       WL         2       10       10    10       8       0       0
+LWc       WL         0        2        2     2       2       0       0
+total     WL         4       15       14    15      11       0       1
+class surplus (max minus own, summed over classes): A hare 51, B owl 26, C swan 30; total 107
+
+# Frame histogram, v2 start (before):
+frame corner cells: A hare 4  B owl 4  C swan 4
+label        A hare    B owl   C swan  spread
+D                 1        0        4       4
+L                 3        2        0       3
+M                 0        2        0       2
+frame edge cells: A hare 122  B owl 122  C swan 122
+label        A hare    B owl   C swan  spread
+D                37        0       29      37
+L                52       33        0      52
+M                 0       69       48      69
+S                 0        3        0       3
+W                 9        0        0       9
+DLs              14        0        7      14
+DMc               0        0        4       4
+DMs               2        0       13      13
+DWs               2        0        2       2
+LDc               4        0        4       4
+LMc               0        2        2       2
+MDc               2        0        6       6
+MLs               0        4        5       5
+MWs               0        7        0       7
+SLs               0        2        0       2
+WDc               0        0        1       1
+WMc               0        2        1       2
+
+# Frame histogram, v3 (after): corner pool (4 cells) and edge pool; labels are plain tiers or classes:
+frame corner cells: A hare 4  B owl 4  C swan 4
+label        A hare    B owl   C swan  spread
+D                 1        0        2       2
+L                 3        2        0       3
+M                 0        2        0       2
+DMs               0        0        2       2
+frame edge cells: A hare 122  B owl 122  C swan 122
+label        A hare    B owl   C swan  spread
+D                29        0       29      29
+L                44       40       10      34
+M                 0       51       51      51
+S                 0        3        0       3
+W                11        5        5       6
+DLc               1        0        0       1
+DLs              19        0        4      19
+DMc               0        0        4       4
+DMs               2        0        5       5
+DWs               2        0        1       2
+LDc               7        0        0       7
+LMc               0        5        2       5
+LWc               2        0        0       2
+MDc               2        0        4       4
+MLc               0        2        0       2
+MLs               0        8        7       8
+MWc               0        2        0       2
+MWs               0        3        0       3
+SLs               0        2        0       2
+WLc               2        0        0       2
+WLs               1        0        0       1
+WMc               0        1        0       1

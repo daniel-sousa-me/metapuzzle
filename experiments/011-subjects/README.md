@@ -46,3 +46,13 @@ A/B/C, with 8/22/6 cells changed. The run stopped in roles (exit 1): the hare ne
 only 10 far D cells exist, and the swan needs 21 with 1. The host check counts D cells next to a
 transition (near), which `pick()` never uses for D, so no scenes, renders or solution JSON were
 written. Log: `27x38-v2/pipeline-out/run-main.log`.
+
+## v3: class-level matching
+
+`make_targets_v3.py` (a copy of make_targets.py) starts from the v2 pictures and matches the transition
+classes the pipeline counts (`budget_v3.py`, checked cell by cell against the classify stage of
+`run_from_tiers_v3.py`). The energy penalizes each class's spread over the three pictures, and the frame
+corner and edge pools the same way. Figures and locked cells are unchanged; 44, 63 and 82 cells moved.
+Class surplus 193 to 107 (51/26/30): the target under 30 is not met. Frame edge surplus 330 to 258,
+corners 15 unchanged: the owl's frame has no D and D is not a background tier for the owl. Tier totals
+are not exact (D 285/287/286). Log: `27x38-v3/budgets.txt`.
