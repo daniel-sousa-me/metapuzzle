@@ -1,0 +1,27 @@
+maps (cols x rows): A 20x25, B 20x25, C 20x25
+class histograms:
+  A: L=287 M=76 DMs=41 MLs=24 MLc=17 DLs=16 MDc=11 D=10 DMc=8 LMc=6 DMp=2 MDd=1 MLp=1
+  B: L=287 M=76 DMs=41 MLs=24 MLc=17 DLs=16 MDc=11 D=10 DMc=8 LMc=6 DMp=2 MDd=1 MLp=1
+  C: L=287 M=76 DMs=41 MLs=24 MLc=17 DLs=16 MDc=11 D=10 DMc=8 LMc=6 DMp=2 MDd=1 MLp=1
+largest same-class blob per class:
+  A: L=284 M=75 DMs=7 MLs=7 DLs=5 D=4 MDc=4 DMc=2 MLc=2 DMp=1 LMc=1 MDd=1 MLp=1
+  B: L=287 M=56 DLs=16 DMs=14 D=6 MLs=6 DMc=2 DMp=2 MDc=2 MLc=2 LMc=1 MDd=1 MLp=1
+  C: L=287 M=38 DLs=10 DMs=8 MLs=8 D=6 MDc=2 MLc=2 DMc=1 DMp=1 LMc=1 MDd=1 MLp=1
+same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+pairs (window reuse shown as plain/rotated, window = rows x cols):
+  A-B: same position 297 (59.4%)
+    same position excl. dominant L (covers 57.4% of cells, gated): 64 (40.3%)
+    weighted overlap: 15.5%
+    window reuse: 1x2 0.89/0.95  2x1 0.93/0.96  2x2 0.66/0.73  3x3 0.37/0.39
+    transferable blob: 233 cells (46.6% of A)
+  A-C: same position 296 (59.2%)
+    same position excl. dominant L (covers 57.4% of cells, gated): 63 (39.6%)
+    weighted overlap: 14.3%
+    window reuse: 1x2 0.93/0.97  2x1 0.91/0.97  2x2 0.74/0.80  3x3 0.42/0.43
+    transferable blob: 230 cells (46.0% of A)
+  B-C: same position 293 (58.6%)
+    same position excl. dominant L (covers 57.4% of cells, gated): 59 (36.9%)
+    weighted overlap: 15.6%
+    window reuse: 1x2 0.92/0.94  2x1 0.91/0.95  2x2 0.69/0.80  3x3 0.43/0.45
+    transferable blob: 234 cells (46.8% of B)
+scene gates: FAIL (A-B same-position excl. L 40.3% ≥ 25%; A-B 2x2 window reuse 65.8% ≥ 30%; A-B transferable blob 46.6% ≥ 10% of cells; A-C same-position excl. L 39.6% ≥ 25%; A-C 2x2 window reuse 74.3% ≥ 30%; A-C transferable blob 46.0% ≥ 10% of cells; B-C same-position excl. L 36.9% ≥ 25%; B-C 2x2 window reuse 68.6% ≥ 30%; B-C transferable blob 46.8% ≥ 10% of cells)

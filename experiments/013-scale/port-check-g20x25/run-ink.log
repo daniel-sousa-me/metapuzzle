@@ -1,0 +1,3 @@
+sizes=20x25, 20x25, 20x25 shared AB/AC/BC=0/0/0 valid=True wrote 16 files to /home/user/metapuzzle/experiments/013-scale/g20x25/run-ink
+piece gates: PASS
+scene gates: FAIL (A-B same-position excl. L 40.3% ≥ 25%; A-B 2x2 window reuse 65.8% ≥ 30%; A-B transferable blob 46.6% ≥ 10% of cells; A-C same-position excl. L 39.6% ≥ 25%; A-C 2x2 window reuse 74.3% ≥ 30%; A-C transferable blob 46.0% ≥ 10% of cells; B-C same-position excl. L 36.9% ≥ 25%; B-C 2x2 window reuse 68.6% ≥ 30%; B-C transferable blob 46.8% ≥ 10% of cells)

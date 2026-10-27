@@ -1,0 +1,14 @@
+plain targets {'D': 10, 'M': 76, 'L': 287}; transition target total 127; estimated shortfall 0, near fallback 37
+placement per image (surplus = pieces that must enter tier x; far slots = 8-independent far cells):
+   cat       surplus into tier D/M/L 17/10/14 (pairs DM 27, DL 3, ML 11; flows DM->D 17, DL->D 0, ML->M 0)
+             far slots (isolated) D/M/L 2/10/40 (estimate 2/10/50); near fallback D/M/L 15/0/0
+   sailboat  surplus into tier D/M/L 3/16/14 (pairs DM 16, DL 0, ML 17; flows DM->D 3, DL->D 0, ML->M 3)
+             far slots (isolated) D/M/L 0/11/48 (estimate 0/11/50); near fallback D/M/L 3/5/0
+   tree      surplus into tier D/M/L 15/15/14 (pairs DM 22, DL 6, ML 16; flows DM->D 9, DL->D 6, ML->M 2)
+             far slots (isolated) D/M/L 1/15/42 (estimate 1/15/49); near fallback D/M/L 14/0/0
+near fallback total (all images): 37
+   residue cat      : after far slots and near fallback, 0 surplus pieces (D/M/L 0/0/0) go to non-isolated far cells; 0 of them touch another surplus piece
+   residue sailboat : after far slots and near fallback, 0 surplus pieces (D/M/L 0/0/0) go to non-isolated far cells; 0 of them touch another surplus piece
+   residue tree     : after far slots and near fallback, 0 surplus pieces (D/M/L 0/0/0) go to non-isolated far cells; 0 of them touch another surplus piece
+target_counts {'D': 10, 'DLs': 16, 'DMc': 8, 'DMp': 2, 'DMs': 41, 'L': 287, 'LMc': 6, 'M': 76, 'MDc': 11, 'MDd': 1, 'MLc': 17, 'MLp': 1, 'MLs': 24}
+wrote roles.txt and roles-spec.json

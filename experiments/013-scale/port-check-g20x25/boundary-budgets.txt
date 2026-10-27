@@ -1,0 +1,32 @@
+# Boundary budgets (v5), experiment 005. Merged classes per unordered pair (darker tier first).
+# max = per-class max over the three images; surplus = max - own (cells that must be added
+# in near roles). A = cat, B = sailboat, C = tree.
+
+Pair D-M
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DMc  corner-P DMc          3        3        8     8        5        5        0
+DMp  cap-P DMp             2        0        0     2        0        2        2
+DMs  straight             22       41       22    41       19        0       19
+MDc  corner-Q MDc          8        3       11    11        3        8        0
+MDd  dot-P MDd             1        0        0     1        0        1        1
+total                     36       47       41    63       27       16       22
+approx strip             2        1        0
+approx s+diag            7        2        7
+approx c+diag            1        0        0
+approx i+multi           1        0        0
+
+Pair D-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+DLs  straight             13       16       10    16        3        0        6
+total                     13       16       10    16        3        0        6
+approx strip             1        0        0
+
+Pair M-L
+class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+MLc  corner-P MLc         10        9       17    17        7        8        0
+MLp  cap-P MLp             1        0        0     1        0        1        1
+MLs  straight             24       16       14    24        0        8       10
+LMc  corner-Q LMc          2        6        1     6        4        0        5
+total                     37       31       32    48       11       17       16
+
+Transition cells per image: cat 86, sailboat 94, tree 83; surplus to place (all pairs): cat 41, sailboat 33, tree 44

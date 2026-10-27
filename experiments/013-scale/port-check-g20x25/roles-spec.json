@@ -1,0 +1,307 @@
+{
+  "_note": "Step 6 (v5, merged classes; dots keep v4 naming). target_counts: transition classes = per-class max over the three images; plain tiers chosen so every image fits. Edge roles fix class and rotation. Frame, near and far cells are plain. Surplus transition pieces go to isolated far slots (x_slot, weight 0.5); near cells (x_nslot, weight 0.2) only where far slots run out; the residue, if any, goes to non-isolated far cells (x_xslot, weight 0.2).",
+  "roles": {
+    "d_frame": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_near": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_far": {
+      "classes": [
+        "D"
+      ]
+    },
+    "d_slot": {
+      "classes": [
+        "D",
+        "DLs",
+        "DMc",
+        "DMp",
+        "DMs",
+        "MDc",
+        "MDd"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "d_nslot": {
+      "classes": [
+        "D",
+        "DLs",
+        "DMc",
+        "DMp",
+        "DMs",
+        "MDc",
+        "MDd"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "d_xslot": {
+      "classes": [
+        "D",
+        "DLs",
+        "DMc",
+        "DMp",
+        "DMs",
+        "MDc",
+        "MDd"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "m_frame": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_near": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_far": {
+      "classes": [
+        "M"
+      ]
+    },
+    "m_slot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMp",
+        "DMs",
+        "LMc",
+        "MDc",
+        "MDd",
+        "MLc",
+        "MLp",
+        "MLs"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "m_nslot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMp",
+        "DMs",
+        "LMc",
+        "MDc",
+        "MDd",
+        "MLc",
+        "MLp",
+        "MLs"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "m_xslot": {
+      "classes": [
+        "M",
+        "DMc",
+        "DMp",
+        "DMs",
+        "LMc",
+        "MDc",
+        "MDd",
+        "MLc",
+        "MLp",
+        "MLs"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "l_frame": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_near": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_far": {
+      "classes": [
+        "L"
+      ]
+    },
+    "l_slot": {
+      "classes": [
+        "L",
+        "DLs",
+        "LMc",
+        "MLc",
+        "MLp",
+        "MLs"
+      ],
+      "weights": [
+        1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "l_nslot": {
+      "classes": [
+        "L",
+        "DLs",
+        "LMc",
+        "MLc",
+        "MLp",
+        "MLs"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "l_xslot": {
+      "classes": [
+        "L",
+        "DLs",
+        "LMc",
+        "MLc",
+        "MLp",
+        "MLs"
+      ],
+      "weights": [
+        1,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "edge_dls": {
+      "classes": [
+        "DLs"
+      ]
+    },
+    "edge_dmc": {
+      "classes": [
+        "DMc"
+      ]
+    },
+    "edge_dmp": {
+      "classes": [
+        "DMp"
+      ]
+    },
+    "edge_dms": {
+      "classes": [
+        "DMs"
+      ]
+    },
+    "edge_lmc": {
+      "classes": [
+        "LMc"
+      ]
+    },
+    "edge_mdc": {
+      "classes": [
+        "MDc"
+      ]
+    },
+    "edge_mdd": {
+      "classes": [
+        "MDd"
+      ]
+    },
+    "edge_mlc": {
+      "classes": [
+        "MLc"
+      ]
+    },
+    "edge_mlp": {
+      "classes": [
+        "MLp"
+      ]
+    },
+    "edge_mls": {
+      "classes": [
+        "MLs"
+      ]
+    }
+  },
+  "target_counts": {
+    "D": 10,
+    "DLs": 16,
+    "DMc": 8,
+    "DMp": 2,
+    "DMs": 41,
+    "L": 287,
+    "LMc": 6,
+    "M": 76,
+    "MDc": 11,
+    "MDd": 1,
+    "MLc": 17,
+    "MLp": 1,
+    "MLs": 24
+  }
+}
