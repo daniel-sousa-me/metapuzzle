@@ -1,4 +1,14 @@
-"""Per-solution class maps: parsing, validation, and inventory derivation."""
+"""Per-solution class maps: parsing, validation, and inventory derivation.
+
+Tokens: ``cls`` (a class label), ``cls@R`` (R in 0, 90, 180, 270: the piece at that cell must
+sit at rotation R), and ``cls@*`` (any rotation: the escape for a forced class).
+
+Orientation rule, applied across the three maps by ``load_scenes`` and ``parse_text``: if ANY
+token of a class in any map carries an explicit ``@R`` suffix (``@0`` counts), every token of
+that class is orientation-forced. Bare and ``@0`` tokens force rotation 0, ``@R`` forces R, and
+``@*`` leaves that one cell free. A class with no explicit suffix anywhere stays unconstrained,
+so its pieces may rotate in quarter mode.
+"""
 from __future__ import annotations
 
 import json
@@ -17,12 +27,33 @@ class SceneError(ValueError):
     """Raised when class maps are malformed or inconsistent."""
 
 
+class _ForcedZero(int):
+    """Rotation 0 that is forced, as opposed to the plain 0 that means unconstrained.
+
+    The solver reads cells as ``rot or None``, so this int is truthy. It still equals 0 everywhere else.
+    """
+
+    def __bool__(self) -> bool:
+        return True
+
+
+FORCED_ZERO = _ForcedZero(0)
+ANY_ROTATION = "*"
+
+
 @dataclass
 class ClassMap:
-    """Grid of class labels (rows x cols) plus forced rotations (0 = unconstrained)."""
+    """Grid of class labels (rows x cols) plus per-cell rotations.
+
+    ``rot`` cell values: plain 0 = unconstrained (any rotation); ``FORCED_ZERO`` = rotation 0 is
+    forced; 90, 180, 270 = forced. ``forced`` lists the classes orientation-forced across the
+    whole scene set (module docstring); it decides how unconstrained cells of such classes are
+    written back as ``cls@*``.
+    """
 
     cls: list[list[str]]
     rot: list[list[int]]
+    forced: frozenset = frozenset()
 
     @property
     def rows(self) -> int:
@@ -36,36 +67,53 @@ class ClassMap:
         return Counter(c for row in self.cls for c in row)
 
     def tokens(self) -> list[list[str]]:
-        return [[c if r == 0 else f"{c}@{r}" for c, r in zip(cr, rr)] for cr, rr in zip(self.cls, self.rot)]
+        """Token rows that ``from_tokens`` reads back to the same map."""
+        forced = self.forced | {c for cr, rr in zip(self.cls, self.rot) for c, r in zip(cr, rr) if r}
+        out = []
+        for cr, rr in zip(self.cls, self.rot):
+            row = []
+            for c, r in zip(cr, rr):
+                if isinstance(r, _ForcedZero):
+                    row.append(f"{c}@0")
+                elif r:
+                    row.append(f"{c}@{r}")
+                else:
+                    row.append(f"{c}@{ANY_ROTATION}" if c in forced else c)
+            out.append(row)
+        return out
 
     @classmethod
     def from_tokens(cls, rows: Sequence[Sequence[str]]) -> "ClassMap":
-        if not rows or not rows[0]:
-            raise SceneError("empty class map")
-        if len({len(r) for r in rows}) != 1:
-            raise SceneError("class map rows have different lengths")
-        parsed = [[parse_token(t) for t in r] for r in rows]
-        return cls([[c for c, _ in r] for r in parsed], [[o for _, o in r] for r in parsed])
+        """One map from token rows. The orientation rule sees only this map; use ``load_scenes`` for the set."""
+        return _maps_from_rows([rows])[0]
 
 
-def parse_token(tok: str) -> tuple[str, int]:
-    """'sky@90' -> ('sky', 90); 'sky@0' == 'sky'."""
+def _split_token(tok: str) -> tuple[str, int | None, bool]:
+    """(label, rotation, explicit). Rotation is None for ``@*``; explicit is False for a bare label."""
     label, sep, rot = tok.partition("@")
     if not label or "@" in rot:
         raise SceneError(f"bad token {tok!r}")
     if not sep:
-        return label, 0
+        return label, 0, False
+    if rot == ANY_ROTATION:
+        return label, None, True
     try:
         r = int(rot)
     except ValueError:
         raise SceneError(f"bad rotation in token {tok!r}") from None
     if r not in ROTATION_DEGREES:
         raise SceneError(f"rotation in {tok!r} must be one of {ROTATION_DEGREES}")
-    return label, r
+    return label, r, True
 
 
-def parse_text(text: str) -> list[ClassMap]:
-    """Parse text: rows of whitespace-separated tokens; blank lines separate maps; '#' comments."""
+def parse_token(tok: str) -> tuple[str, int]:
+    """'sky@90' -> ('sky', 90); 'sky@0' and 'sky' -> ('sky', 0); 'sky@*' -> ('sky', 0), unconstrained."""
+    label, rot, _ = _split_token(tok)
+    return label, rot or 0
+
+
+def _text_grids(text: str) -> list[list[list[str]]]:
+    """Token rows per map in text: blank lines separate maps; '#' starts a comment."""
     blocks: list[list[list[str]]] = [[]]
     for line in text.splitlines():
         line = line.split("#", 1)[0].strip()
@@ -74,34 +122,66 @@ def parse_text(text: str) -> list[ClassMap]:
                 blocks.append([])
             continue
         blocks[-1].append(line.split())
-    return [ClassMap.from_tokens(b) for b in blocks if b]
+    return [b for b in blocks if b]
 
 
-def _maps_from_json(data) -> list[ClassMap]:
+def _json_grids(data) -> list[list[list[str]]]:
     grids = data["maps"] if isinstance(data, dict) else data
-    out = []
-    for g in grids:
-        rows = [r.split() if isinstance(r, str) else list(r) for r in g]
-        out.append(ClassMap.from_tokens(rows))
-    return out
+    return [[r.split() if isinstance(r, str) else list(r) for r in g] for g in grids]
+
+
+def _maps_from_rows(grids: Sequence[Sequence[Sequence[str]]]) -> list[ClassMap]:
+    """Parse token grids into maps, applying the orientation rule across all of them."""
+    parsed = []
+    for rows in grids:
+        if not rows or not rows[0]:
+            raise SceneError("empty class map")
+        if len({len(r) for r in rows}) != 1:
+            raise SceneError("class map rows have different lengths")
+        parsed.append([[_split_token(t) for t in r] for r in rows])
+    forced = frozenset(
+        lbl for g in parsed for row in g for lbl, rot, explicit in row if explicit and rot is not None
+    )
+
+    def cell(lbl: str, rot: int | None) -> int:
+        if rot is None:
+            return 0
+        return FORCED_ZERO if rot == 0 and lbl in forced else rot
+
+    return [
+        ClassMap(
+            [[lbl for lbl, _, _ in row] for row in g],
+            [[cell(lbl, rot) for lbl, rot, _ in row] for row in g],
+            forced,
+        )
+        for g in parsed
+    ]
+
+
+def parse_text(text: str) -> list[ClassMap]:
+    """Parse text: rows of whitespace-separated tokens; blank lines separate maps; '#' comments."""
+    return _maps_from_rows(_text_grids(text))
 
 
 def load_scenes(paths: str | Path | Sequence[str | Path]) -> list[ClassMap]:
-    """Load 3 maps: three files (one map each), or one text/JSON file holding all three."""
+    """Load 3 maps: three files (one map each), or one text/JSON file holding all three.
+
+    The orientation rule (module docstring) is applied across all three maps together.
+    """
     plist = [paths] if isinstance(paths, (str, Path)) else list(paths)
-    maps: list[ClassMap] = []
+    grids: list[list[list[str]]] = []
     for p in plist:
         text = Path(p).read_text()
         if Path(p).suffix.lower() == ".json":
             try:
-                maps += _maps_from_json(json.loads(text))
+                grids += _json_grids(json.loads(text))
             except (KeyError, TypeError, json.JSONDecodeError) as e:
                 raise SceneError(f"bad scene JSON {p}: {e}") from e
         else:
-            maps += parse_text(text)
-    if len(maps) != 3:
-        raise SceneError(f"expected 3 class maps, found {len(maps)}")
-    return maps
+            grids += _text_grids(text)
+    if len(grids) != 3:
+        raise SceneError(f"expected 3 class maps, found {len(grids)}")
+    return _maps_from_rows(grids)
 
 
 def _boards3(boards) -> list[Board]:
@@ -130,7 +210,7 @@ def validate_scenes(boards, maps: Sequence[ClassMap], free_corners: bool = False
                     raise SceneError(f"bad class label {c!r}")
         for y in range(m.rows):
             for x in range(m.cols):
-                if m.rot[y][x]:
+                if m.rot[y][x] != 0:  # explicit nonzero suffix; forced 0 (inferred or @0) is always allowed
                     if b.rotation != "quarter":
                         raise SceneError(f"map {'ABC'[k]} cell ({x},{y}): orientation suffix needs rotation 'quarter'")
                     if b.slots[b.slot_at(x, y)].kind != "interior":
@@ -381,6 +461,8 @@ def pieces_from_scenes(
     rotation). `extra_flat_pieces` adds that many more flat edge pieces on top, spread over the
     classes (without rotation, in N/S then W/E pairs; an odd count gets one more partner). The
     automatic padding needs every class to be rotation-free or every class fully rotatable.
+    A frame cell with a forced rotation (module docstring) takes a piece showing its flat at that
+    rotation; the seam padding does not yet account for such cells.
 
     allowed_rotations maps class -> rotations (degrees). Classes it omits get the board default:
     all four in quarter mode, {0} otherwise (corners of free_corners get all four).
@@ -407,12 +489,14 @@ def pieces_from_scenes(
     total = a_map.histogram()
     classes = sorted(total)
     # Border cells per map and class: (slot id, shape, side index or corner index); corners first.
-    need: list[dict[str, list[tuple[int, str, int]]]] = [{} for _ in range(3)]
+    need: list[dict[str, list[tuple[int, str, int, int | None]]]] = [{} for _ in range(3)]
     for k in range(3):
         for s in bl[k].slots:
             if s.kind != "interior":
                 key = SIDES.index(s.home) if s.kind == "edge" else CORNERS.index(s.home)
-                need[k].setdefault(maps[k].cls[s.y][s.x], []).append((s.id, s.kind, key))
+                forced = maps[k].rot[s.y][s.x] or None
+                need[k].setdefault(maps[k].cls[s.y][s.x], []).append(
+                    (s.id, s.kind, key, None if forced is None else int(forced)))
         for lst in need[k].values():
             lst.sort(key=lambda d: d[1] != "corner")
     interior = [s for s in a_board.slots if s.kind == "interior"]
@@ -426,8 +510,17 @@ def pieces_from_scenes(
     used: list[dict[str, set[int]]] = [{c: set() for c in classes} for _ in range(3)]
     for k in range(3):
         for c in classes:
-            for slot_id, shape, key in need[k].get(c, []):
-                rots = rots_for(c, shape)
+            for slot_id, shape, key, forced in need[k].get(c, []):
+                allowed = rots_for(c, shape)
+                rots = allowed
+                if forced is not None:  # a forced border cell needs a piece showing its flat at that rotation
+                    cell = bl[k].slots[slot_id]
+                    if forced not in allowed:
+                        raise SceneError(
+                            f"class {c!r} (allowed rotations {sorted(allowed)}): map {'ABC'[k]} cell "
+                            f"({cell.x},{cell.y}) is forced to rotation {forced}"
+                        )
+                    rots = frozenset({forced})
                 idx = next(
                     (i for i, (sh, h) in enumerate(pools[c]) if i not in used[k][c] and sh == shape and key in _covers(h, rots)),
                     None,
@@ -437,7 +530,7 @@ def pieces_from_scenes(
                         cell = bl[k].slots[slot_id]
                         where = f"{SIDES[key]} side" if shape == "edge" else f"{CORNERS[key]} corner"
                         raise SceneError(
-                            f"class {c!r} (allowed rotations {sorted(rots)}) has {total[c]} cells, too few for its "
+                            f"class {c!r} (allowed rotations {sorted(allowed)}) has {total[c]} cells, too few for its "
                             f"border pieces: map {'ABC'[k]} cell ({cell.x},{cell.y}) needs another piece with its "
                             f"{where} flat"
                         )

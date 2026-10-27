@@ -3,6 +3,7 @@ import json
 import pytest
 
 from metapuzzle.board import square_board
+from metapuzzle.optimize import solve, validate_solution
 from metapuzzle.pieces import rotations_for_piece
 from metapuzzle.scene import ClassMap, SceneError, load_scenes, parse_text, parse_token, pieces_from_scenes, validate_scenes
 
@@ -149,3 +150,95 @@ def test_directional_side_mismatch_is_impossible_and_named():
     pieces = pieces_from_scenes(boards, maps, allowed_rotations={"rail": ALL_ROTATIONS})
     assert sum(p.cls == "rail" and p.shape_type == "edge" for p in pieces) == 2
     _every_cell_fits(boards, maps, pieces)
+
+
+def _solver_view(m):
+    """Rotation per cell as the solver reads it: None = unconstrained, else the forced degrees."""
+    return [[r or None for r in row] for row in m.rot]
+
+
+# Orientation rule, end to end: 4x5 standard frame, three maps, quarter rotation.
+# `sun` carries @90 in map A only, so its bare cells in B and C are forced to 0.
+_SUN_SCENES = """\
+canopy canopy canopy canopy
+canopy sun@90 sea canopy
+canopy sea sea canopy
+canopy sea sun canopy
+canopy canopy canopy canopy
+
+canopy canopy canopy canopy
+canopy sea sun canopy
+canopy sea sea canopy
+canopy sun sea canopy
+canopy canopy canopy canopy
+
+canopy canopy canopy canopy
+canopy sea sea canopy
+canopy sun sun canopy
+canopy sea sea canopy
+canopy canopy canopy canopy
+"""
+
+
+def _sun_case(text=_SUN_SCENES):
+    maps = parse_text(text)
+    boards = [square_board(4, 5, rotation="quarter")] * 3
+    validate_scenes(boards, maps)
+    sol = solve(boards, pieces_from_scenes(boards, maps), maps, seed=0)
+    return boards, maps, sol
+
+
+def test_forced_class_keeps_its_rotation_in_every_placement():
+    boards, maps, sol = _sun_case()
+    assert validate_solution(sol) == []
+    for k, (b, m) in enumerate(zip(boards, maps)):
+        placed = {slot: (pid, rot) for pid, (slot, rot) in sol.placements[k].items()}
+        for s in b.slots:
+            if m.cls[s.y][s.x] != "sun":
+                continue
+            pid, rot = placed[s.id]
+            assert sol.pieces[pid].cls == "sun"
+            # Only A's (1,1) is written @90; every other sun cell is forced to rotation 0.
+            assert rot == (90 if (k, s.x, s.y) == (0, 1, 1) else 0), (k, s.x, s.y)
+
+
+def test_unsuffixed_class_stays_unconstrained():
+    boards, maps, sol = _sun_case()
+    b, m = boards[0], maps[0]
+    sea_cells = [s for s in b.slots if m.cls[s.y][s.x] == "sea"]
+    assert all(_solver_view(m)[s.y][s.x] is None for s in sea_cells)
+    piece = next(p for p in sol.pieces if p.cls == "sea")
+    assert {90, 180, 270} <= set(rotations_for_piece(b, piece, sea_cells[0].id, None))
+    # Sea pieces are not pinned: some are placed turned.
+    turned = [rot for k in range(3) for pid, (_, rot) in sol.placements[k].items()
+              if sol.pieces[pid].cls == "sea" and rot]
+    assert turned
+
+
+def test_any_rotation_escape_leaves_one_cell_free():
+    text = _SUN_SCENES.replace("canopy sea sun canopy", "canopy sea sun@* canopy", 1)  # map A, cell (2,3)
+    boards, maps, sol = _sun_case(text)
+    assert validate_solution(sol) == []
+    assert _solver_view(maps[0])[3][2] is None  # `@*` inside a forced class: unconstrained
+    assert maps[0].tokens()[3][2] == "sun@*" and maps[0].tokens()[1][1] == "sun@90"
+    assert maps[1].tokens()[1][2] == "sun@0"  # bare cells of the forced class stay forced
+    piece = next(p for p in sol.pieces if p.cls == "sun")
+    assert set(rotations_for_piece(boards[0], piece, boards[0].slot_at(2, 3), None)) == {0, 90, 180, 270}
+
+
+def test_orientation_rule_spans_all_three_maps(tmp_path):
+    # `sun@90` in A forces every sun in B and C; `sun@*` is free; `sea` never has a suffix.
+    maps = parse_text("sun@90 sea\nsea sea\n\nsun sea\nsea sun@*\n\nsea sun\nsun sea")
+    a, b, c = (_solver_view(m) for m in maps)
+    assert a[0][0] == 90 and a[1][1] is None
+    assert b[0][0] == 0 and b[1][1] is None
+    assert c[0][1] == 0 and c[1][0] == 0 and c[0][0] is None and c[1][1] is None
+    assert maps[0].tokens() == [["sun@90", "sea"], ["sea", "sea"]]
+    assert maps[1].tokens() == [["sun@0", "sea"], ["sea", "sun@*"]]
+    assert maps[2].tokens() == [["sea", "sun@0"], ["sun@0", "sea"]]
+    # Written back as one scene file and reloaded, the solver view is unchanged.
+    path = tmp_path / "scenes.txt"
+    path.write_text("\n\n".join("\n".join(" ".join(r) for r in m.tokens()) for m in maps), encoding="utf-8")
+    again = load_scenes(path)
+    assert [_solver_view(m) for m in again] == [a, b, c]
+    assert [m.cls for m in again] == [m.cls for m in maps]
