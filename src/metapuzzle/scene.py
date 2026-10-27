@@ -211,10 +211,9 @@ def validate_scenes(boards, maps: Sequence[ClassMap], free_corners: bool = False
         for y in range(m.rows):
             for x in range(m.cols):
                 if m.rot[y][x] != 0:  # explicit nonzero suffix; forced 0 (inferred or @0) is always allowed
+                    # Frame cells may carry one too: their piece's flat side is then fixed by the rotation.
                     if b.rotation != "quarter":
                         raise SceneError(f"map {'ABC'[k]} cell ({x},{y}): orientation suffix needs rotation 'quarter'")
-                    if b.slots[b.slot_at(x, y)].kind != "interior":
-                        raise SceneError(f"map {'ABC'[k]} cell ({x},{y}): orientation suffix not allowed on border cells")
     h0 = maps[0].histogram()
     for k in (1, 2):
         if maps[k].histogram() != h0:
@@ -249,9 +248,29 @@ ALL_ROTATIONS = frozenset(ROTATION_DEGREES)
 _RANK = {"corner": 0, "edge": 1, "interior": 2}
 
 
-def _covers(home: int, rots) -> set[int]:
-    """Frame positions (side or corner index, clockwise from N or NW) a piece covers at `rots`."""
-    return {(home + r // 90) % 4 for r in rots}
+def _assign_homes(needs: Sequence[frozenset[int]], homes: Sequence[int]) -> list[int | None]:
+    """Maximum matching of needs to pieces: needs[u] is the set of homes a need accepts.
+
+    Returns, per need, the index into `homes` of its piece, or None when it has no piece.
+    """
+    owner: dict[int, int] = {}
+
+    def augment(u: int, seen: set[int]) -> bool:
+        for j, h in enumerate(homes):
+            if j in seen or h not in needs[u]:
+                continue
+            seen.add(j)
+            if j not in owner or augment(owner[j], seen):
+                owner[j] = u
+                return True
+        return False
+
+    for u in range(len(needs)):
+        augment(u, set())
+    out: list[int | None] = [None] * len(needs)
+    for j, u in owner.items():
+        out[u] = j
+    return out
 
 
 def _add_seam_pieces(bl, maps, pools, used, total, rots_for, quarter, free_corners, extra, cap_share) -> None:
@@ -447,11 +466,14 @@ def pieces_from_scenes(
 
     The inventory is derived class by class. Each border cell of a class, in each of the three
     maps, needs a piece of that class whose flat side(s) cover the cell at one of the class's
-    allowed rotations. A directional class (rotations {0}) keeps each piece's side, so its border
-    cells are matched side by side across the maps: each side gets as many pieces as the map
-    needing most of them there. A rotatable class pools its border cells, since any piece covers
-    any side. Pieces left over, and the plain interior pieces, fill the rest of A's cells of the
-    class.
+    allowed rotations (a forced cell: at its forced rotation). A piece whose canonical flat side is
+    h shows that flat at side (h + r/90) mod 4 when turned by r, so a cell on side `key` needs
+    h = (key - r/90) mod 4; corners work the same on corner indices, with the pair of flat sides
+    turned together. A directional class (rotations {0}) and a forced cell admit one home; a
+    rotatable class admits all four, so its border cells pool. Each map is matched class by class
+    against the same physical pool: the pool grows to the most any map needs per home, and the
+    rotatable needs take what is left. Pieces left over, and the plain interior pieces, fill the
+    rest of A's cells of the class.
 
     Flat-sided pieces that frame one map sit inside a smaller frame, where they must form seams
     (two flat sides touching: a domino of two edge pieces, or a two-flat corner piece with two edge
@@ -461,8 +483,9 @@ def pieces_from_scenes(
     rotation). `extra_flat_pieces` adds that many more flat edge pieces on top, spread over the
     classes (without rotation, in N/S then W/E pairs; an odd count gets one more partner). The
     automatic padding needs every class to be rotation-free or every class fully rotatable.
-    A frame cell with a forced rotation (module docstring) takes a piece showing its flat at that
-    rotation; the seam padding does not yet account for such cells.
+    Forced frame cells (module docstring) are matched as above. The seam padding is conservative
+    about forced rotations: it counts leftover flat pieces by class and ignores their rotations,
+    and `_layouts_exist` then confirms that each map admits a valid layout.
 
     allowed_rotations maps class -> rotations (degrees). Classes it omits get the board default:
     all four in quarter mode, {0} otherwise (corners of free_corners get all four).
@@ -503,11 +526,18 @@ def pieces_from_scenes(
     if extra_flat_pieces > len(interior):
         raise SceneError(f"{extra_flat_pieces} extra flat pieces do not fit the {len(interior)} interior cells of map A")
 
-    # Greedy per class: pools[c] lists the physical frame pieces of class c as (shape, home).
-    # used[k][c] holds the pool indices that fill map k's own border; the rest sit inside map k.
+    # Frame pieces, class by class. pools[c] lists the physical frame pieces of class c as (shape, home),
+    # home being the canonical flat position (side or corner index). At rotation r a piece with home h
+    # shows its flat at (h + r/90) % 4, so a frame cell on side (or corner) `key` takes a piece whose
+    # home is in {(key - r/90) % 4 : r allowed}: one home for a forced cell or a directional class,
+    # all four for a rotatable one. Phase 1 places the one-home needs map by map (the pool grows to the
+    # most any map needs per home). Phase 2 matches the other needs into the pool with augmenting paths
+    # and adds a piece only where a need has no match. used[k][c] holds the pool indices that fill
+    # map k's own border; the rest sit inside map k.
     pools: dict[str, list[tuple[str, int]]] = {c: [] for c in classes}
-    a_pick: dict[int, tuple[str, int]] = {}  # map A slot -> (class, pool index)
     used: list[dict[str, set[int]]] = [{c: set() for c in classes} for _ in range(3)]
+    picks: list[dict[int, tuple[str, int]]] = [{} for _ in range(3)]  # map k: border slot -> (class, pool index)
+    homes_of: list[dict[str, list[tuple[int, str, int, frozenset[int]]]]] = [{} for _ in range(3)]
     for k in range(3):
         for c in classes:
             for slot_id, shape, key, forced in need[k].get(c, []):
@@ -521,24 +551,58 @@ def pieces_from_scenes(
                             f"({cell.x},{cell.y}) is forced to rotation {forced}"
                         )
                     rots = frozenset({forced})
-                idx = next(
-                    (i for i, (sh, h) in enumerate(pools[c]) if i not in used[k][c] and sh == shape and key in _covers(h, rots)),
-                    None,
-                )
+                homes = frozenset((key - r // 90) % 4 for r in rots)
+                homes_of[k].setdefault(c, []).append((slot_id, shape, key, homes))
+
+    def grow(c: str, k: int, slot_id: int, shape: str, key: int, home: int) -> int:
+        """Append a piece of class c with `home` for map k's cell; raise when the class has no cell left for it."""
+        if len(pools[c]) >= total[c]:
+            cell = bl[k].slots[slot_id]
+            where = f"{SIDES[key]} side" if shape == "edge" else f"{CORNERS[key]} corner"
+            raise SceneError(
+                f"class {c!r} (allowed rotations {sorted(rots_for(c, shape))}) has {total[c]} cells, too few for its "
+                f"border pieces: map {'ABC'[k]} cell ({cell.x},{cell.y}) needs another piece with its "
+                f"{where} flat"
+            )
+        pools[c].append((shape, home))
+        return len(pools[c]) - 1
+
+    for k in range(3):  # phase 1: one-home needs
+        for c in classes:
+            for slot_id, shape, key, homes in homes_of[k].get(c, []):
+                if len(homes) > 1:
+                    continue
+                (home,) = homes
+                idx = next((i for i, p in enumerate(pools[c]) if i not in used[k][c] and p == (shape, home)), None)
                 if idx is None:
-                    if len(pools[c]) == total[c]:
-                        cell = bl[k].slots[slot_id]
-                        where = f"{SIDES[key]} side" if shape == "edge" else f"{CORNERS[key]} corner"
-                        raise SceneError(
-                            f"class {c!r} (allowed rotations {sorted(allowed)}) has {total[c]} cells, too few for its "
-                            f"border pieces: map {'ABC'[k]} cell ({cell.x},{cell.y}) needs another piece with its "
-                            f"{where} flat"
-                        )
-                    pools[c].append((shape, (key - min(r // 90 for r in rots)) % 4))
-                    idx = len(pools[c]) - 1
+                    idx = grow(c, k, slot_id, shape, key, home)
                 used[k][c].add(idx)
-                if k == 0:
-                    a_pick[slot_id] = (c, idx)
+                picks[k][slot_id] = (c, idx)
+
+    # phase 2: rotatable needs, per map and class, matched into the pool; a new piece takes the home
+    # most often allowed by the class's rotatable needs, then the need's own side (as before).
+    for k in range(3):
+        for c in classes:
+            for shape in ("corner", "edge"):
+                todo = [(slot_id, key, homes) for slot_id, sh, key, homes in homes_of[k].get(c, [])
+                        if sh == shape and len(homes) > 1]
+                if not todo:
+                    continue
+                popular: Counter = Counter(
+                    h for m in range(3) for _, sh, _, hs in homes_of[m].get(c, []) if sh == shape and len(hs) > 1 for h in hs)
+                while True:
+                    free = [i for i, (sh, _) in enumerate(pools[c]) if sh == shape and i not in used[k][c]]
+                    match = _assign_homes([hs for _, _, hs in todo], [pools[c][i][1] for i in free])
+                    if all(j is not None for j in match):
+                        for (slot_id, _, _), j in zip(todo, match):
+                            used[k][c].add(free[j])
+                            picks[k][slot_id] = (c, free[j])
+                        break
+                    slot_id, key, hs = todo[match.index(None)]
+                    home = min(hs, key=lambda h: (-popular[h], (h - key) % 4))
+                    grow(c, k, slot_id, shape, key, home)
+
+    a_pick = picks[0]
 
     def assemble(pools):
         """One piece per cell of A: its border piece, else a spare flat piece, else a plain one."""

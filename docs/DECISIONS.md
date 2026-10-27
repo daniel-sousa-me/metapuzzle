@@ -37,7 +37,7 @@ Image models are not used by the toolkit. Once style, elements and scenes are se
 
 After three grammars were rendered and blind-tested (direction A "Dapple Mosaic", direction B "Garden Terrazzo", density fields), the hybrid tone-field grammar is the one to develop further:
 - Subjects are designed as bold three-tier tone maps (dark / mid / light) with matched tier areas; one piece histogram serves all three because tiers are quantized by fixed thresholds and equalized by moving a few near-threshold cells.
-- Every tier boundary lies inside a two-material transition piece (masked ragged blob), so no colour step lands on a cut; frame cells are plain for now (engine limitation to fix).
+- Every tier boundary lies inside a two-material transition piece (masked ragged blob), so no colour step lands on a cut; frame cells may carry transitions since 2026-10-27 (engine supports forced rotations on the frame in quarter mode).
 - The role-map solver gives the histogram slack by letting interior regions absorb surplus transition pieces as texture variation.
 - Quarter rotation is used; all classes are non-directional.
 First render at 20×25: piece-level shared adjacencies 0/0/0; distinctiveness 4/5; the tree was recognized blind, the cat and boat were not (silhouette fixes in progress). Directions A and B are retired as scene designs; their lexicon mechanisms (masked transitions, context-dependent readings, role maps) are kept.
