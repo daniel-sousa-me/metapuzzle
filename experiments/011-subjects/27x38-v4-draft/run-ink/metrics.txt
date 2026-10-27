@@ -1,0 +1,13 @@
+board A: 27x38 tray rotation=quarter
+board B: 27x38 tray rotation=quarter
+board C: 27x38 tray rotation=quarter
+pieces: 1026  adjacencies per board: [1987, 1987, 1987]
+AB: shared=1 (0.05%)  clusters(3+)=[]  largest=2  familiar pieces=2  max fam=1  mean fam=0.002
+AC: shared=2 (0.10%)  clusters(3+)=[]  largest=2  familiar pieces=4  max fam=1  mean fam=0.004
+BC: shared=3 (0.15%)  clusters(3+)=[]  largest=2  familiar pieces=6  max fam=1  mean fam=0.006
+total shared=6  cluster penalty=0
+rotated pieces per solution: [756, 778, 749]
+corner orders: [[56, 294, 853, 513], [11, 836, 393, 477], [567, 1013, 973, 670]]
+meta: seed=0, iters=300000, iters_used=300000, energy=6.0, cluster_penalty=0, valid=True, violations=0, distinct_corner_orders=False, mating_weight=0.0, max_shared_fraction=None, mating_hops=None, mating_penalty=None, elapsed_s=3.907
+piece gates: PASS
+validity: OK

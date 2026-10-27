@@ -38,7 +38,8 @@ RK = {t: i for i, t in enumerate(ORDER)}
 PICS = ["A", "B", "C"]
 MAX_COVER = 0.18                 # motif cells per picture, as a fraction of 27 x 38
 CHEB_MIN = 2                     # minimum Chebyshev distance between two motif cells
-HALO = 2                         # minimum Chebyshev distance of a regular motif from a tier boundary cell
+HALO = 1                         # v4draft: 2 in v6. The draft has M 271 cells (v2: 396), so only 47-76 M cells lie at distance >= 2 and the M classes do not fit; 1 places all counts
+
 BOUNDARY = "carrier"             # boundary cells: the darker side of each tier boundary (see boundary_distance)
 CLUSTER = 4                      # target members per cluster
 SPREAD = {"s": 2.6, "c": 2.0, "u": 2.4, "f": 2.2, "d": 1.8, "v": 1.8, "l": 1.6, "k": 1.5, "p": 1.4}
@@ -56,25 +57,28 @@ SEQ = [("k", "D"), ("v", "D"), ("p", "D"), ("s", "D"),
        ("p", "L"), ("v", "L"), ("u", "L"), ("f", "L")]
 
 # Hero motifs: (code, row, col) per picture; counts I2 G2 O2 E1 Y1 N1 in each.
+# v4draft: hero cells re-anchored to the v4 draft tiers (equalized tiles of the run). Each entry keeps its v2 piece
+# class and moves to the nearest cell of that class in its picture (rarest class first, Chebyshev distance >= 2 from
+# the other heroes). The v2 cell is in brackets; the comment is the v2 intent.
 HEROES = {
-    "A": [("I", 11, 0), ("I", 11, 1),      # rising sun's rim, low sky above the left horizon (plain L)
-          ("G", 6, 24), ("G", 6, 25),      # frost sparkle on the hedge-tree crown (D-L convex corners)
-          ("O", 3, 11), ("O", 25, 24),     # pale daytime moon between the ears; its reflection in a puddle
-          ("E", 12, 17),                   # hare's amber eye (D-on-M dot)
-          ("Y", 5, 21),                    # a rook in the dawn sky (D-on-L dot)
-          ("N", 14, 20)],                  # hare's nose
-    "B": [("I", 12, 7), ("I", 12, 15),     # owl's amber irises, beside the pupils (plain L)
-          ("G", 12, 8), ("G", 12, 16),     # owl's catchlights on the pupils (D-L convex corners)
-          ("O", 4, 15), ("O", 5, 9),       # craters on the moon
-          ("E", 15, 1),                    # a crow at the sky's edge (D-on-M dot)
-          ("Y", 35, 24),                   # a blackbird on the snow (D-on-L dot)
-          ("N", 16, 12)],                  # owl's beak tip
-    "C": [("I", 6, 5), ("I", 7, 5),        # swan's orange bill tip (plain L)
-          ("G", 1, 19), ("G", 1, 24),      # two stars hugging the moon's rim (D-L convex corners)
-          ("O", 3, 21), ("O", 5, 23),      # craters on the moon
-          ("E", 32, 5),                    # a coot on the lake (D-on-M dot)
-          ("Y", 5, 11),                    # swan's eye (D-on-L dot)
-          ("N", 16, 5)],                   # the bill's reflection in the lake
+    "A": [("I", 11, 0), ("I", 9, 1),       # [v2 11,0 / 11,1] rising sun's rim, low sky above the left horizon (plain L)
+          ("G", 8, 21), ("G", 10, 25),      # [v2 6,24 / 6,25] frost sparkle on the hedge-tree crown (D-L convex corners)
+          ("O", 3, 11), ("O", 21, 24),     # [v2 3,11 / 25,24] pale daytime moon between the ears; its reflection in a puddle
+          ("E", 12, 17),                   # [v2 12,17] hare's amber eye (D-on-M dot)
+          ("Y", 1, 11),                    # [v2 5,21] a rook in the dawn sky (D-on-L dot)
+          ("N", 14, 20)],                  # [v2 14,20] hare's nose
+    "B": [("I", 14, 8), ("I", 12, 15),     # [v2 12,7 / 12,15] owl's amber irises, beside the pupils (plain L)
+          ("G", 11, 8), ("G", 12, 17),     # [v2 12,8 / 12,16] owl's catchlights on the pupils (D-L convex corners)
+          ("O", 4, 15), ("O", 5, 9),       # [v2 4,15 / 5,9] craters on the moon
+          ("E", 21, 1),                    # [v2 15,1] a crow at the sky's edge (D-on-M dot)
+          ("Y", 17, 18),                   # [v2 35,24] a blackbird on the snow (D-on-L dot)
+          ("N", 21, 12)],                  # [v2 16,12] owl's beak tip
+    "C": [("I", 6, 5), ("I", 8, 6),        # [v2 6,5 / 7,5] swan's orange bill tip (plain L)
+          ("G", 4, 19), ("G", 2, 24),      # [v2 1,19 / 1,24] two stars hugging the moon's rim (D-L convex corners)
+          ("O", 3, 21), ("O", 5, 23),      # [v2 3,21 / 5,23] craters on the moon
+          ("E", 31, 4),                    # [v2 32,5] a coot on the lake (D-on-M dot)
+          ("Y", 3, 9),                     # [v2 5,11] swan's eye (D-on-L dot)
+          ("N", 15, 4)],                   # [v2 16,5] the bill's reflection in the lake
 }
 
 

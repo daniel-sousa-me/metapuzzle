@@ -1,0 +1,5 @@
+sizes=27x38, 27x38, 27x38 shared AB/AC/BC=1/2/3 valid=True wrote 16 files to /home/user/metapuzzle/experiments/011-subjects/27x38-v4-draft/run-full
+piece gates: PASS
+scene gates: PASS
+
+--- stderr ---
