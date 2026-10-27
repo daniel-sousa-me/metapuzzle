@@ -1,11 +1,11 @@
 # Motif and hero cells, experiment 011 v7 (A hare, B owl, C swan). moves = motif displaced from a cell
 # that had to host a surplus piece, to the nearest plain cell of its tier.
 
-A hare: D_k_a 1, D_k_b 1, D_p_a 1, D_p_b 1, D_p_c 1, D_s_a 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 1, L_u_a 1, L_v_a 1, M_c_a 2, M_c_b 2, M_c_c 2, M_d_a 2, M_d_b 2, M_d_c 2, M_l_a 3, M_l_b 2, M_l_c 2, M_s_a 2, M_s_b 1, M_s_c 1
-   displaced 1: (2, 19)->(2, 21) D_k_a (D)
-B owl: D_k_a 1, D_k_b 1, D_p_a 1, D_p_b 1, D_p_c 1, D_s_a 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 1, L_u_a 1, L_v_a 1, M_c_a 2, M_c_b 2, M_c_c 2, M_d_a 2, M_d_b 2, M_d_c 2, M_l_a 3, M_l_b 2, M_l_c 2, M_s_a 2, M_s_b 1, M_s_c 1
+A hare: D_v_a 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 1, L_f_b 1, L_p_a 1, L_v_a 1, L_v_b 1, M_c_a 1, M_c_b 1, M_d_a 1, M_d_b 1, M_d_c 1, M_l_a 1, M_l_b 1, M_s_a 2, M_s_b 1, M_s_c 1
    displaced 0: none
-C swan: D_k_a 1, D_k_b 1, D_p_a 1, D_p_b 1, D_p_c 1, D_s_a 1, D_v_a 1, D_v_b 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 1, L_u_a 1, L_v_a 1, M_c_a 2, M_c_b 2, M_c_c 2, M_d_a 2, M_d_b 2, M_d_c 2, M_l_a 3, M_l_b 2, M_l_c 2, M_s_a 2, M_s_b 1, M_s_c 1
-   displaced 1: (25, 10)->(23, 9) D_v_a (D)
+B owl: D_v_a 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 1, L_f_b 1, L_p_a 1, L_v_a 1, L_v_b 1, M_c_a 1, M_c_b 1, M_d_a 1, M_d_b 1, M_d_c 1, M_l_a 1, M_l_b 1, M_s_a 2, M_s_b 1, M_s_c 1
+   displaced 0: none
+C swan: D_v_a 1, H_E 1, H_G 2, H_I 2, H_N 1, H_O 2, H_Y 1, L_f_a 1, L_f_b 1, L_p_a 1, L_v_a 1, L_v_b 1, M_c_a 1, M_c_b 1, M_d_a 1, M_d_b 1, M_d_c 1, M_l_a 1, M_l_b 1, M_s_a 2, M_s_b 1, M_s_c 1
+   displaced 0: none
 class counts identical across A, B, C: yes (checked)
-plain motif cells per tier (identical): 8/0/24/0/7; plain remainder 103/5/255/16/273
+plain motif cells per tier (identical): 1/0/12/0/9; plain remainder 110/5/267/16/271

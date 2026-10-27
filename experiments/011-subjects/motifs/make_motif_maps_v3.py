@@ -31,7 +31,7 @@ RK = {t: i for i, t in enumerate(ORDER)}
 PICS = ["A", "B", "C"]
 MAX_COVER = 0.25                 # motif cells per picture, as a fraction of 27 x 38 (v7 cap; v2: 0.18)
 CHEB_MIN = 2                     # minimum Chebyshev distance between two motif cells of one class
-HALO = 1                         # minimum Chebyshev distance of a regular motif from a transition carrier (v7: 1, was 2)
+HALO = 2                         # minimum Chebyshev distance of a regular motif from a tier boundary cell (as v2)
 BOUNDARY = "carrier"             # boundary cells: the darker side of each tier boundary (see boundary_distance)
 FIG_TIER = {"A": "M", "B": "D", "C": "L"}   # tier of each figure (make_targets.py FIGURE)
 LADDER = {3: 0.15, 4: 0.25}     # chance per cell by silhouette distance (v7, coordinator decision)
@@ -254,32 +254,6 @@ def figure_mask(g, tier):
     return [[main[r][c] or (out[r][c] >= 0 and out[r][c] not in border) for c in range(C)] for r in range(R)]
 
 
-def family_distance(g):
-    """v7: Chebyshev distance of every cell to the silhouette, measured as the distance to the nearest cell of the
-    other family: dark/mid (D, M: the animal and its ground) versus cream (L). S and W boundaries and the D-M tone
-    transitions are not counted. For L cells this is the distance to the nearest D or M cell; for D and M cells the
-    distance to the nearest L cell."""
-    R, C = len(g), len(g[0])
-
-    def bfs(sources):
-        dist = [[None] * C for _ in range(R)]
-        q = deque()
-        for r, c in sources:
-            dist[r][c] = 0
-            q.append((r, c))
-        while q:
-            r, c = q.popleft()
-            for rr, cc in neighbours(R, C, r, c):
-                if dist[rr][cc] is None:
-                    dist[rr][cc] = dist[r][c] + 1
-                    q.append((rr, cc))
-        return dist
-
-    to_l = bfs([(r, c) for r in range(R) for c in range(C) if g[r][c] == "L"])
-    to_dm = bfs([(r, c) for r in range(R) for c in range(C) if g[r][c] in "DM"])
-    return [[to_dm[r][c] if g[r][c] == "L" else to_l[r][c] for c in range(C)] for r in range(R)]
-
-
 def figure_distance(g, fm):
     """Chebyshev distance of every cell to the figure outline (cells with a neighbour on the other side), both sides."""
     R, C = len(g), len(g[0])
@@ -372,10 +346,11 @@ def build_all(seed=11):
     for p in PICS:
         g = load(p)
         R, C = len(g), len(g[0])
+        fm = figure_mask(g, FIG_TIER[p])                      # v7: this picture's own figure (make_targets FIGURE)
         m = [["." for _ in range(C)] for _ in range(R)]
         for code, r, c in HEROES[p]:
             m[r][c] = code
-        S[p] = {"g": g, "m": m, "dist": boundary_distance(g), "fd": family_distance(g),
+        S[p] = {"g": g, "m": m, "dist": boundary_distance(g), "fd": figure_distance(g, fm),
                 "placed": {}, "rng": random.Random(f"{seed}{p}"), "spill": {}}
     for cls in SEQ:
         for p in PICS:
@@ -458,6 +433,25 @@ def motif_distance(m):
     return dist
 
 
+def pool_histogram(g, fm, halo=HALO):
+    """Plain cells (DML, not a transition carrier) by figure distance 1, 2, 3, 4, 5+, before any sampling; and the
+    eligible ones (carrier distance >= halo)."""
+    dist = boundary_distance(g)
+    fd = figure_distance(g, fm)
+    R, C = len(g), len(g[0])
+    def bucket(d):
+        return min(d, 5)
+    plain = [0] * 6
+    elig = [0] * 6
+    for r in range(R):
+        for c in range(C):
+            if g[r][c] in "DML" and dist[r][c] >= 1 and fd[r][c] is not None and fd[r][c] >= 1:
+                plain[bucket(fd[r][c])] += 1
+                if dist[r][c] >= halo:
+                    elig[bucket(fd[r][c])] += 1
+    return plain, elig
+
+
 def main():
     hero_cls = check_heroes()
     maps = build_all()
@@ -513,7 +507,7 @@ def main():
         g, m, _ = maps[p]
         R, C = len(g), len(g[0])
         dist = boundary_distance(g)
-        fd = family_distance(g)
+        fd = figure_distance(g, figure_mask(g, FIG_TIER[p]))
         parts = []
         for lo, hi, nom in bands:
             elig = [(r, c) for r in range(R) for c in range(C)

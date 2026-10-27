@@ -2,45 +2,45 @@
 # per code. spill = cells outside the class region (weight < 2).
 
 class           A hare   B owl  C swan  spread   spill A/B/C
-streak D             2       2       2       0   0/0/0
-chevron D            2       2       2       0   1/1/1
-pebbles D            3       3       3       0   1/1/0
-star D               1       1       1       0   0/1/0
-seedhead M           6       6       6       0   2/2/2
-leaf M               7       7       7       0   2/0/1
-curl M               6       6       6       0   1/1/2
-star M               4       4       4       0   4/0/1
-pebbles L            0       0       0       0   0/0/0
-chevron L            1       1       1       0   1/0/0
-cloud L              1       1       1       0   1/1/0
-snowflake L          1       1       1       0   1/0/1
+streak D             0       0       0       0   0/0/0
+chevron D            1       1       1       0   0/0/0
+pebbles D            0       0       0       0   0/0/0
+star D               0       0       0       0   0/0/0
+seedhead M           3       3       3       0   1/2/0
+leaf M               2       2       2       0   0/1/1
+curl M               2       2       2       0   0/0/0
+star M               4       4       4       0   3/0/3
+pebbles L            1       1       1       0   0/1/1
+chevron L            2       2       2       0   0/0/2
+cloud L              0       0       0       0   0/0/0
+snowflake L          2       2       2       0   0/0/2
 amberwedge hero       2       2       2       0   -
 catchlight hero       2       2       2       0   -
 crater hero          2       2       2       0   -
 ambereye hero        1       1       1       0   -
 dot-eye hero         1       1       1       0   -
 beak/nose hero       1       1       1       0   -
-all motifs          43      43      43
-coverage %         4.2     4.2     4.2   (cap 25%)
+all motifs          26      26      26
+coverage %         2.5     2.5     2.5   (cap 25%)
 # hero piece classes (same in A, B, C): I on L/L, G on DLc/DLc, O on L/L, E on DMd, Y on DLd, N on M
 
 # Density gradient by figure distance: regular motifs per eligible plain cell (DML, carrier distance >= HALO)
 # in each band of figure distance, with the nominal chance of the band
-A: fig 2: 0/199 (0%, nominal 5%); fig 3-4: 14/191 (7%, nominal 10%); fig 5-7: 14/100 (14%, nominal 15-25%); fig 8+: 6/31 (19%, nominal 30%)
-B: fig 2: 0/180 (0%, nominal 5%); fig 3-4: 11/156 (7%, nominal 10%); fig 5-7: 16/164 (10%, nominal 15-25%); fig 8+: 7/19 (37%, nominal 30%)
-C: fig 2: 0/212 (0%, nominal 5%); fig 3-4: 16/174 (9%, nominal 10%); fig 5-7: 15/81 (19%, nominal 15-25%); fig 8+: 3/31 (10%, nominal 30%)
+A: fig 2: 0/95 (0%, nominal 5%); fig 3-4: 14/70 (20%, nominal 10%); fig 5-7: 3/26 (12%, nominal 15-25%); fig 8+: 0/0 (0%, nominal 30%)
+B: fig 2: 0/35 (0%, nominal 5%); fig 3-4: 10/101 (10%, nominal 10%); fig 5-7: 6/76 (8%, nominal 15-25%); fig 8+: 1/15 (7%, nominal 30%)
+C: fig 2: 0/43 (0%, nominal 5%); fig 3-4: 7/67 (10%, nominal 10%); fig 5-7: 10/48 (21%, nominal 15-25%); fig 8+: 0/18 (0%, nominal 30%)
 
 # Plain cells: DML cells with no motif and not a transition carrier; how many lie more than 3 cells from
 # any motif (heroes included)
-A: plain cells 645, more than 3 cells from any motif 186
-B: plain cells 642, more than 3 cells from any motif 118
-C: plain cells 623, more than 3 cells from any motif 219
+A: plain cells 662, more than 3 cells from any motif 279
+B: plain cells 659, more than 3 cells from any motif 284
+C: plain cells 640, more than 3 cells from any motif 338
 
 # Lattice test: equally spaced triples of one class in a row or column (regular motifs, all classes)
 # chance = mean over 300 draws of the same counts placed uniformly under the same spacing rule
-A: actual 0 triples, chance mean 0.0 (share of draws at or below actual 0.97); ratio 0.00
-B: actual 1 triples, chance mean 0.0 (share of draws at or below actual 1.00); ratio 33.33
-C: actual 0 triples, chance mean 0.0 (share of draws at or below actual 0.99); ratio 0.00
+A: actual 0 triples, chance mean 0.0 (share of draws at or below actual 1.00); ratio 0.00
+B: actual 0 triples, chance mean 0.0 (share of draws at or below actual 1.00); ratio 0.00
+C: actual 0 triples, chance mean 0.0 (share of draws at or below actual 1.00); ratio 0.00
 
 # Band (B cream top band, one motif type per 3 x 3 window): pairs of different types within Chebyshev 2
 A: 0 pairs (no band in this picture)
@@ -49,9 +49,9 @@ C: 0 pairs (no band in this picture)
 
 # Halo and spacing (all pictures): regular motif cells closer than HALO to a tier boundary cell,
 # pairs of motif cells closer than CHEB_MIN, and the mean boundary distance of motifs vs plain cells
-A: regular motifs 34, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 8; mean boundary distance motifs 2.24 vs open D/M/L cells 1.09
+A: regular motifs 17, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 9; mean boundary distance motifs 3.18 vs open D/M/L cells 1.10
    heroes (boundary distance): O3,11:2, Y5,21:0, G6,24:0, G6,25:0, I11,0:1, I11,1:1, E12,17:0, N14,20:1, O25,24:1
-B: regular motifs 34, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 8; mean boundary distance motifs 1.65 vs open D/M/L cells 1.07
+B: regular motifs 17, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 7; mean boundary distance motifs 2.71 vs open D/M/L cells 1.07
    heroes (boundary distance): O4,15:1, O5,9:1, I12,7:1, G12,8:0, I12,15:1, G12,16:0, E15,1:0, N16,12:1, Y35,24:0
-C: regular motifs 34, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 9; mean boundary distance motifs 2.06 vs open D/M/L cells 0.98
+C: regular motifs 17, within HALO of a boundary 0; same-class pairs at Chebyshev 1: 0; all motif pairs at Chebyshev 1 (classes may touch): 15; mean boundary distance motifs 2.76 vs open D/M/L cells 0.98
    heroes (boundary distance): G1,19:0, G1,24:0, O3,21:2, Y5,11:0, O5,23:2, I6,5:1, I7,5:1, N16,5:2, E32,5:0
