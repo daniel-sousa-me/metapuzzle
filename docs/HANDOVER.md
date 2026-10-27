@@ -93,3 +93,53 @@ the DECISIONS "Superseded by" notes record what changed and when.
 - 14:30 UTC: cross-class seams landed (769 tests pass); standard border valid for the subject set, shared 0/1/1, gates pass (`border-check/round2/run-standard`); tray stays default until a side-by-side at v4 tiers (DECISIONS). Pipeline v7 (motif gradient) is a negative result: 5.2% coverage, fields bare; figure-aware placement needs an animal mask, now requested from the design pass (FINDINGS 38). Per-piece parameter ranges in class specs landed. Still running: design pass v4 draft (with animal masks), matcher v4.
 - 15:15 UTC: `--cut-overlay` render option landed (774 tests): piece outlines plus a seam-run report, so the physical seam tell can be judged; on the standard-border run the 68 seams per board form only one straight run of 3 (A). The tray-vs-standard choice will be made on the v4 tiers with this overlay (DECISIONS 14:30). Waiting on: design pass v4 draft (with animal masks), matcher v4.
 - 15:45 UTC: v4 draft tiers committed (`27x38-v4-draft/`: internal lines, scene cues, animal masks, budgets within a spread of 6; owl branch is a 19-cell straight run; hedge and moons roughened by the annealer). Running: pipeline v6 on the draft tiers (ink and full into `27x38-v4-draft/`), a blind test of the draft previews (`blind-test-v4-draft.md`), matcher v4/v4b (surplus 78 after single-cell moves; block moves next). Next: blind tests and T9 on the v4 draft renders; tray-vs-standard side-by-side with the cut overlay on the v4 scenes; then run the matcher on the draft tiers.
+
+## 7. Paused state (2026-10-27, 16:30 UTC) and how to resume
+
+The owner asked to let the running agents finish and then pause. All agents have finished and
+everything is committed. Sections 1 and 6 describe earlier states; this section is current.
+
+**Where we stand**
+
+- Best evaluated render: `experiments/011-subjects/27x38-v2/run-full-v6` and `run-ink-v6`
+  (pipeline v6, 14% sparse motifs): shared adjacency 1/1/0, piece and scene gates pass, T9 3/5,
+  blind recognition limited by figure detail and scene cues (FINDINGS 37).
+- Subject-set redraws: `27x38-v4-draft/` (internal lines, scene cues, animal masks; blind test of
+  the previews: hare 2/5, owl 4/5, swan 2/5, FINDINGS 39; pipeline v6 run valid, shared 1/2/3,
+  surplus 229, FINDINGS 41) and `27x38-v4b/` (hare back to the v2 pose with big ears and no hedge,
+  swan with a wide S neck and a straight water band, owl's moon moved to the corner; tier spreads
+  2 to 4; NOT yet blind-tested or run through the pipeline).
+- Surplus: post-hoc class matching stalls near 80 (`27x38-v4/`, `27x38-v4-blocks/`, FINDINGS 40);
+  design-time pool matching does not translate into pipeline classes (FINDINGS 41). Next approach:
+  make the design annealer count the pipeline's transition classes (`budget_v3.py` classifier).
+- Engine: cross-class seams make the standard border feasible (`border-check/round2/run-standard`,
+  shared 0/1/1, 68 seams per board, one straight run of 3); `--cut-overlay` renders piece outlines
+  and a seam-run report; per-piece seeded parameter ranges in class specs. 774 tests pass.
+- Motif placement by distance from the figure needs the animal masks that v4 draft and v4b now
+  export (FINDINGS 38); pipeline v7 was retired.
+
+**Resume in this order** (each step is one Haiku agent; orchestrator never reads code)
+
+1. Blind test of `27x38-v4b/contours-preview.png` and `targets-preview.png` with a fresh agent
+   that reads nothing else (brief as in `blind-test-v4-draft.md`). Pass mark: all three at 3/5 or
+   better on tones. If the hare or swan fail again, send the design agent brief (DECISIONS and
+   FINDINGS 39 explain what failed) for a v4c; the design script is `make_targets_v4b.py`.
+2. Run `pipeline/run_from_tiers_v6_v4draft.py` on `27x38-v4b` (it carries the hero re-anchoring
+   and the 1-cell M halo; check the M tier size first and restore the 2-cell halo if there is
+   room), tray border, quarter rotation, cell 21; ink and full renders.
+3. Blind tests on the renders (ink first), T9 and a grid review per `docs/EVALUATION.md`; record
+   as `evaluation-v4b.md`; add findings; refresh `gallery/README.md`, README.md "Where we are".
+4. Tray vs standard side-by-side on the v4b scenes: run `metapuzzle prototype` twice with
+   `--border tray` and `--border standard --cut-overlay`; compare the seam-run report and a grid
+   review; record the decision in `docs/DECISIONS.md`.
+5. Surplus: write `make_targets_v5.py` whose annealer scores the pipeline's class histogram
+   (import the classifier used by `budget_v3.py`) so the three pictures match on real classes;
+   target class surplus under 30 before equalization.
+6. Then motif placement with the animal masks (halo around the animal only, denser in open
+   fields), and the ideas in `docs/IDEAS.md`.
+
+**Working rules that held** (see section 3): Haiku agents for bounded tasks with explicit file
+paths and a word-limited report; Opus only for the drawing pass; agents never commit; the
+orchestrator commits by explicit paths after running the relevant tests, with the trailers in
+section 3; WIP snapshots are committed when the session must stop with agents mid-task; every
+result goes to FINDINGS (numbered), every choice to DECISIONS (dated), every render to the gallery.

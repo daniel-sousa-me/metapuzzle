@@ -16,7 +16,7 @@ status, the pipeline, the working method and a file map. Then read `docs/DECISIO
 
 ## Where we are
 
-Status as of 2026-10-27, 14:30 UTC. Sources are given in each item.
+Status as of 2026-10-27, 16:30 UTC (paused; see docs/HANDOVER.md section 7 to resume). Sources are given in each item.
 
 - **Working grid: 27x38 (1026 pieces), tray border.** Adopted 2026-10-27 after experiment
   013 (`docs/DECISIONS.md`). The tray (no flat-edged frame) follows from the value-inversion
@@ -54,9 +54,11 @@ Status as of 2026-10-27, 14:30 UTC. Sources are given in each item.
 - **Pipeline v7 (motif density gradient) is a negative result:** the tone tiers cannot separate the
   animal from its landmass, and the fallback reached 5.2% coverage. v6 stays the motif baseline;
   the design pass now exports an animal mask (FINDINGS 38).
-- **In progress (14:30 UTC).** A design pass (`make_targets_v4_draft.py` -> `27x38-v4-draft/`:
-  owl cues, hare background, swan water, internal lines, animal masks) and matcher v4
-  (`make_targets_v4.py` -> `27x38-v4/`, figure-edge nudges, surplus under 30).
+- **Subject-set redraws (paused here).** `27x38-v4-draft/` adds internal lines, scene cues and
+  animal masks; its preview blind test gave hare 2/5, owl 4/5, swan 2/5 (the hedge band reads as
+  a canopy; FINDINGS 39), and its pipeline run is valid with surplus 229 (FINDINGS 41). `27x38-v4b/`
+  redraws the hare and swan accordingly and is not yet tested. Post-hoc surplus matching stalls
+  near 80 (FINDINGS 40); the next matcher must count the pipeline's own classes.
 - **Open items:**
   - **Solvability.** T9 is 2/5 for the plain fields. The v5 motif render needs a full render,
     blind tests and T9 before it counts.
