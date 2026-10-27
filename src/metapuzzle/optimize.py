@@ -21,7 +21,7 @@ from pathlib import Path
 from .connectors import DEFAULT_MATING_HOPS, MatingPenalty, mating_penalty, target_block_size
 from .board import PROFILES, SIDE_DELTA, Board, mates, square_board
 from .metrics import PAIR_INDEX, PAIR_NAMES, cluster_penalty, corner_order, shared_adjacencies
-from .pieces import Piece, build_valid_layout, group_placements, piece_from_dict, piece_to_dict, rotations_for_piece
+from .pieces import Piece, SeamSpace, build_valid_layout, piece_from_dict, piece_to_dict, rotations_for_piece
 from .scene import ClassMap, validate_scenes
 
 DEFAULT_ITERS = 300_000
@@ -601,22 +601,19 @@ def solve(
                 for i_ in mem:
                     gid[k][i_] = g_
         gopt: dict = {}  # (k, type signature) -> (arrangements, index by slot set)
+        spaces = [SeamSpace(bl[k], cls_at[k], forced_at[k]) for k in range(3)]
 
         def arrangements(k: int, mem: list):
             sig = (k, tuple(ptype[i_] for i_ in mem))
             if sig not in gopt:
-                cm = class_maps[k] if class_maps else None
-                cls_ = [cm.cls[y][x] for y, x in zip(Y[k], X[k])] if cm else None
-                for_ = [cm.rot[y][x] or None for y, x in zip(Y[k], X[k])] if cm else None
-                arr = [tuple((s_, r_ // 90) for s_, r_ in pl) for pl in
-                       group_placements(bl[k], [pieces[i_] for i_ in mem], cls_, for_)]
+                arr = [tuple((s_, r_ // 90) for s_, r_ in pl) for pl in spaces[k].placements([pieces[i_] for i_ in mem])]
                 idx: dict = {}
                 for a_ in arr:
                     idx.setdefault(frozenset(s_ for s_, _ in a_), []).append(a_)
                 gopt[sig] = (arr, idx)
             return gopt[sig]
 
-        glist = [[g_ for g_ in range(len(groups[k]))] for k in range(3)]
+        flat_list = [i for i in range(n) if FLAT in sc[i]]
         while it < iters and not done:
             it += 1
             if not (it & 127):
@@ -636,7 +633,24 @@ def solve(
             atk, posk, rk = at[k], pos[k], rot[k]
             g_ = gid[k][p]
             moves = []
-            if g_ < 0:
+            role = None
+            if FLAT in sc[p] and rand() < 0.3:
+                # role swap: two flat-sided pieces (seam members or frame pieces) trade places when each
+                # can show the flat sides the other's place needs; this re-pairs seams and trades frame
+                # and seam duty
+                q = flat_list[randrange(len(flat_list))]
+                gp, gq = g_, gid[k][q]
+                if q == p or (gp < 0 and gq < 0) or (gp >= 0 and gp == gq):
+                    continue
+                s, t = posk[p], posk[q]
+                fp, fq = fl[ptype[p]][rk[p]], fl[ptype[q]][rk[q]]
+                oq = [r_ for r_ in OPT[k][ptype[q]][s] if fl[ptype[q]][r_] == fp]
+                op = [r_ for r_ in OPT[k][ptype[p]][t] if fl[ptype[p]][r_] == fq]
+                if not oq or not op:
+                    continue
+                moves = [(p, t, op[randrange(len(op))]), (q, s, oq[randrange(len(oq))])]
+                role = (p, q, gp, gq)
+            elif g_ < 0:
                 s = posk[p]
                 cl = cx[k][ptype[p]]
                 t = cl[randrange(len(cl))]
@@ -668,19 +682,24 @@ def solve(
                     occ = [atk[s_] for s_ in disp]
                     gids = {gid[k][o_] for o_ in occ}
                     if gids == {-1}:
-                        randperm = vac[:]
-                        for j_ in range(len(randperm) - 1, 0, -1):
-                            r_ = randrange(j_ + 1)
-                            randperm[j_], randperm[r_] = randperm[r_], randperm[j_]
+                        # send each displaced piece to a vacated slot it fits (its class, exact flats)
+                        occ_order = occ[:]
+                        rng.shuffle(occ_order)
+                        freev = vac[:]
                         okm = True
-                        for o_, vs in zip(occ, randperm):
-                            oo = sing(k, ptype[o_], vs)
-                            if not oo:
+                        sent = []
+                        for o_ in occ_order:
+                            fit = [vs for vs in freev if sing(k, ptype[o_], vs)]
+                            if not fit:
                                 okm = False
                                 break
-                            moves.append((o_, vs, rk[o_] if rk[o_] in oo else oo[randrange(len(oo))]))
+                            vs = fit[randrange(len(fit))]
+                            freev.remove(vs)
+                            oo = sing(k, ptype[o_], vs)
+                            sent.append((o_, vs, rk[o_] if rk[o_] in oo else oo[randrange(len(oo))]))
                         if not okm:
                             continue
+                        moves += sent
                     elif len(gids) == 1 and -1 not in gids and disp == newset:
                         g2 = next(iter(gids))
                         mem2 = groups[k][g2]
@@ -741,6 +760,13 @@ def solve(
                         atk[ns_] = p_
                         posk[p_] = ns_
                         rk[p_] = nq
+                if role:
+                    rp_, rq_, gp_, gq_ = role
+                    if gp_ >= 0:
+                        groups[k][gp_][groups[k][gp_].index(rp_)] = rq_
+                    if gq_ >= 0:
+                        groups[k][gq_][groups[k][gq_].index(rq_)] = rp_
+                    gid[k][rq_], gid[k][rp_] = gp_, gq_
                 E_sol[k].difference_update(removed)
                 E_sol[k].update(added)
                 for pi, ns, c_ in changes:

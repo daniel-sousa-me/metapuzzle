@@ -18,6 +18,7 @@ from metapuzzle.classes import (
     ClassSpec,
     ClassSpecError,
     _layer_seed,
+    _sample_layer_params,
     load_class_spec,
 )
 from metapuzzle.cli import main
@@ -633,3 +634,107 @@ def test_seed_group_is_refused_on_an_inline_mask():
     inline = {"primitive": "blotch_mask", "seed_group": "g"}
     with pytest.raises(ClassSpecError, match="unknown key 'seed_group'"):
         _load(_masked(inline))
+
+
+# ------------------------------------------------------------ parameter ranges
+
+def _motif_spec(params):
+    return _load(_one_class(_layer("motif", palette=("moss", "pine", "paper"), params=params)))
+
+
+def _sampled(spec, seed, index=0):
+    return _sample_layer_params("motif", spec.classes["c"].layers[index].params, index, seed)
+
+
+def test_range_is_sampled_differently_per_piece():
+    spec = _motif_spec({"kind": "disc", "scale": {"range": [0.2, 0.6]}})
+    values = [_sampled(spec, seed)["scale"] for seed in (1, 2, 3)]
+    assert len(set(values)) == 3
+    assert all(0.2 <= v <= 0.6 for v in values)
+    draw = spec.drawer()
+    assert draw("a", "c", 1, 100.0) != draw("b", "c", 2, 100.0)
+
+
+def test_same_piece_gets_the_same_sampled_value():
+    spec = _motif_spec({"kind": "disc", "scale": {"range": [0.2, 0.6]}})
+    assert _sampled(spec, 7) == _sampled(spec, 7)
+    draw = spec.drawer()
+    assert draw("p", "c", 7, 100.0) == draw("p", "c", 7, 100.0)
+
+
+def test_sampled_range_is_independent_of_render_size():
+    spec = _motif_spec({"kind": "disc", "scale": {"range": [0.2, 0.6]}})
+    draw = spec.drawer()
+
+    def artwork(svg):  # everything inside the scale wrapper
+        return svg.split('">', 1)[1].rsplit("</g>", 1)[0]
+
+    assert artwork(draw("p", "c", 7, 64.0)) == artwork(draw("p", "c", 7, 256.0))
+
+
+def test_sampled_value_depends_on_layer_index_and_parameter_name():
+    spec = _motif_spec({"kind": "disc", "scale": {"range": [0.2, 0.6]},
+                        "jitter": {"range": [0.0, 0.1]}})
+    params = spec.classes["c"].layers[0].params
+    base = _sample_layer_params("motif", params, 0, 5)
+    assert base["scale"] != _sample_layer_params("motif", params, 1, 5)["scale"]
+    assert base["scale"] != base["jitter"]
+
+
+def test_integer_bounds_give_an_integer_inclusive():
+    spec = _load(_one_class(_layer("dabs", palette=("moss", "pine"),
+                                   params={"count": {"range": [10, 12]}})))
+    spec.validate()
+    counts = {_sample_layer_params("dabs", spec.classes["c"].layers[0].params, 0, s)["count"]
+              for s in range(40)}
+    assert counts <= {10, 11, 12} and all(isinstance(c, int) for c in counts)
+    assert len(counts) > 1
+
+
+def test_plain_list_on_a_list_valued_parameter_stays_literal():
+    spec = _motif_spec({"kind": "disc", "offset": [0.1, 0.0]})
+    spec.validate()
+    assert _sampled(spec, 3)["offset"] == [0.1, 0.0]
+    scatter = _load(_one_class(_layer("scatter_shapes", palette=("moss", "pine"),
+                                      params={"kinds": ["leaf", "disc"]})))
+    scatter.validate()
+    assert _sample_layer_params("scatter_shapes", scatter.classes["c"].layers[0].params, 0, 3)[
+        "kinds"] == ["leaf", "disc"]
+
+
+def test_plain_pair_is_a_range_on_a_numeric_parameter():
+    spec = _motif_spec({"kind": "disc", "scale": [0.2, 0.6]})
+    spec.validate()
+    value = _sampled(spec, 4)["scale"]
+    assert 0.2 <= value <= 0.6
+
+
+@pytest.mark.parametrize("params, fragment", [
+    ({"scale": {"range": [0.6, 0.2]}}, "needs lo < hi, got [0.6, 0.2]"),
+    ({"scale": [0.9, 0.2]}, "needs lo < hi"),
+    ({"scale": {"range": [0.2, 0.2]}}, "needs lo < hi"),
+    ({"scale": {"range": ["a", 0.5]}}, "must be [lo, hi] with two numbers"),
+    ({"scale": {"range": [0.1]}}, "must be [lo, hi] with two numbers"),
+    ({"scale": {"range": [False, True]}}, "must be [lo, hi] with two numbers"),
+    ({"scale": [0.1, 0.2, 0.3]}, "must be [lo, hi] with two numbers"),
+    ({"scale": {"range": [0.1, 0.2], "step": 0.1}}, "takes only 'range'"),
+    ({"offset": {"range": [0.0, 0.1]}}, "needs a numeric parameter"),
+])
+def test_bad_ranges_are_reported_by_validate(params, fragment):
+    with pytest.raises(ClassSpecError, match=re.escape(fragment)):
+        _motif_spec(params).validate()
+
+
+def test_range_is_checked_at_both_ends():
+    spec = _load(_one_class(_layer("blotch", palette=("moss", "pine"),
+                                   params={"coverage": {"range": [0.2, 3.0]}})))
+    with pytest.raises(ClassSpecError, match="coverage must be in"):
+        spec.validate()
+
+
+def test_mask_parameters_cannot_be_ranges():
+    data = _one_class(_layer("blotch", palette=("moss", "pine"),
+                             mask={"primitive": "blotch_mask",
+                                   "params": {"coverage": {"range": [0.3, 0.5]}}}))
+    with pytest.raises(ClassSpecError, match="cannot be a range"):
+        _load(data)

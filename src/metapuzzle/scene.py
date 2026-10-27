@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
 from .board import CORNERS, ROTATION_DEGREES, SIDE_DELTA, SIDES, Board
-from .pieces import _CORNER_FLATS, Piece, build_valid_layout, default_sides
+from .pieces import _CORNER_FLATS, Piece, SeamPlanner, SeamSpace, build_valid_layout, default_sides
 
 
 class SceneError(ValueError):
@@ -461,6 +461,7 @@ def pieces_from_scenes(
     extra_flat_pieces: int = 0,
     free_corners: bool = False,
     allowed_rotations: Mapping[str, Iterable[int]] | None = None,
+    strict_border: bool = False,
 ) -> list[Piece]:
     """One physical piece per cell of map A, each carrying that cell's class.
 
@@ -492,7 +493,17 @@ def pieces_from_scenes(
     Raises SceneError naming the class and side when a class has too few cells for its border.
     """
     bl = _boards3(boards)
-    validate_scenes(bl, maps, free_corners, strict_border=False if extra_flat_pieces else None)
+    differ = False
+    if not extra_flat_pieces:
+        try:
+            validate_scenes(bl, maps, free_corners, strict_border=True)
+        except SceneError as e:
+            if "border class counts" not in str(e):
+                raise
+            if strict_border:
+                validate_scenes(bl, maps, free_corners)  # the classic rule: raises for boards of one shape
+            differ = True  # frame class mixes differ: cross-class seams must absorb the difference
+    validate_scenes(bl, maps, free_corners, strict_border=False)
     a_board, a_map = bl[0], maps[0]
     quarter = a_board.rotation == "quarter"
     conn = "andro" if quarter else "asym"
@@ -604,6 +615,11 @@ def pieces_from_scenes(
 
     a_pick = picks[0]
 
+    def make_piece(c, shape, home, pid=0):
+        name = None if home is None else (SIDES[home] if shape == "edge" else CORNERS[home])
+        inner = "wild" if shape == "corner" and free_corners else None
+        return Piece(pid, shape, c, rots_for(c, shape), name, default_sides(shape, name, conn, inner))
+
     def assemble(pools):
         """One piece per cell of A: its border piece, else a spare flat piece, else a plain one."""
         spare: dict[str, list[tuple[str, int | None]]] = {}
@@ -620,9 +636,7 @@ def pieces_from_scenes(
                 shape, home = pools[c][a_pick[s.id][1]]
             else:
                 shape, home = spare[c].pop(0)
-            name = None if home is None else (SIDES[home] if shape == "edge" else CORNERS[home])
-            inner = "wild" if shape == "corner" and free_corners else None
-            out.append(Piece(pid, shape, c, rots_for(c, shape), name, default_sides(shape, name, conn, inner)))
+            out.append(make_piece(c, shape, home, pid))
         return out
 
     if a_board.border != "standard":
@@ -634,17 +648,160 @@ def pieces_from_scenes(
         _add_seam_pieces(bl, maps, pools, used, total, rots_for, quarter, free_corners, extra_flat_pieces, share)
         out = assemble(pools)
         if all(len(pools[c]) == len(used[k][c]) for k in range(3) for c in classes):
-            break  # no flat piece sits inside any picture
+            return out  # no flat piece sits inside any picture
         if _layouts_exist(bl, maps, out):
-            break
+            return out
+    # Seams could not absorb the leftover flat pieces as derived: add flat pieces of classes next to the
+    # ones left unplaced (cross-class partners), as far as the class cell counts allow.
+    pools, out = _repair_seams(bl, maps, pools, used, total, classes, rots_for, assemble, make_piece)
+    if out is None:
+        if differ:
+            raise SceneError(
+                "the frames of the three maps use different class mixes and the surplus flat pieces cannot "
+                "all be seated as seams (cross-class seams need interior cells of the surplus classes next "
+                "to each other, and spare cells in a class to hold padding pieces)")
+        out = assemble(pools)
     return out
 
 
-def _layouts_exist(bl, maps, pieces) -> bool:
+def _cls_grids(bl, maps):
+    """Per map: per-slot class labels and forced rotations (None when free)."""
+    return (
+        [[m.cls[s.y][s.x] for s in b.slots] for b, m in zip(bl, maps)],
+        [[m.rot[s.y][s.x] or None for s in b.slots] for b, m in zip(bl, maps)],
+    )
+
+
+def _layouts_exist(bl, maps, pieces, steps: int = 3000, tries: int = 3) -> bool:
     """True when every map admits a valid placement of `pieces` (seams included)."""
-    for b, m in zip(bl, maps):
-        cls_at = [m.cls[s.y][s.x] for s in b.slots]
-        forced = [m.rot[s.y][s.x] or None for s in b.slots]
-        if build_valid_layout(b, pieces, cls_at, forced, random.Random(0), tries=4) is None:
+    cls_at, forced = _cls_grids(bl, maps)
+    for k, b in enumerate(bl):
+        if build_valid_layout(b, pieces, cls_at[k], forced[k], random.Random(0), tries=tries, steps=steps) is None:
             return False
     return True
+
+
+REPAIR_TRIAL_STEPS = 400  # seam search moves per map when scoring a padding candidate
+REPAIR_PADS = 40
+REPAIR_PLATEAU = 5
+REPAIR_DEBUG = False
+
+
+def _repair_seams(bl, maps, pools, used, total, classes, rots_for, assemble, make_piece):
+    """Grow the flat-piece pools until every map seats its surplus flat pieces as seams.
+
+    Each map keeps a seam planner holding its leftover pieces (the pool entries not used on its own frame).
+    A flat edge piece added to a class's pool is surplus in all three maps, so a candidate is scored by the
+    pieces left unseated, summed over the maps, after a short search resumed from the current state.
+    Candidates are classes that border an unseated piece in some map, singly or in pairs; the best one
+    that lowers the score is kept. Returns (pools, pieces), or (pools, None) when no candidate helps.
+    """
+    cls_at, forced = _cls_grids(bl, maps)
+    spaces = [SeamSpace(b, cls_at[k], forced[k]) for k, b in enumerate(bl)]
+    forced_cls = {c for k in range(3) for c, f in zip(cls_at[k], forced[k]) if f is not None}
+    planners = []
+    for k in range(3):
+        pl = SeamPlanner(spaces[k], random.Random(k))
+        for c in classes:
+            for i, (shape, home) in enumerate(pools[c]):
+                if i not in used[k][c]:
+                    pl.add(make_piece(c, shape, home))
+        pl.search()
+        planners.append(pl)
+
+    def homes(c):
+        return range(4) if (c in forced_cls or len(rots_for(c, "edge")) < 4) else (0,)
+
+    def room(c):
+        return total[c] - len(pools[c])
+
+    def trial(extra, steps):
+        pls = [pl.copy() for pl in planners]
+        for pl in pls:
+            for c, h in extra:
+                pl.add(make_piece(c, "edge", h))
+            pl.search(steps)
+        return pls
+
+    flat_steps = 0
+    for _ in range(REPAIR_PADS):
+        un = [len(pl.unplaced) for pl in planners]
+        if not any(un):
+            return pools, assemble(pools)
+        for pl in planners:  # a longer search from the current state first
+            if pl.unplaced:
+                pl.search(2000)
+        un = [len(pl.unplaced) for pl in planners]
+        if not any(un):
+            return pools, assemble(pools)
+        reach = [Counter() for _ in range(3)]  # per map: classes next to an unseated piece (interior cells)
+        for k, b in enumerate(bl):
+            want = {planners[k].pieces[i].cls for i in planners[k].unplaced}
+            for s in b.slots:
+                if s.boundary_sides or cls_at[k][s.id] not in want:
+                    continue
+                reach[k][cls_at[k][s.id]] += 2
+                for t in s.neighbors:
+                    if not b.slots[t].boundary_sides:
+                        reach[k][cls_at[k][t]] += 1
+        # prefer classes that border the unseated pieces of several maps at once
+        rank = sorted(classes, key=lambda c: (-sum(1 for k in range(3) if reach[k][c]), -sum(r[c] for r in reach)))
+        cand_cls = [c for c in rank if any(r[c] for r in reach)][:10]
+        cands = [(c, h) for c in cand_cls for h in homes(c) if room(c) > 0]
+        if REPAIR_DEBUG:
+            print("repair: unseated", [[(planners[k].pieces[i].cls, planners[k].pieces[i].shape_type) for i in planners[k].unplaced] for k in range(3)], "candidate classes", cand_cls, flush=True)
+        trials = [[x] for x in cands] + [[x, y] for i, x in enumerate(cands[:12]) for y in cands[i:12]]
+        best = None
+        for extra in trials:
+            if any(room(c) < sum(1 for x in extra if x[0] == c) for c, _ in extra):
+                continue
+            pls = trial(extra, REPAIR_TRIAL_STEPS)
+            v = sum(len(pl.unplaced) for pl in pls)
+            if best is None or v < best[0] or (v == best[0] and len(extra) < len(best[1])):
+                best = (v, extra, pls)
+        if best is None or best[0] > sum(un):
+            return pools, None
+        flat_steps = flat_steps + 1 if best[0] == sum(un) else 0
+        if flat_steps > REPAIR_PLATEAU:  # sideways moves are allowed for a few rounds
+            return pools, None
+        for c, h in best[1]:
+            pools[c].append(("edge", h))
+        planners = best[2]
+        if REPAIR_DEBUG:
+            print("  added", best[1], "->", best[0], flush=True)
+    return pools, None
+
+
+def seam_report(boards, maps: Sequence[ClassMap], pieces: Sequence[Piece], tries: int = 8) -> list[dict]:
+    """Per map: the flat-sided pieces inside the picture and the seams that hold them, from a constructed layout.
+
+    Each entry has `flat_inside` (flat-sided pieces off the frame), `seams` (flat-flat contacts), `groups`
+    (counts by size: 2 domino, 3 L-tromino, 4 block) and `cross_class` (seams whose two pieces differ in
+    class). An entry is None when no layout was found.
+    """
+    bl = _boards3(boards)
+    cls_at, forced = _cls_grids(bl, maps)
+    out = []
+    for k, b in enumerate(bl):
+        res = build_valid_layout(b, pieces, cls_at[k], forced[k], random.Random(0), tries=tries)
+        if res is None:
+            out.append(None)
+            continue
+        slot_of, rot_of, groups = res
+        at = {s: i for i, s in enumerate(slot_of)}
+        seams = cross = 0
+        for i, (slot, rot) in enumerate(zip(slot_of, rot_of)):
+            sl = b.slots[slot]
+            for face in (1, 2):  # E and S: each contact once
+                x, y = sl.x + SIDE_DELTA[face][0], sl.y + SIDE_DELTA[face][1]
+                if x >= b.cols or y >= b.rows:
+                    continue
+                j = at[b.slot_at(x, y)]
+                if (pieces[i].sides[(face - rot // 90) % 4] == "flat"
+                        and pieces[j].sides[(face + 2 - rot_of[j] // 90) % 4] == "flat" and not sl.boundary_sides):
+                    seams += 1
+                    cross += pieces[i].cls != pieces[j].cls
+        sizes = Counter(len(g) for g in groups)
+        out.append({"flat_inside": sum(len(g) for g in groups), "seams": seams, "cross_class": cross,
+                    "groups": {"domino": sizes[2], "L": sizes[3], "block": sizes[4]}})
+    return out

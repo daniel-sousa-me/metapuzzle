@@ -76,12 +76,13 @@ def _check_cells_fit(maps, boards, pieces: list[Piece]) -> None:
 
 
 def seam_counts(sol) -> list[dict]:
-    """Per board: flat-flat contacts (seams) inside the picture and flat-sided pieces off the frame."""
+    """Per board: flat-flat contacts (seams) inside the picture, those between pieces of different
+    classes (cross_class), and flat-sided pieces off the frame."""
     by_id = {p.piece_id: p for p in sol.pieces}
     out = []
     for pl, b in zip(sol.placements, sol.boards):
         at = {s: pid for pid, (s, _) in pl.items()}
-        seams = 0
+        seams = cross = 0
         for sl in b.slots:
             for face, (x, y) in ((1, (sl.x + 1, sl.y)), (2, (sl.x, sl.y + 1))):  # E and S: each contact once
                 if x >= b.cols or y >= b.rows:
@@ -90,8 +91,9 @@ def seam_counts(sol) -> list[dict]:
                 if (by_id[a].sides[(face - pl[a][1] // 90) % 4] == "flat"
                         and by_id[c].sides[(face + 2 - pl[c][1] // 90) % 4] == "flat"):
                     seams += 1
+                    cross += by_id[a].cls != by_id[c].cls
         inside = sum(1 for pid, (s, _) in pl.items() if "flat" in by_id[pid].sides and not b.slots[s].boundary_sides)
-        out.append({"seams": seams, "flat_pieces_inside": inside})
+        out.append({"seams": seams, "cross_class": cross, "flat_pieces_inside": inside})
     return out
 
 
@@ -176,6 +178,7 @@ def run_prototype(
     extra_flat: int = 0,
     mating_weight: float = 0.0,
     max_shared_fraction: float | None = None,
+    strict_border: bool = False,
 ) -> dict:
     """Solve the three class maps and write the prototype outputs into `out_dir`.
 
@@ -185,7 +188,10 @@ def run_prototype(
 
     Boards of different shapes have different frames, so the border inventory covers the largest
     frame and the surplus flat-sided pieces sit inside the smaller pictures as seams (two flat
-    sides touching). `extra_flat` adds that many more flat-sided pieces beyond the automatic ones.
+    sides touching). The same holds for boards of one shape whose frames use different class mixes:
+    the flat-sided pool is sized to the largest per-class frame need, and each map's surplus sits inside
+    as seams whose two pieces may differ in class (`strict_border=True` asks for identical frame mixes
+    instead). `extra_flat` adds that many more flat-sided pieces beyond the automatic ones.
 
     Returns a dict with `valid`, `violations`, `shared` (per pair), `files` (name -> path) and
     `out_dir`. Invalid solutions still write their outputs and return `valid: False`.
@@ -202,7 +208,8 @@ def run_prototype(
     spec = load_class_spec(classes_path)
 
     class_rotations = {cls: _allowed_rotations(spec, cls, rotation) for cls in maps[0].histogram()}
-    pieces = pieces_from_scenes(boards, maps, extra_flat_pieces=extra_flat, allowed_rotations=class_rotations)
+    pieces = pieces_from_scenes(boards, maps, extra_flat_pieces=extra_flat,
+                              allowed_rotations=class_rotations, strict_border=strict_border)
     _check_cells_fit(maps, boards, pieces)
     missing_classes = sorted(set(maps[0].histogram()) - set(spec.classes))
 
@@ -261,6 +268,7 @@ def run_prototype(
         "grid": grid,
         "labels": labels,
         "interior seams (A / B / C)": " / ".join(str(x["seams"]) for x in seams),
+        "cross-class seams (A / B / C)": " / ".join(str(x["cross_class"]) for x in seams),
     }
     piece_failures, scene_failures = rep["gates"]["failures"], scene_rep["gates"]["failures"]
     gate_lines = [gate_line("piece", piece_failures), gate_line("scene", scene_failures)]

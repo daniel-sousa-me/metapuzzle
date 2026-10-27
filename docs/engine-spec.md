@@ -24,24 +24,35 @@ Default connectors (`pieces.default_sides`): rotation none uses the asymmetric i
 Each solution has its own board, and the boards may have different frames. The inventory is sized to the largest perimeter any board needs. A picture with a smaller frame therefore receives surplus flat-sided pieces in its interior, as seams.
 
 - **Inventory** (`pieces.inventory_layout`): 4 corner pieces; edge pieces numbering the largest border need of any board (per side without rotation, pooled with rotation); `extra_flat_pieces` more flat edge pieces; the rest interior.
-- **Seams.** A seam is one flat-flat contact inside a picture. Surplus edge pieces pair into **dominoes** (one seam). A surplus corner piece sits in an **L-tromino**: the corner piece plus two edge pieces (two seams). Without rotation the two flats of a domino must be opposite (N with S, W with E). With rotation an even count pairs freely.
-- **Constructed layouts.** `pieces.build_valid_layout(board, pieces, cls_at=None, forced_at=None, rng=None, tries=25)` builds one valid placement per board, seams included: exact-fit pieces on frame slots (a maximum matching on boundary sides), then corner-plus-two-edges and edge pairs on interior slots, then plain pieces by class. It returns `(slot_of, rotation_of, groups)`, or `None` after `tries` attempts. `pieces.group_placements(board, parts, cls_at=None, forced_at=None)` lists every interior placement of a seam group (`parts[0]` is the root; it shows one flat per leaf, each facing a leaf that shows a flat back).
+- **Seams.** A seam is one flat-flat contact inside a picture. Surplus edge pieces pair into **dominoes** (one seam). A surplus corner piece sits in an **L-tromino**: the corner piece plus two edge pieces (two seams). Two surplus corners can share a **2x2 block** (corner, corner, edge, edge: four seams), and four corners fill one (four seams). Without rotation the two flats of a domino must be opposite (N with S, W with E). With rotation an even count pairs freely. The pieces of a group need not share a class (see Cross-class seams below).
+- **Constructed layouts.** `pieces.build_valid_layout(board, pieces, cls_at=None, forced_at=None, rng=None, tries=25)` builds one valid placement per board, seams included: exact-fit pieces on frame slots (a maximum matching on boundary sides), then corner-plus-two-edges and edge pairs on interior slots, then plain pieces by class. It returns `(slot_of, rotation_of, groups)`, or `None` after `tries` attempts (`diag={}` then receives `unplaced`, the pieces the best attempt could not seat). The seam groups come from `SeamSpace.plan`. `pieces.group_placements(board, parts, cls_at=None, forced_at=None)` lists every interior placement of a seam group (any shape above; each part shows exactly the flats that face another part of the group; the result is `(slot, rotation)` per part, in `parts` order).
 - **Seam-aware mode in `solve`.** Used when some board has more flat-sided pieces than frame slots (standard border, no `distinct_corner_orders`). The start is built by `build_valid_layout`, and the moves keep it valid:
   - single swaps (both pieces fit each other's slot exactly);
   - group moves: a seam group goes to any of its placements (rotated when its pieces rotate), and the displaced pieces go to the vacated slots, one by one or as a whole group;
   - swaps of two groups.
+
+  Displaced plain pieces go to the vacated slots they fit (matched by class, so groups whose pieces sit on cells of different classes stay movable).
 - **Evidence.** `experiments/008-mixed-frames/README.md`, Round 2. Quarter rotation: valid, shared 0/0/0, 127 flat-sided pieces, 15 to 23 seams per board. Rotation none with 64 extra flat pieces: valid, shared 2/0/0, 245 flat-sided pieces. Without rotation, 137 to 161 interior pieces are flat-sided, so the seams will show in print; quarter is the better choice for those maps.
+
+## Cross-class seams: frames with different class mixes
+
+A standard (flat-edged) border needs a flat-sided piece of the right class at every frame cell, and the three pictures' frames can use different class mixes. A seam pair is two flat-sided pieces at adjacent interior cells with their flat sides touching. The scene prescribes the class of each cell, so the two partners only have to match the classes of those two cells, not each other (and, under forced rotations, the flat side must land on the shared edge: the cell's forced rotation fixes which home a piece needs for a given direction).
+
+- **Derivation** (`pieces_from_scenes(..., strict_border=False)`, the default). Frame class counts are no longer required to agree (`strict_border=True` and CLI `--strict-border` restore the old check). The flat-sided pool of each class is sized to the largest frame need of that class over the three maps (per home with forced rotations; see Class maps). In map `k` the surplus of class `c` is the pool minus map `k`'s own frame need; those pieces become seam pieces on interior cells of class `c` of map `k`, each paired with any other surplus flat piece on an adjacent interior cell, whatever its class. After the existing padding, the derivation checks every map with the seam planner. If some surplus piece cannot be seated (a class with an odd surplus and no neighbouring class with surplus, a corner without two usable neighbours), it adds flat edge pieces of classes that border the unseated pieces (a single piece, else a pair), scored by the pieces left unseated summed over the three maps, until all three maps seat their surplus or no candidate helps. Failure raises `SceneError` when the frames differ (it stays silent, as before, when they agree).
+- **Planner** (`pieces.SeamSpace.plan`). For one map it lists every group placement on interior cells (shapes: domino, L-tromino, corner pair plus edge pair, four corners) and runs an ejection-chain search: an unseated piece takes a placement whose other positions are filled from unseated pieces or from the groups it displaces (any piece of a fitting class and flat count may be taken, displacing its group); displaced pieces become unseated; a worsening move is accepted with probability exp(-cost/0.7). It returns the groups or the unseated pieces of the best state. `build_valid_layout` uses it for the leftover pieces after the frame matching.
+- **Report.** `scene.seam_report(boards, maps, pieces)` gives, per map, the flat-sided pieces inside the picture, the seams, how many join different classes (`cross_class`) and the group sizes. `prototype.seam_counts(solution)` gives the same for a solved board; the prototype `summary.md` lists "interior seams" and "cross-class seams" per board.
+- **Limits.** Groups have at most four pieces and only the shapes above (no chains of three edge pieces, no 3x2 blocks). Every non-flat profile must mate with every other (the seam-aware solver mode assumes it). The planner is a heuristic: a feasible scene can be reported infeasible, and the padding search is greedy, so it can add more flat pieces than the minimum. A class needs spare cells to hold padding pieces (pool at most the class's cell count). Without rotation the pairs must be opposite flats at adjacent cells, so cross-class partners are rarer. Groups of cross-class pieces have fewer placements than same-class groups (they live on class boundaries), which limits how far the solver can move them and can leave a few shared adjacencies.
 
 ## Class maps: derivation (`scene.pieces_from_scenes`)
 
-`pieces_from_scenes(boards, maps, extra_flat_pieces=0, free_corners=False, allowed_rotations=None)` returns one piece per cell of map A, carrying A's class. Maps B and C supply the needs that size the border pool.
+`pieces_from_scenes(boards, maps, extra_flat_pieces=0, free_corners=False, allowed_rotations=None, strict_border=False)` returns one piece per cell of map A, carrying A's class. Maps B and C supply the needs that size the border pool.
 
 1. **Per-class border matching.** Each border cell of class `c`, in each of the three maps, needs a piece of class `c` whose flat side covers that cell at one of the class's allowed rotations (a forced cell: at its forced rotation). A piece with canonical flat home `h` shows that flat on side `(h + r/90) mod 4` when turned by `r`, so a cell on side `key` needs `h = (key - r/90) mod 4`. Corners use the same rule on corner indices, with the two flats turned together.
 2. **Directional vs rotatable.** A directional class (allowed rotations `{0}`) and a forced cell admit one home. A rotatable class admits all four homes, so its border cells pool. Each map is matched class by class against one physical pool: the pool grows to the most any map needs per home, and rotatable needs take what is left. Leftover pieces and the plain interior pieces fill the rest of A's cells of the class. When a class has too few cells, `SceneError` names the class, map, cell and side.
 3. **Seam padding.** Flat edge pieces are added, with classes chosen to suit all three maps (a flow over the class pairs that touch in each map), until each map's leftover flat pieces can pair up: opposite flats without rotation, an even count with rotation. Automatic padding applies only when every class is rotation-free or every class is fully rotatable. The count is conservative about forced rotations (it ignores the turns of leftover pieces), and `_layouts_exist` confirms each map afterwards.
 4. **Extra flat pieces.** `extra_flat_pieces` adds that many flat edge pieces on top, spread over the classes: without rotation as N/S then W/E pairs (opposite-side pairs); an odd count gets one more partner.
 5. **Defaults.** Allowed rotations: all four in quarter mode, `{0}` otherwise. With `free_corners`, corners get all four, and their inner sides are `wild`.
-6. **Histogram and border checks** (`validate_scenes`). Three maps, each the shape of its board, identical class histograms. Border class counts per side (rotation none) or pooled (quarter, free corners) must match only when all boards have the same shape or `strict_border=True`. `pieces_from_scenes` passes `strict_border=False` when extras are used.
+6. **Histogram and border checks** (`validate_scenes`). Three maps, each the shape of its board, identical class histograms. Border class counts per side (rotation none) or pooled (quarter, free corners) must match only when all boards have the same shape or `strict_border=True`. `pieces_from_scenes` relaxes this by default (frame mixes may differ, seams absorb the difference, see above) and checks it only when called with `strict_border=True` and no extras.
 
 ## Forced rotations and orientation suffixes
 
@@ -120,8 +131,9 @@ flat_side_indices(shape_type, home) -> tuple[int, ...]
 rotations_for_piece(board, piece, slot_id, forced=None) -> tuple[int, ...]
 flat_dirs(sides, rotation) -> frozenset                       # directions showing flat
 exact_rotations(piece, flats, cls_at=None, forced=None) -> tuple[int, ...]
-group_placements(board, parts, cls_at=None, forced_at=None) -> list[tuple]
-build_valid_layout(board, pieces, cls_at=None, forced_at=None, rng=None, tries=25)
+group_placements(board, parts, cls_at=None, forced_at=None, space=None) -> list[tuple]
+class SeamSpace(board, cls_at=None, forced_at=None): placements(parts); plan(pieces, left, rng, steps=0)
+build_valid_layout(board, pieces, cls_at=None, forced_at=None, rng=None, tries=25, space=None, diag=None, steps=0)
 inventory_layout(boards, extra_flat_pieces=0, free_corners=False) -> list[(shape_type, home)]
 make_inventory(boards, cls="any", extra_flat_pieces=0, free_corners=False) -> list[Piece]
 piece_to_dict(p) / piece_from_dict(d)
@@ -137,7 +149,8 @@ FORCED_ZERO                                        # rot value for a forced 0
 class ClassMap: cls, rot (grids), forced; cols, rows; histogram(); tokens(); from_tokens(rows)
 parse_token(tok) -> (cls, rot); parse_text(text) -> list[ClassMap]; load_scenes(paths) -> list[ClassMap]
 validate_scenes(boards, maps, free_corners=False, strict_border=None) -> None   # raises SceneError
-pieces_from_scenes(boards, maps, extra_flat_pieces=0, free_corners=False, allowed_rotations=None) -> list[Piece]
+pieces_from_scenes(boards, maps, extra_flat_pieces=0, free_corners=False, allowed_rotations=None, strict_border=False) -> list[Piece]
+seam_report(boards, maps, pieces) -> list[dict | None]   # flat_inside, seams, cross_class, groups per map
 ```
 - `boards` is one board or three; maps are per solution and have that solution's shape.
 - Text format: one row per line, whitespace-separated tokens, blank line between maps, `#` comments. JSON: a list of 3 grids, or `{"maps": [...]}`. `load_scenes` takes three paths or one file with three maps.
@@ -181,7 +194,7 @@ validate_solution(solution) -> list[str]     # empty means valid
 ```python
 run_prototype(scenes_path, classes_path, out_dir, *, sizes=None, border="standard", rotation="none",
               seed=0, iters=None, cell=48, grid="none", labels=False, extra_flat=0,
-              mating_weight=0.0, max_shared_fraction=None) -> dict
+              mating_weight=0.0, max_shared_fraction=None, strict_border=False) -> dict
 ```
 Loads the class maps, derives the inventory (with `extra_flat` added to the automatic seams), restricts rotations by the class spec (pinned to 0 in none mode), solves, and writes the outputs. Returns `valid`, `violations`, `shared`, `gates` (`{"piece", "scene", "failures"}`), `gate_lines`, `files` and `out_dir`. Invalid solutions still write their outputs.
 
@@ -190,10 +203,10 @@ Loads the class maps, derives the inventory (with `extra_flat` added to the auto
 ```
 metapuzzle solve [--cols N] [--rows N] [--sizes CxR,CxR,CxR] [--border standard|tray]
                  [--rotation none|quarter] [--seed N] [--iters N] [--scenes PATH ...]
-                 [--extra-flat N] [--free-corners] [--distinct-corner-orders]
+                 [--extra-flat N] [--strict-border] [--free-corners] [--distinct-corner-orders]
                  [--mating-weight W] [--max-shared-fraction F] [--out sol.json]
 metapuzzle prototype --scenes FILE --classes SPEC.json --out DIR [--sizes ...] [--rotation ...]
-                 [--seed N] [--iters N] [--cell N] [--extra-flat N] [--mating-weight W] [--max-shared-fraction F]
+                 [--seed N] [--iters N] [--cell N] [--extra-flat N] [--strict-border] [--mating-weight W] [--max-shared-fraction F]
 metapuzzle report sol.json [--json]
 ```
 Defaults 10x8 standard none seed 0. `--sizes` gives per-solution sizes (cols x rows; one entry is repeated three times; piece counts must be equal). With `--scenes`, sizes come from the maps (a conflicting `--sizes` is an error). Exit code 2 when the result is not valid. `metapuzzle connectors` exits 2 when some contacts do not mate.

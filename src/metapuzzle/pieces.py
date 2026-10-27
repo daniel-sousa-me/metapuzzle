@@ -1,7 +1,9 @@
 """Piece inventory: side profiles, shape types, classes, allowed rotations."""
 from __future__ import annotations
 
+import functools
 import itertools
+import math
 import random
 from dataclasses import dataclass
 from typing import Sequence
@@ -136,10 +138,12 @@ def make_inventory(
 
 
 # ---- seams: flat-sided pieces sitting inside a picture ------------------------------------
-# A flat side is legal inside the picture only against another flat side. A *group* is a root
-# piece plus leaf pieces, each leaf showing a flat side to one of the root's flat sides: a domino
-# (edge + edge) or an L-tromino (a two-flat corner piece + two edge pieces). Groups sit on interior
-# slots, so every other side of their pieces meets an ordinary connector.
+# A flat side is legal inside the picture only against another flat side. A *group* is a set of
+# flat-sided pieces on interior cells whose flat sides all face each other: a domino (edge + edge),
+# an L-tromino (a two-flat corner piece + two edge pieces), a 2x2 block of two corners and two edges
+# (C C over E E) or four corners. The scene prescribes the class of every cell, so the pieces of a
+# group need not share a class: each piece only has to match the class (and forced rotation) of the
+# cell it sits on. Every other side of a group piece meets an ordinary connector.
 
 
 def flat_dirs(sides: Sequence[str], rotation: int) -> frozenset:
@@ -162,76 +166,338 @@ def _sig(p: Piece) -> tuple:
     return (p.sides, p.allowed_rotations, p.cls)
 
 
-def group_placements(board: Board, parts: Sequence[Piece], cls_at=None, forced_at=None) -> list[tuple]:
-    """Every way to place a group on interior slots of `board`.
+def _shape(cells, links) -> tuple:
+    """((dx, dy, flat directions), ...) of a group: cells with `links` (index pairs) as flat-flat contacts."""
+    flats = [set() for _ in cells]
+    for i, j in links:
+        d = SIDE_DELTA.index((cells[j][0] - cells[i][0], cells[j][1] - cells[i][1]))
+        flats[i].add(d)
+        flats[j].add((d + 2) % 4)
+    return tuple((x, y, frozenset(f)) for (x, y), f in zip(cells, flats))
 
-    parts[0] is the root, the rest are leaves; the root shows exactly len(leaves) flat sides, each
-    facing a leaf that shows a flat side back (and no other). Returns tuples of (slot, rotation degrees)
-    in `parts` order. cls_at / forced_at are per-slot class labels and forced rotations (or None).
-    """
-    root, leaves = parts[0], parts[1:]
-    out: list[tuple] = []
-    for u in board.slots:
-        if u.boundary_sides:
-            continue
-        for r in sorted(root.allowed_rotations):
-            if (forced_at and forced_at[u.id] not in (None, r)) or (cls_at and cls_at[u.id] != root.cls):
-                continue
-            fl = flat_dirs(root.sides, r)
-            if len(fl) != len(leaves):
-                continue
-            for assign in set(itertools.permutations(sorted(fl))):
-                placed = [(u.id, r)]
-                for leaf, d in zip(leaves, assign):
-                    dx, dy = SIDE_DELTA[d]
-                    x, y = u.x + dx, u.y + dy
-                    if not (0 <= x < board.cols and 0 <= y < board.rows):
-                        break
-                    v = board.slot_at(x, y)
-                    if board.slots[v].boundary_sides:
-                        break
-                    rs = exact_rotations(leaf, frozenset({(d + 2) % 4}), cls_at[v] if cls_at else None,
-                                         forced_at[v] if forced_at else None)
-                    if not rs:
-                        break
-                    placed.append((v, rs[0]))
-                else:
-                    if len({s for s, _ in placed}) == len(placed):
-                        out.append(tuple(placed))
+
+def _group_shapes() -> list[tuple]:
+    out = [_shape([(0, 0), (1, 0)], [(0, 1)]), _shape([(0, 0), (0, 1)], [(0, 1)])]  # dominoes
+    for a in range(4):  # L: a corner piece (flats a, a+1) with an edge piece across each flat
+        out.append(_shape([(0, 0), SIDE_DELTA[a], SIDE_DELTA[(a + 1) % 4]], [(0, 1), (0, 2)]))
+    ring = [(0, 0), (1, 0), (1, 1), (0, 1)]
+    out.append(_shape(ring, [(0, 1), (1, 2), (2, 3), (3, 0)]))  # four corners
+    for skip in range(4):  # two corners and two edges: the ring with one contact left out
+        out.append(_shape(ring, [(i, (i + 1) % 4) for i in range(4) if i != skip]))
     return out
 
 
-SEARCH_STEPS = 4000
+GROUP_SHAPES = _group_shapes()
 
 
-def build_valid_layout(board: Board, pieces: Sequence[Piece], cls_at=None, forced_at=None, rng=None, tries: int = 25):
+def _kind(flat_counts) -> tuple[int, int]:
+    return (sum(n == 1 for n in flat_counts), sum(n == 2 for n in flat_counts))
+
+
+@functools.lru_cache(maxsize=32)
+def _geometry(cols: int, rows: int) -> dict:
+    """Every placement of each group shape on interior cells: kind (edges, corners) -> [(slots, flats)]."""
+    out: dict = {}
+    for shape in GROUP_SHAPES:
+        kind = _kind([len(f) for _, _, f in shape])
+        lst = out.setdefault(kind, [])
+        for y in range(1, rows - 1):
+            for x in range(1, cols - 1):
+                cells = [(x + dx, y + dy) for dx, dy, _ in shape]
+                if all(1 <= cx < cols - 1 and 1 <= cy < rows - 1 for cx, cy in cells):
+                    lst.append((tuple(cy * cols + cx for cx, cy in cells), tuple(f for _, _, f in shape)))
+    return out
+
+
+class SeamSpace:
+    """Seam groups on the interior of one board, for the class map `cls_at` and forced rotations `forced_at`.
+
+    Both are per-slot lists (or None). `placements` lists the ways to put a group on the board; `plan`
+    searches for a set of disjoint groups that absorbs given flat-sided pieces.
+    """
+
+    def __init__(self, board: Board, cls_at=None, forced_at=None):
+        self.board, self.cls_at, self.forced_at = board, cls_at, forced_at
+        self.geom = _geometry(board.cols, board.rows)
+        self._rots: dict = {}
+        self._index: dict | None = None
+        self.instances: list = []
+        self.inst_kind: list = []
+        self._opts: dict = {}
+
+    def rots(self, piece: Piece, slot: int, flats: frozenset, sig=None) -> tuple[int, ...]:
+        """Rotations at which `piece` sits on interior `slot` showing exactly `flats`."""
+        c = self.cls_at[slot] if self.cls_at else None
+        f = self.forced_at[slot] if self.forced_at else None
+        key = (sig or _sig(piece), c, f, flats)
+        r = self._rots.get(key)
+        if r is None:
+            r = self._rots[key] = exact_rotations(piece, flats, c, f)
+        return r
+
+    def index(self) -> dict:
+        """(cell class, flat count, group kind) -> [(instance id, position)] over every group placement."""
+        if self._index is None:
+            idx: dict = {}
+            for kind, lst in self.geom.items():
+                for inst in lst:
+                    iid = len(self.instances)
+                    self.instances.append(inst)
+                    self.inst_kind.append(kind)
+                    for pos, (slot, f) in enumerate(zip(*inst)):
+                        idx.setdefault((self.cls_at[slot] if self.cls_at else None, len(f), kind), []).append((iid, pos))
+            self._index = idx
+        return self._index
+
+    def options(self, piece: Piece, sig, kinds) -> list:
+        """(instance id, position) pairs where `piece` fits a group of one of the given kinds."""
+        key = (sig, tuple(kinds))
+        if key not in self._opts:
+            idx = self.index()
+            n = sum(s == "flat" for s in piece.sides)
+            ck = piece.cls if self.cls_at else None
+            self._opts[key] = [
+                (iid, pos) for kind in kinds for iid, pos in idx.get((ck, n, kind), ())
+                if self.rots(piece, self.instances[iid][0][pos], self.instances[iid][1][pos], sig)
+            ]
+        return self._opts[key]
+
+    def placements(self, parts: Sequence[Piece]) -> list[tuple]:
+        """Every way to place the group `parts` (a tuple of (slot, rotation degrees) per part, in order)."""
+        kind = _kind([sum(s == "flat" for s in p.sides) for p in parts])
+        if kind not in self.geom:
+            return []
+        out: list[tuple] = []
+        for slots, flats in self.geom[kind]:
+            by_n: dict = {1: [], 2: []}
+            for pos, f in enumerate(flats):
+                by_n[len(f)].append(pos)
+            pbn: dict = {1: [], 2: []}
+            for j, p in enumerate(parts):
+                pbn[sum(s == "flat" for s in p.sides)].append(j)
+            for perm1 in set(itertools.permutations(pbn[1])):
+                for perm2 in set(itertools.permutations(pbn[2])):
+                    placed = [None] * len(parts)
+                    ok = True
+                    for js, ps in ((perm1, by_n[1]), (perm2, by_n[2])):
+                        for j, pos in zip(js, ps):
+                            rs = self.rots(parts[j], slots[pos], flats[pos])
+                            if not rs:
+                                ok = False
+                                break
+                            placed[j] = (slots[pos], rs[0])
+                        if not ok:
+                            break
+                    if ok:
+                        out.append(tuple(placed))
+        return out
+
+    def plan(self, pieces: Sequence[Piece], left: Sequence[int], rng: random.Random, steps: int = 0):
+        """Place the flat-sided pieces `left` (indices into `pieces`) as disjoint seam groups.
+
+        Returns (groups, unplaced): on success `groups` holds (piece indices by position, ((slot, rotation
+        degrees), ...)) and `unplaced` is empty; otherwise `groups` is empty and `unplaced` lists the
+        pieces left over in the best state found (a piece with no placement at all comes alone).
+        """
+        left = list(left)
+        planner = SeamPlanner(self, rng)
+        for i in left:
+            planner.add(pieces[i])
+        planner.search(steps)
+        if planner.unplaced:
+            return [], sorted(left[j] for j in planner.best)
+        return [([left[j] for j in mem], placed) for mem, placed in planner.groups_out()], []
+
+
+class SeamPlanner:
+    """A stateful seam search on one `SeamSpace`: pieces can be added and the search resumed.
+
+    An ejection-chain search: an unplaced piece takes a group placement whose other positions are filled
+    from unplaced pieces or from the groups it displaces (a piece of any group may be taken, which displaces
+    that group too); displaced pieces become unplaced. A worsening move is accepted with probability
+    exp(-cost/0.7). `best` keeps the unplaced pieces of the best state seen (local indices, in the order
+    pieces were added).
+    """
+
+    def __init__(self, space: SeamSpace, rng: random.Random):
+        self.space, self.rng = space, rng
+        self.pieces: list[Piece] = []
+        self.sig: list = []
+        self.nfl: list = []
+        self.ck: list = []
+        self.unplaced: set = set()
+        self.where: dict = {}  # piece -> group id
+        self.groups: dict = {}  # group id -> (members by position, instance id)
+        self.occ: dict = {}  # slot -> group id
+        self.all_key: dict = {}  # (class, flat count) -> every piece of that kind
+        self.nxt = 0
+        self.best: list = []
+
+    def copy(self) -> "SeamPlanner":
+        c = SeamPlanner(self.space, self.rng)
+        c.pieces, c.sig, c.nfl, c.ck = list(self.pieces), list(self.sig), list(self.nfl), list(self.ck)
+        c.unplaced, c.where = set(self.unplaced), dict(self.where)
+        c.groups, c.occ, c.nxt = dict(self.groups), dict(self.occ), self.nxt
+        c.all_key = {k: list(v) for k, v in self.all_key.items()}
+        c.best = list(self.best)
+        return c
+
+    def add(self, piece: Piece) -> int:
+        i = len(self.pieces)
+        n = sum(s == "flat" for s in piece.sides)
+        self.pieces.append(piece)
+        self.sig.append(_sig(piece))
+        self.nfl.append(n)
+        self.ck.append(piece.cls if self.space.cls_at else None)
+        self.unplaced.add(i)
+        self.all_key.setdefault((self.ck[i], n), []).append(i)
+        self.best = sorted(self.unplaced)
+        return i
+
+    def _kinds(self) -> list:
+        n_corner = sum(n == 2 for n in self.nfl)
+        return [k for k in self.space.geom if k[1] <= n_corner and k[0] <= sum(n == 1 for n in self.nfl)]
+
+    def search(self, steps: int = 0) -> int:
+        """Run up to `steps` moves (0: a default growing with the piece count); returns the unplaced count."""
+        sp, rng = self.space, self.rng
+        sp.index()
+        insts = sp.instances
+        kinds = self._kinds()
+        opts: dict = {}
+        for i in range(len(self.pieces)):
+            if self.sig[i] not in opts:
+                opts[self.sig[i]] = sp.options(self.pieces[i], self.sig[i], kinds)
+        dead = [i for i in self.unplaced if not opts[self.sig[i]]]
+        if dead:
+            self.best = sorted(dead)
+            return len(self.unplaced)
+        pieces, sig, nfl, ck = self.pieces, self.sig, self.nfl, self.ck
+        unplaced, where, groups, occ, all_key = self.unplaced, self.where, self.groups, self.occ, self.all_key
+        cls_at = sp.cls_at
+        steps = steps or 3000 + 100 * len(pieces)
+
+        def fill(iid: int, pos: int, p: int, blk: set):
+            """Pieces for the other positions of instance `iid` (p sits at `pos`), or None."""
+            slots, flats = insts[iid]
+            order = [j for j in range(len(slots)) if j != pos]
+            used = {p}
+            res = {pos: p}
+
+            def rec(t: int) -> bool:
+                if t == len(order):
+                    return True
+                j = order[t]
+                key = (cls_at[slots[j]] if cls_at else None, len(flats[j]))
+                near, far = [], []
+                for q in all_key.get(key, ()):
+                    if q not in used:
+                        (near if q in unplaced or where[q] in blk else far).append(q)
+                rng.shuffle(near)
+                rng.shuffle(far)
+                for q in near + far[:6]:
+                    if not sp.rots(pieces[q], slots[j], flats[j], sig[q]):
+                        continue
+                    used.add(q)
+                    res[j] = q
+                    if rec(t + 1):
+                        return True
+                    used.discard(q)
+                return False
+
+            return res if rec(0) else None
+
+        for _ in range(steps):
+            if not unplaced:
+                break
+            p = rng.choice(sorted(unplaced))
+            op = opts[sig[p]]
+            sample = op if len(op) <= 24 else rng.sample(op, 24)
+            scored = []
+            for iid, pos in sample:
+                slots = insts[iid][0]
+                blk = {occ[sl] for sl in slots if sl in occ}
+                res = fill(iid, pos, p, blk)
+                if res is not None:
+                    gone = blk | {where[q] for q in res.values() if q in where}
+                    scored.append((sum(len(groups[g][0]) for g in gone) - len(slots), rng.random(), iid, gone, res))
+            if not scored:
+                continue
+            cost, _, iid, gone, res = min(scored) if rng.random() < 0.85 else rng.choice(scored)
+            if cost > 0 and rng.random() > math.exp(-cost / 0.7):
+                continue
+            slots = insts[iid][0]
+            for g in gone:
+                members, _i = groups.pop(g)
+                for m in members:
+                    unplaced.add(m)
+                    del where[m]
+                for sl in insts[_i][0]:
+                    del occ[sl]
+            mem = [res[j] for j in range(len(slots))]
+            for m in mem:
+                unplaced.discard(m)
+                where[m] = self.nxt
+            groups[self.nxt] = (mem, iid)
+            for sl in slots:
+                occ[sl] = self.nxt
+            self.nxt += 1
+            if len(unplaced) < len(self.best) or not self.best:
+                self.best = sorted(unplaced)
+        return len(unplaced)
+
+    def groups_out(self) -> list:
+        """Placed groups as (members by position, ((slot, rotation degrees), ...))."""
+        sp, rng = self.space, self.rng
+        out = []
+        for mem, iid in self.groups.values():
+            slots, flats = sp.instances[iid]
+            out.append((mem, tuple((sl, rng.choice(sp.rots(self.pieces[m], sl, f, self.sig[m])))
+                                   for m, sl, f in zip(mem, slots, flats))))
+        return out
+
+
+def group_placements(board: Board, parts: Sequence[Piece], cls_at=None, forced_at=None, space: SeamSpace | None = None) -> list[tuple]:
+    """Every way to place a seam group on interior slots of `board`.
+
+    `parts` are the group's pieces (a domino, an L-tromino with the corner first, or a 2x2 block); each
+    piece shows exactly the flat sides that face another piece of the group. Returns tuples of
+    (slot, rotation degrees) in `parts` order. cls_at / forced_at are per-slot class labels and forced
+    rotations (or None); parts of different classes need cells of their own classes.
+    """
+    return (space or SeamSpace(board, cls_at, forced_at)).placements(parts)
+
+
+def build_valid_layout(
+    board: Board, pieces: Sequence[Piece], cls_at=None, forced_at=None, rng=None, tries: int = 25,
+    space: SeamSpace | None = None, diag: dict | None = None, steps: int = 0,
+):
     """Construct one valid placement of `pieces` on a standard board, seams included.
 
     Border slots take pieces whose flat sides are exactly the slot's boundary sides (a maximum
-    matching); the flat-sided pieces left over form seam groups on interior slots (each corner piece
-    with two edge pieces, then edge pieces in pairs); plain pieces fill the rest by class.
+    matching); the flat-sided pieces left over form seam groups on interior slots (`SeamSpace.plan`:
+    dominoes, L-trominoes, 2x2 blocks; the pieces of a group may have different classes, each matching
+    the class of its cell); plain pieces fill the rest by class.
     Returns (slot_of, rotation_of, groups) indexed by position in `pieces`, groups being lists of
-    piece indices (root first), or None when no layout was found. Validity assumes every non-flat
-    profile mates with every other non-flat profile the pieces can present.
+    piece indices, or None when no layout was found (`diag["unplaced"]` then lists the pieces the best
+    attempt could not seat, `diag["frame"]` is True when the frame itself could not be matched). `steps`
+    caps the seam search per try (0: a default that grows with the number of seam pieces).
+    Validity assumes every non-flat profile mates with every other non-flat profile the pieces can present.
     """
     n = board.n_slots
+    if diag is not None:
+        diag.clear()
     if board.border != "standard" or len(pieces) != n:
         return None
     rng = rng or random.Random(0)
     nflat = [sum(s == "flat" for s in p.sides) for p in pieces]
     if max(nflat) > 2:
         return None
-    memo: dict = {}
-    grp_memo: dict = {}
+    space = space or SeamSpace(board, cls_at, forced_at)
 
     def rots(i: int, slot: int, flats: frozenset) -> tuple[int, ...]:
-        key = (_sig(pieces[i]), slot, flats)
-        if key not in memo:
-            memo[key] = exact_rotations(pieces[i], flats, cls_at[slot] if cls_at else None,
-                                        forced_at[slot] if forced_at else None)
-        return memo[key]
+        return space.rots(pieces[i], slot, flats)
 
-    interior_all = [s for s in board.slots if not s.boundary_sides]
     border = [s for s in board.slots if s.boundary_sides]
     flat_idx = [i for i in range(n) if nflat[i]]
     plain_idx = [i for i in range(n) if not nflat[i]]
@@ -240,7 +506,10 @@ def build_valid_layout(board: Board, pieces: Sequence[Piece], cls_at=None, force
     bflats = {s.id: frozenset(s.boundary_sides) for s in border}
     cand0 = {s.id: [i for i in flat_idx if nflat[i] == len(bflats[s.id]) and rots(i, s.id, bflats[s.id])] for s in border}
     if any(not c for c in cand0.values()):
+        if diag is not None:
+            diag["frame"] = True
         return None
+    best_unplaced = None
     for _ in range(tries):
         # 1. border matching (Kuhn), random tie-breaking
         cand = {s: rng.sample(c, len(c)) for s, c in cand0.items()}
@@ -259,6 +528,8 @@ def build_valid_layout(board: Board, pieces: Sequence[Piece], cls_at=None, force
         slots_order = list(cand)
         rng.shuffle(slots_order)
         if not all(augment(s, set()) for s in slots_order):
+            if diag is not None:
+                diag["frame"] = True
             return None
         slot_of: dict[int, int] = {}
         rot_of: dict[int, int] = {}
@@ -266,155 +537,17 @@ def build_valid_layout(board: Board, pieces: Sequence[Piece], cls_at=None, force
         for i, s in owner.items():
             slot_of[i], at[s] = s, i
             rot_of[i] = rng.choice(rots(i, s, bflats[s]))
-        # 2. seam groups from the leftover flat-sided pieces. Each leftover corner takes two edge
-        # pieces (the pair with the most placements) and forms an L; the other edge pieces are paired
-        # up (any two with a common placement). A min-conflicts search then picks one placement per
-        # group, and may swap partners between two dominoes.
+        # 2. seam groups from the leftover flat-sided pieces
         left = [i for i in flat_idx if i not in owner]
-        rng.shuffle(left)
-        taken: set[int] = set()
-        members: list[list[int]] = []  # corner groups: [corner, leaf, leaf]; dominoes: [lower id, higher id]
-
-        def group_options(ids) -> list:
-            key = tuple(_sig(pieces[i]) for i in ids)
-            if key not in grp_memo:
-                grp_memo[key] = group_placements(board, [pieces[i] for i in ids], cls_at, forced_at)
-            return grp_memo[key]
-
-        ok = True
-        for root in [i for i in left if nflat[i] == 2]:
-            taken.add(root)
-            by_sig: dict = {}
-            for j in left:
-                if j not in taken and nflat[j] == 1:
-                    by_sig.setdefault(_sig(pieces[j]), []).append(j)
-            sigs = list(by_sig)
-            scored = []
-            for x, sa in enumerate(sigs):
-                for sb in sigs[x:]:
-                    if sa == sb and len(by_sig[sa]) < 2:
-                        continue
-                    ia, ib = by_sig[sa][0], by_sig[sb][-1 if sa == sb else 0]
-                    n_opt = len(group_options([root, ia, ib]))
-                    if n_opt:
-                        scored.append(((len(by_sig[sa]) + len(by_sig[sb])) * (0.5 + rng.random()), ia, ib))
-            if not scored:
-                ok = False
-                break
-            _, ia, ib = max(scored)
-            taken.update((ia, ib))
-            members.append([root, ia, ib])
-        if not ok:
+        groups, unplaced = space.plan(pieces, left, rng, steps)
+        if unplaced:
+            if best_unplaced is None or len(unplaced) < len(best_unplaced):
+                best_unplaced = unplaced
             continue
-        n_corner_groups = len(members)
-        rest = [i for i in left if i not in taken and nflat[i] == 1]
-        busy = set(at)
-        partner: dict[int, int] = {}
-        compat = {a: [] for a in rest}
-        for x, a in enumerate(rest):
-            for b in rest[x + 1:]:
-                n_opt = len(group_options([a, b] if a < b else [b, a]))
-                if n_opt:
-                    w = n_opt * (0.5 + rng.random())
-                    compat[a].append((w, b))
-                    compat[b].append((w, a))
-        for a in compat:
-            compat[a] = [b for _, b in sorted(compat[a], reverse=True)]
-
-        def augment_pair(a: int, depth: int, seen: set) -> bool:
-            for b in compat[a]:
-                if b in seen:
-                    continue
-                seen.add(b)
-                if b not in partner:
-                    partner[a], partner[b] = b, a
-                    return True
-                if depth:
-                    c = partner[b]
-                    del partner[b], partner[c]
-                    seen.add(c)
-                    if augment_pair(c, depth - 1, seen):
-                        partner[a], partner[b] = b, a
-                        return True
-                    partner[b], partner[c] = c, b
-            return False
-
-        order = list(rest)
-        rng.shuffle(order)
-        order.sort(key=lambda a: len(compat[a]))
-        for a in order:
-            if a not in partner and not augment_pair(a, 60, {a}):
-                ok = False
-                break
-        if not ok:
-            continue
-        members += [[a, b] for a, b in partner.items() if a < b]
-        opt_cache: dict = {}
-
-        def cands(ids) -> list:
-            key = tuple(ids)
-            if key not in opt_cache:
-                opt_cache[key] = group_options(ids)
-            return opt_cache[key]
-
-        cand = [cands(m) for m in members]
-        if any(not c for c in cand):
-            continue
-        choice = [rng.randrange(len(c)) for c in cand]
-        cover: dict[int, int] = {}
-
-        def put(g: int, sign: int) -> None:
-            for slot, _ in cand[g][choice[g]]:
-                cover[slot] = cover.get(slot, 0) + sign
-
-        def overlap(g: int) -> int:
-            return sum(cover[sl] - 1 for sl, _ in cand[g][choice[g]])
-
-        def best_choice(g: int) -> int:
-            pool = rng.sample(range(len(cand[g])), min(40, len(cand[g])))
-            return min(pool, key=lambda t: (sum(cover.get(sl, 0) for sl, _ in cand[g][t]), rng.random()))
-
-        for g in range(len(members)):
-            put(g, 1)
-        for _step in range(SEARCH_STEPS):
-            bad = [g for g in range(len(members)) if overlap(g) > 0]
-            if not bad:
-                break
-            g = rng.choice(bad)
-            others = [x for x in range(n_corner_groups, len(members)) if x != g]
-            if g < n_corner_groups or rng.random() < 0.7 or not others:  # move a group to its least crowded placement
-                put(g, -1)
-                choice[g] = best_choice(g)
-                put(g, 1)
-                continue
-            h = rng.choice(others)  # or swap partners with another domino
-            (a, b), (c, d) = members[g], members[h]
-            new = rng.choice([((a, c), (b, d)), ((a, d), (b, c))])
-            new = [sorted(new[0]), sorted(new[1])]
-            oc = [cands(new[0]), cands(new[1])]
-            if not oc[0] or not oc[1]:
-                continue
-            old = (members[g], members[h], cand[g], cand[h], choice[g], choice[h])
-            before = sum(overlap(x) > 0 for x in (g, h))
-            put(g, -1)
-            put(h, -1)
-            members[g], members[h] = new
-            cand[g], cand[h] = oc
-            choice[g] = best_choice(g)
-            put(g, 1)
-            choice[h] = best_choice(h)
-            put(h, 1)
-            if sum(overlap(x) > 0 for x in (g, h)) > before:
-                put(g, -1)
-                put(h, -1)
-                members[g], members[h], cand[g], cand[h], choice[g], choice[h] = old
-                put(g, 1)
-                put(h, 1)
-        else:
-            continue
-        groups: list[list[int]] = [list(m) for m in members]
-        for g, mem in enumerate(members):
-            for i, (slot, rot) in zip(mem, cand[g][choice[g]]):
+        members: list[list[int]] = []
+        for mem, placed in groups:
+            members.append(list(mem))
+            for i, (slot, rot) in zip(mem, placed):
                 slot_of[i], rot_of[i], at[slot] = slot, rot, i
         # 3. plain pieces fill the remaining slots by class
         by_cls: dict = {}
@@ -422,6 +555,7 @@ def build_valid_layout(board: Board, pieces: Sequence[Piece], cls_at=None, force
             by_cls.setdefault(pieces[i].cls if cls_at else None, []).append(i)
         for lst in by_cls.values():
             rng.shuffle(lst)
+        ok = True
         for s in board.slots:
             if s.id in at:
                 continue
@@ -434,7 +568,9 @@ def build_valid_layout(board: Board, pieces: Sequence[Piece], cls_at=None, force
             slot_of[pick], at[s.id] = s.id, pick
             rot_of[pick] = rng.choice(rots(pick, s.id, frozenset()))
         if ok and len(at) == n:
-            return [slot_of[i] for i in range(n)], [rot_of[i] for i in range(n)], groups
+            return [slot_of[i] for i in range(n)], [rot_of[i] for i in range(n)], members
+    if diag is not None and best_unplaced is not None:
+        diag["unplaced"] = best_unplaced
     return None
 
 

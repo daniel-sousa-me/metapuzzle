@@ -51,6 +51,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--iters", type=int, default=None)
     s.add_argument("--scenes", nargs="+", metavar="PATH", help="class maps: three files, or one file with three maps")
     s.add_argument("--extra-flat", type=int, default=0, help="flat-sided pieces beyond the perimeter")
+    s.add_argument("--strict-border", action="store_true",
+                   help="require identical frame class mixes in the three maps (default: seams may absorb differences)")
     s.add_argument("--free-corners", action="store_true", help="corner pieces may rotate even without rotation mode")
     s.add_argument("--distinct-corner-orders", action="store_true", help="three different cyclic corner orders")
     _mating_args(s)
@@ -91,6 +93,8 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--iters", type=int, default=None)
     pt.add_argument("--extra-flat", type=int, default=0, metavar="N",
                     help="flat-sided pieces beyond those the frames need; the surplus sits inside as seams")
+    pt.add_argument("--strict-border", action="store_true",
+                    help="require identical frame class mixes in the three maps (default: cross-class seams absorb differences)")
     _mating_args(pt)
     pt.add_argument("--cell", type=int, default=48, help="cell size in pixels")
     pt.add_argument("--labels", action="store_true", help="print piece ids in the cells")
@@ -161,7 +165,7 @@ def _cmd_solve(a: argparse.Namespace) -> int:
         sizes = [(a.cols or 10, a.rows or 8)] * 3
     boards = [square_board(c, r, a.border, a.rotation) for c, r in sizes]
     if maps:
-        pieces = pieces_from_scenes(boards, maps, a.extra_flat, a.free_corners)
+        pieces = pieces_from_scenes(boards, maps, a.extra_flat, a.free_corners, strict_border=a.strict_border)
     else:
         pieces = make_inventory(boards, "any", a.extra_flat, a.free_corners)
     sol = solve(
@@ -224,7 +228,7 @@ def _cmd_prototype(a: argparse.Namespace) -> int:
     res = run_prototype(
         a.scenes, a.classes, a.out, sizes=a.sizes, border=a.border, rotation=a.rotation,
         seed=a.seed, iters=a.iters, cell=a.cell, labels=a.labels, extra_flat=a.extra_flat,
-        mating_weight=a.mating_weight, max_shared_fraction=a.max_shared_fraction,
+        mating_weight=a.mating_weight, max_shared_fraction=a.max_shared_fraction, strict_border=a.strict_border,
     )
     s = res["shared"]
     print(

@@ -44,6 +44,16 @@ Spec format (see ``data/sample_classes.json``)::
   ``(s, "mask:name")`` or ``(s, "group:seed_group")``, and an outline layer the seed of the
   mask it outlines), so layers
   are independent and the output does not depend on ``PYTHONHASHSEED``.
+* A numeric layer parameter may be a range, sampled once per piece. ``{"range": [lo, hi]}``
+  works for any numeric parameter. A plain ``[lo, hi]`` pair is a range only when the
+  primitive's default for that parameter is a number (``scale``, ``density``, ``length``,
+  ``amplitude``...); a parameter whose default is a list or tuple (``offset``, ``kinds``,
+  ``radius``) keeps a plain list as a literal, and the explicit form on it is an error.
+  The value is drawn uniformly from the piece seed mixed with the layer index and the
+  parameter name, so it is the same on every call and at every render size. Two integer
+  bounds give an integer drawn inclusive, otherwise a float. ``validate`` requires ``lo < hi``
+  and numeric bounds, and checks each layer at both ends of its ranges. Mask parameters
+  cannot be ranges.
 * Top-level ``ref_size`` (default 100) is the unit the spec is written in. Every piece
   is drawn at that size and the fragment is scaled to the display size, so the artwork
   is the same at every render size; only the resolution changes.
@@ -57,6 +67,8 @@ import dataclasses
 import hashlib
 import inspect
 import json
+import math
+import random
 import re
 import warnings
 from dataclasses import dataclass, field
@@ -163,6 +175,11 @@ def _parse_mask(where: str, raw: Any, *, named: bool = False) -> Mask:
     params = raw.get("params", {})
     if not isinstance(params, Mapping):
         raise ClassSpecError(f"{where}: mask params must be an object")
+    mfn = MASK_PRIMITIVES.get(prim)
+    for key, value in params.items():
+        if mfn is not None and _range_bounds(key, value, _param_default(mfn, key)) is not None:
+            raise ClassSpecError(f"{where}: mask parameter {key!r} cannot be a range; "
+                                 f"ranges apply to layer params only")
     group = raw.get("seed_group")
     if group is not None and (not isinstance(group, str) or not group):
         raise ClassSpecError(f"{where}: seed_group must be a non-empty string")
@@ -270,6 +287,80 @@ def _mask_tag(name: str, mask: Mask) -> str:
     return f"group:{mask.seed_group}" if mask.seed_group is not None else f"mask:{name}"
 
 
+# ------------------------------------------------------------------ parameter ranges
+
+_NO_DEFAULT = object()
+
+
+def _param_default(fn, name: str) -> Any:
+    p = inspect.signature(fn).parameters.get(name)
+    return _NO_DEFAULT if p is None or p.default is inspect.Parameter.empty else p.default
+
+
+def _is_number(x: Any) -> bool:
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x)
+
+
+def _range_bounds(name: str, value: Any, default: Any) -> tuple[float, float] | None:
+    """``(lo, hi)`` when a layer parameter is a range, else None. Raises on a malformed range.
+
+    ``{"range": [lo, hi]}`` is a range for any parameter whose default is a number, None or
+    unknown. A plain ``[lo, hi]`` is a range only when the default is a number.
+    """
+    if isinstance(value, Mapping) and "range" in value:
+        extra = sorted(str(k) for k in value if k != "range")
+        if extra:
+            raise ClassSpecError(f"param {name!r}: a range object takes only 'range', not {extra}")
+        if default is not _NO_DEFAULT and default is not None and not _is_number(default):
+            raise ClassSpecError(f"param {name!r}: a range needs a numeric parameter")
+        pair = value["range"]
+    elif isinstance(value, list) and _is_number(default):
+        pair = value
+    else:
+        return None
+    if not (isinstance(pair, (list, tuple)) and len(pair) == 2 and all(_is_number(x) for x in pair)):
+        raise ClassSpecError(f"param {name!r}: a range must be [lo, hi] with two numbers, got {pair!r}")
+    lo, hi = pair
+    if not lo < hi:
+        raise ClassSpecError(f"param {name!r}: a range needs lo < hi, got [{lo}, {hi}]")
+    return lo, hi
+
+
+def _range_endpoints(primitive: str, params: Mapping[str, Any]) -> list[dict]:
+    """The layer params with every range at its low end, then at its high end (for validation)."""
+    fn = PRIMITIVES[primitive]
+    bounds = {}
+    for name, value in params.items():
+        b = _range_bounds(name, value, _param_default(fn, name))
+        if b is not None:
+            bounds[name] = b
+    if not bounds:
+        return [dict(params)]
+    low = {**params, **{k: b[0] for k, b in bounds.items()}}
+    high = {**params, **{k: b[1] for k, b in bounds.items()}}
+    return [low, high]
+
+
+def _sample_layer_params(primitive: str, params: Mapping[str, Any], index: int,
+                         piece_seed: int) -> dict:
+    """The layer params with each range replaced by its value for this piece and layer.
+
+    The draw depends only on the piece seed, the layer index and the parameter name.
+    """
+    fn = PRIMITIVES[primitive]
+    out = {}
+    for name, value in params.items():
+        bounds = _range_bounds(name, value, _param_default(fn, name))
+        if bounds is None:
+            out[name] = value
+            continue
+        lo, hi = bounds
+        rng = random.Random(_layer_seed(piece_seed, f"{index}:param:{name}"))
+        out[name] = rng.randint(lo, hi) if isinstance(lo, int) and isinstance(hi, int) \
+            else rng.uniform(lo, hi)
+    return out
+
+
 # ------------------------------------------------------------------ spec
 
 @dataclass
@@ -353,12 +444,14 @@ class ClassSpec:
             raise ClassSpecError(f"unknown primitive {layer.primitive!r}; use one of {sorted(PRIMITIVES)}")
         palette = self._resolve(layer.palette)
         self._check_params(layer.primitive, fn, layer.params, reserved=_RESERVED_PARAMS)
-        try:
-            frag = fn(_TEST_SEED, _TEST_SIZE, palette, background=layer.background, **layer.params)
-        except Exception as e:  # the primitive's own message is the useful part
-            raise ClassSpecError(f"{type(e).__name__}: {e}") from e
-        if not frag.strip():
-            raise ClassSpecError("primitive produced an empty fragment")
+        # Each range is checked at both ends (raises on a malformed range).
+        for params in _range_endpoints(layer.primitive, layer.params):
+            try:
+                frag = fn(_TEST_SEED, _TEST_SIZE, palette, background=layer.background, **params)
+            except Exception as e:  # the primitive's own message is the useful part
+                raise ClassSpecError(f"{type(e).__name__}: {e}") from e
+            if not frag.strip():
+                raise ClassSpecError("primitive produced an empty fragment")
         if isinstance(layer.mask, str):
             if layer.mask not in masks:
                 raise ClassSpecError(f"unknown mask {layer.mask!r}")
@@ -415,9 +508,10 @@ class ClassSpec:
         # An outline layer shares the seed of the mask it outlines, so its line is that edge.
         tag = index if layer.outline_of is None else _mask_tag(layer.outline_of,
                                                                 masks[layer.outline_of])
+        params = _sample_layer_params(layer.primitive, layer.params, index, piece_seed)
         body = PRIMITIVES[layer.primitive](
             _layer_seed(piece_seed, tag), size, palette,
-            background=layer.background, **layer.params,
+            background=layer.background, **params,
         )
         if layer.mask is None:
             return body

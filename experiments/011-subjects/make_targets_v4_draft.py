@@ -1,49 +1,26 @@
-"""Tier targets for experiment 011: "Field, Wood and Water" (hare at dawn, owl at dusk, swan at midnight).
+"""Tier targets for experiment 011, version 4 DRAFT: recognition cues added to the three animals.
 
-Version 2 (2026-10-27): the three pictures are drawn natively at 27 x 38 (no resampled 20 x 25 pixel
-art, so no 2-cell steps), after blind test 1 (blind-test-full-1.md, blind-test-ink-1.md). The
-previous version is make_targets_v1.py (its outputs: 27x38/, 20x25/ and the files next to this one).
+Copy of make_targets.py (v2, natively drawn 27 x 38) with redrawn sketches after blind test v2
+(blind-test-v2.md); the method (locks, annealer on background lines, budget_v2 pairs) is unchanged.
+Outputs go to 27x38-v4-draft/ (tiers-A/B/C.txt, budgets.txt, targets-preview.png and
+contours-preview.png, both without text labels). Usage: python3 make_targets_v4_draft.py [27x38]
 
-Usage: python3 make_targets.py [COLSxROWS ...]   default: 27x38 (native) then 20x25.
-Every size is written to <COLS>x<ROWS>-v2/ (tiers-A/B/C.txt, budgets.txt, targets-preview.png,
-contours-preview.png; the previews have no text labels, for blind tests). About 25 min on 4 cores.
+        tier   A hare (dawn)                 B owl (dusk)                   C swan (midnight)
+        D      wood: crowns, trunks, shadow  owl, branch, pupils, bat dot   night sky, near bank, duck dots
+        M      hare                          dusk sky, beak                 lake, clouds, beak
+        L      sky, light between trunks,    moon disc, eyes, snow          swan, moon, star, glint
+               meadow
+        S      starlings (2x3, 2x2)          moon craters (2x3, 2x2)        moon craters (2x3, 2x2)
+        W      dawn cloud, mist              chest feathers, cloud          water band, reflections, cloud
 
-Each picture is a tier map: D dark, M mid, L light, S dark chips scattered on light, W mid with
-wave lenses. v2: W and S are full tiers (budget_v2.py, as the pipeline's run_from_tiers_v2.py and
-classes-v9): every contact between two tiers is a transition, S touches L only. Value inversion with field ownership
-(docs/design/07, 08): every tier is the figure in one picture, the sky in another and the ground or
-water in the third.
-
-        tier   A hare (dawn, vertical)   B owl (dusk, radial)    C swan (midnight, horizontal)
-        D      ploughed field, lone tree owl, branch, crow dot   night sky, far bank, duck dot
-        M      hare                      dusk sky, bat dot        lake, clouds
-        L      sky, light furrow lenses  moon disc, eyes, snow    swan, moon, stars, glints
-        S      starling flock            bramble in the snow      wing feathers
-        W      dawn cloud, mist at feet  clouds at owl and moon   water band, far swell
-
-v2 figures: A a hare sitting up in profile (two separated ears 4-5 cells wide, nape and throat
-notches, haunch, front leg and paw, tail, D-dot eye), body inside the dark field and head in the
-light sky; B an owl with round octagonal eyes (2 x 2 pupils), a beak, the moon disc behind the head,
-a branch and tail, clouds across the moon and at its sides; C a swan with a "2"-shaped neck, head, beak and D-dot eye, wing feathers, sitting
-on a W band. Dot pieces (one dark cell on four sides of one other tier) are matched: per picture one
-D-on-L dot (A crow, B crow on the snow, C swan eye) and one D-on-M dot (A hare eye, B bat, C duck).
-
-Transition pieces are a shared inventory (FINDINGS 12), so tier counts and, per tier pair, boundary
-edges and corners (budget_v2.py, seven pairs incl. W and S-L) must match across the three pictures; tips (1-cell caps) and 45-degree
-staircase runs are tracked too (future tip and diagonal tiles). Method:
-  1. SKETCHES: hand-drawn 27 x 38 pixel art. The figure (largest region of the figure tier plus the
-     holes it encloses: eyes, beak) is locked, as are S and features marked lower case (the
-     hare's tree, the swan's clouds, the dots and their neighbours). v2: W is background and may move.
-  2. balance(): seeded simulated annealing that changes only unlocked cells within one cell of a
-     drawn boundary (horizon, snow line, moon rim, clouds, mist, lenses), to a neighbouring background
-     tier. Energy: spreads of counts / edges / corners / 45-degree runs beyond a tolerance, tips and
-     anomalies (caps, 1-wide strips, dots, pinches against any other tier; weight 1000 in v2, so
-     none is added), straight runs longer
-     than 5 edges per 20 columns, changes of the Euler number of any tier (no new islands or
-     holes), S touching anything but L (8-neighbourhood), and every changed cell. SEEDS runs in parallel, then a
-     cooler polish pass from the best one. v2: half of the moves flip a domino of two cells.
-  3. Other sizes: the balanced 27 x 38 maps are resampled (blurred one-hot labels, bilinear,
-     argmax), cleaned of anomalies, S and W counts equalized, and balanced again at that size.
+v4 changes (animals): B owl: two slanted ear tufts, 7-wide round eyes with single-cell pupils (dot
+pieces), a small pointed beak (4-4-2 cells), a barred W chest bounded by the wings, two legs gripping a
+dark branch that lies on the snow, the moon disc behind the head. A hare: unchanged figure with dark
+ear tips, cropped by mist at the feet; the dark tier is a wood of round crowns with light between
+the trunks and the hare's long shadow on the meadow. C swan: redrawn facing left with an S neck, an
+olive (M) beak, a raised wing bump and a pointed tail, floating in a W water band with reflections.
+Dots matched per picture: two D-on-L (A crows, B pupils, C eye and a duck on a glint) and one D-on-M
+(A hare eye, B bat, C duck). S is the same pair of shapes in every picture.
 """
 import os
 import sys
@@ -58,7 +35,7 @@ sys.path.insert(0, str(HERE))
 from budget_v2 import PAIRS, FORBIDDEN, budgets, table, anomaly_map, key as pair_key  # noqa: E402
 
 PRIMARY = "27x38"   # COLSxROWS of the native drawings and primary deliverable (owner decision)
-OUT_SUFFIX = "-v2"  # outputs go to <COLS>x<ROWS>-v2/ (v1 outputs are kept)
+OUT_SUFFIX = "-v4-draft"  # outputs go to 27x38-v4-draft/
 SMOOTH = 0.55       # Gaussian sigma (sketch cells) used when resampling the sketches
 NAMES = ["A", "B", "C"]
 TITLES = {"A": "A hare (dawn)", "B": "B owl (dusk)", "C": "C swan (midnight)"}
@@ -78,126 +55,126 @@ SKETCHES = {}  # filled below
 # (the hare's tree, the swan's clouds, the dots and their neighbours). The figure and S are always
 # locked.
 SKETCHES["A"] = """
-...........................
-....................wwwwww.
-..SS...........MM...wwwwww.
-.SSS..MM......MMMM.........
-.SSS..MMM.....MMMM..,,,....
-.SSS..MMMM....MMMM..,d,....
-.SSS...MMMM...MMMMM.,,,....
-.SSS...MMMM...MMMMM.....dd.
-.SSSS..MMMMM..MMMMM....dddd
-..SSS..MMMMM..MMMMM....dddd
-..SSS...MMMMMMMMMMMM...dddd
-.........MMMMMMMMMMM....ddd
-.........MMMMMMMMdMMM...dd.
-DDD......MMMMMMMMMMMMM..dd.
-DDDD......MMMMMMMMMMMM..dd.
-DDDDD......MMMMMMMMMMM..dd.
-DDDDDD......MMMMMMMM....dd.
-DDDDDDD.....MMMMMM......dd.
-DDDDDDDD...MMMMMMM.....dddd
-DDDDDDDD..MMMMMMMMM....dddd
+..........,,,.....wwwww....
+..SSS.....,d,.....wwwww....
+..SSS.....,,,..dd..........
+......dd.......dd..........
+..,,,.dd......MMMM......SS.
+..,d,..MMM....MMMM......SS.
+..,,,..MMMM...MMMMM........
+.......MMMM...MMMMMDDD.....
+..DD...MMMMM..MMMMMDDDD..DD
+.DDDD..MMMMM..MMMMMDDDDDDDD
+DDDDDDDDMMMMMMMMMMMMDDDDDDD
 DDDDDDDDDMMMMMMMMMMMDDDDDDD
-DDDDDDDDDMMMMMMMMMMMDDD..DD
-DDDDDDDMMMMMMMMMMMMMMDD..DD
-..DDDDMMMMMMMMMMMMMMMDDDDDD
-..DDDMMMMMMMMMMMMMMMMDDDDDD
-DDDDDMMMMMMMMMMMMMMMMDDD..D
-DDDDMMMMMMMMMMMMMMMMMDDD..D
-DDDDMMMMMMMMMMMMMMMMDDDDDDD
-DDDMMMMMMMMMMMMMMMMMDDDDDDD
-DMMMMMMMMMMMMMMMMMMMDD..DDD
-DMMMMMMMMMMMMMMDDMMMDD..DDD
-DDDMMMMMMMMMMMMDDMMMDDDDDDD
-DDDMMMMMMMMMMwwwwMMMDDDDDDD
-DDDDMMMMMMMMMwwwwMMMDDDD..D
-DDDDMMMMMMMMMMMwwMMMMDDD..D
-DDDDDDDDMMMMMMMwwMMMMDDDDDD
-..DDDDDDwwwwwwwwwwDDDDDDDDD
-...DDDDDwwwwwwwwwwDDDDDDDDD
+DDDDDDDDDMMMMMMMMdMMMDDDDDD
+DDDDDDDDDMMMMMMMMMMMMMDDDDD
+DDDDDDDDDDMMMMMMMMMMMMDDDDD
+DDDDDDDDDDDMMMMMMMMMMMDDDDD
+DDDDDD..DDDDMMMMMMMM..DDDDD
+.........DDDMMMMMM.........
+...........MMMMMMM.........
+DDDDDD....MMMMMMMMM..DDDDDD
+DDDDDD...MMMMMMMMMMM.DDDDDD
+.........MMMMMMMMMMM.......
+.......MMMMMddMMMMMMM......
+DDD...MMMMMMddMMMMMMMwwwwww
+DDD..MMMMMMddMMMMMMMMwwwwww
+www..MMMMMMddMMMMMMMMwwwwww
+wwww,,MMMMddMMMddMMMMwwwwww
+wwww,,MMMMddMMMddMMMwwwwwww
+wwwMMMMMMMMMMMMddMMMwwwwwww
+wwwMMMMMMMMMMMMddMMMwwwwwww
+wwwDDDDDDDDDDDDDDDDDwwwwwww
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
 """
 
 SKETCHES["B"] = """
-MMMMMMMMMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMMwwwwwwwMMMMMMMMMM
-MMMMMMM...wwwwwww..MMMMMMMM
-MMMMM................MMMMMM
-MMMM..................MMMMM
-MMMM......DDDDDD......MMMMM
-MMM.....DDDDDDDDDD.....MMMM
-MM....DDDDDDDDDDDDDD....MMM
-MM...DDDDDDDDDDDDDDDD...MMM
-MM..DDDD..DDDDDD..DDDD..MMM
-MM..DDD....DDDD....DDD..MMM
-MM..DD..DD..DD..DD..DD..MMM
-MM..DD..DD..DD..DD..DD..MMM
-mmmMDDD....DDDD....DDDMMMMM
-mdmMDDDD..DDMMDD..DDDDMMMMM
-mmmMMDDDDDDDMMDDDDDDDMMMMMM
-MMMMMDDDDDDDMMDDDDDDDMMMMMM
-MMMwwDDDDDDDDDDDDDDDDwwMMMM
-MMMwwDDDDDDDDDDDDDDDDwwMMMM
-MMMwwDDDDDDDDDDDDDDDDwwMMMM
-MMMwwDDDDDDDDDDDDDDDDwwMMMM
-MMMMMMMDDDDDDDDDDDDMMMMMMMM
-MMMMMMMDDDDDDDDDDDDMMMMMMMM
-MMMMMMMMDDDDDDDDDDMMMMMMMMM
-MMMMMMMMDDDDDDDDDDMMMMMMMMM
-MMMMMMDDDDDDDDDDDDDDDMMMMMM
-MMMMMDDDDDDDDDDDDDDDDMMMMMM
-MMMMMDDDDMMMDDMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMMMMMMMMMMM
-..MMMMMMMMMMMMMMMMMMMMMMMMM
-....MM....MMMMMM..MM.....MM
+wwwwwww..............MMMMMM
+wwwwww..SSS...........MMMMM
+MMM.....SSS......SS....MMMM
+MMM..............SS.....MMM
+MMM......................MM
+MM.......................MM
+MM........................M
+MM........................M
+MM..DD................DD..M
+MM..DDD..............DDD..M
+MM..DDDD............DDDD..M
+MM...DDDD..........DDDD...M
+MM...DDDDDD......DDDDDD...M
+MMMMDDDDDDDD....DDDDDDDDMMM
+MMMMDDDD...DDDDDD...DDDDMMM
+MMMMDDD.....DDDD.....DDDMMM
+MMMMDD.......DD.......DDMMM
+MMMMDD...d...DD...d...DDMMM
+MMMMDD.......DD.......DDMMM
+MMMMDDD.....DDDD.....DDDMMM
+mmmMDDDD...DDDDDD...DDDDMMM
+mdmMDDDDDDDDmmmmDDDDDDDDMMM
+mmmMDDDDDDDDmmmmDDDDDDDDMMM
+MMMMDDDDDDDDDmmDDDDDDDDDMMM
+MMMMDDDDDDDDDDDDDDDDDDDDMww
+wwwDDDwwDDDDDDDDDDDDwwDDwww
+wwwDDDwwDDDDDDDDDDDDwwDDwww
+wwwDDDwwDDDDDDDDDDDDwwDDwww
+wwMMDDDwwDDDDDDDDDDwwDDDMMM
+wwMMDDDwwDDDDDDDDDDwwDDDMMM
+MMMMMDDwwDDDDDDDDDDwwDDMMMM
+MMMMMMMDDDDDDDDDDDDDDMMMMMM
+.....MMMMMDDDMMDDDMMMMMMMMM
+.....MMMMMDDDMMDDDMMMMMMMMM
+DDDDDDDDDDDDDDDDDDDwwwwwwww
+DDDDDDDDDDDDDDDDDDDwwwwwwww
 ...........................
 ...........................
-........SS.............,,,.
-......SSSSS...SSSSS....,d,.
-......SSSSS...SSSSS....,,,.
-..............SSSSS........
 """
 
 SKETCHES["C"] = """
-DDDDDDDDDDDDDDDDDDDDDDDDDDD
-DDmmmmmDDDDDDDDDDDDDD...DDD
-mmmmmmmDDDDDDDDDDDDD.....DD
-mmmmmmDDDDD...DDDDD.......D
-DDDDDDDDD......DDDD.......D
-DDDDDDDDD..d...DDDDD.....DD
-DDDDD...........DDDDD...DDD
-DDDDD...........DDDDDDDDDDD
-DDDDDDDDDDD.......DDDDDDDDD
-DDD..DDDDDDDDD....DDDDDDDDD
-DDD..DDDDDDDDDD...DDDDDDDDD
-DDDDDDDD..DDDDD...DDDDDDDDD
-DDDDDDDD..DDDD....DDDwwwwww
-DDDDDDDDDDDDDD...DDDDwwwwww
-MMMMMMDDDDDDD....DDDMMMMMMM
-MMMMMMMMMMMM....MMMMMMMMMMM
-MMMMMMMMMMMM...MMMMMMMMMMMM
-MMMMMMMMMM.....MMM...MM...M
-MMMMMMMMM......MM.........M
-MMMMMMM...................M
-MMMMMM.............SS.....M
-MMMMM.......SSSSSSSSS.....M
-MMMMM.......SSSSSSSSS....MM
-MMMMM........SSSSSSS.....MM
-MMMMM...................MMM
-MMMMMM.................MMMM
-MMMMMMMww.......wwwwwwwMMMM
-MMMMMMMwwwwwwwwwwwwwwwwMMMM
-MMMMMMMMMwwwwwwwMMMMMMMMMMM
+wwwDDDDDDDDDDDDDDDD......DD
+wwwDDDDDDDDDDDDDDD........D
+DDDDDDDDDDDDDDDDD..SSS.....
+DDDDD.....DDDDDDD..SSS.....
+DDDDD......DDDDDD..........
+DDDDD..d...DDDDDD..........
+DDmmm......DDDDDD....SS....
+DDmmm......DDDDDD....SS....
+DDDDDD.....DDDDDDD........D
+DDDDDDD....DDDDDDDD......DD
+D..DDDDD....DDDDDDDDDDDDDDD
+D..DDDDDD....DDmmmmDDDDDDDD
+DDDDDDDDD....DDmmmmDDDwwwww
+DDDDDDDDD....DDDDDDDDDwwwww
+mmmmmDDDD....DDDDDDDDDDDDDD
+mmmmmDDD....DDDD....DDDDDDD
+DDDDDDDD....DDD......DD...D
+DDDDDDD.....DDD......DD...D
+MMMMM.....................M
+MMMMM....................MM
+MMMM.....................MM
+MMM.....................MMM
+MMM.....................MMM
+MMM.....................MMM
+MMMww.................wwMMM
+MMMwwwwwwwwwwwwwwwwwwwwwMMM
+MMMMMwwwwwwwwwwwwwwwwwMMMMM
+MMMMMMMMwwMMMMMMMMMMMMMMMMM
+MMMMMMMMwwMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMMMMMM...MM
-MMMMmmmMMMMMMMMMMMMMMM...MM
-MMMMmdmMMMMMMMMMM...MMMMMMM
-MMMMmmmMMMMMMMMMM...MMMMMMM
-MMMMMMMMMMMMMMMMMMMMM...MMM
-DDDMMMMMMMMMMMMMMMMMM...MMD
-DDDDDMMMMMMMMMMMMMMMMMMMMDD
-DDDDDDDDMMMMMMMDDDDMMMMMDDD
+MMMmmmMMMMMMMMMMMMMMMMMMMMM
+MMMmdmMMMMMMMMMMMMMM.....MM
+MMMmmmMMMMMMMMMMMMMM.,,,.MM
+DDMMMMMMMMDDMMMMMMMM.,d,.MM
+DDDDMMMMMMDDMMMMMMMM.,,,.MM
+DDDDDDMMMMDDMMMMMMMM.....DD
+DDDDDDDMMMDDMMMMMMMMDDDDDDD
+DDDDDDDDDDDDMMMMMMDDDDDDDDD
 """
 
 
@@ -674,9 +651,9 @@ def write_outputs(start, maps, out, rows, cols, run_limit):
 
 
 def main(argv):
-    """Usage: make_targets.py [COLSxROWS ...]   (default: 27x38 native, then 20x25).
-    Every size is written to <COLS>x<ROWS>-v2/."""
-    sizes = argv or [PRIMARY, "20x25"]
+    """Usage: make_targets_v4_draft.py [COLSxROWS ...]   (default: 27x38 only).
+    Every size is written to <COLS>x<ROWS>-v4-draft/."""
+    sizes = argv or [PRIMARY]
     for size in sizes:
         cols, rows = (int(v) for v in size.lower().split("x"))
         print(f"== {cols}x{rows}", flush=True)
