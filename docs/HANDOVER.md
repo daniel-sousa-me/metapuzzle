@@ -82,3 +82,9 @@ best tiers in `27x38-v2/` are copied elsewhere.
 
 Audit of 2026-10-27: README, gallery and FINDINGS were corrected against the experiment files. FINDINGS entries 26 to 35 and
 the DECISIONS "Superseded by" notes record what changed and when.
+
+## 6. Update 2026-10-27, 11:30 UTC
+
+- Pipeline v5 (motif layer) rendered and evaluated: scene gates pass, but recognition dropped (motifs too dense and lattice-like; see experiments/011-subjects/evaluation-v5.md, finding 36). Pipeline v6 (18% coverage, organic clusters, per-piece variation, silhouette halo, light ink motifs) is being built: `pipeline/run_from_tiers_v6.py`, `gen_classes_v12.py`, `motifs/make_motif_maps_v2.py`.
+- In flight at the time of writing: matcher v4 (`make_targets_v4.py` → `27x38-v4/`), design pass (`make_targets_v4_draft.py` → `27x38-v4-draft/`), faithful motif kinds in `src/metapuzzle/textures.py`, cross-class seams for a standard border (engine; results under `experiments/011-subjects/border-check/round2/`). Their partial files may be untracked; commit them as WIP if the session ends.
+- Next milestone unchanged: v4 tiers + pipeline v6 → blind tests (ink first) pass for all three animals, surplus under 30, T9 ≥ 3/5.
