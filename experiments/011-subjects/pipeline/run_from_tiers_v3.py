@@ -41,6 +41,7 @@ Differences from 013/005 that the data forced:
 
 Usage: run_from_tiers.py [--stages classify,budgets,roles,scenes,metrics,render] [--border tray]
                          [--iters N] [--seed N] [--restarts N] [--cell N]
+                         [--in-dir 27x38] [--out-dir D --render-tag ""]   (D: pipeline-out/, run-ink/, run-full/)
 """
 from __future__ import annotations
 
@@ -60,8 +61,10 @@ HERE = Path(__file__).resolve().parent              # experiments/011-subjects/p
 EXP = HERE.parent                                   # experiments/011-subjects
 REPO = HERE.parents[2]                              # /home/user/metapuzzle
 CLS_DIR = REPO / "experiments" / "005-hybrid-tones"  # class specs (read only)
-SIZE_DIR = EXP / "27x38"
-IMAGES = ["A", "B", "C"]                            # hare, owl, swan
+SIZE_DIR = EXP / "27x38"                             # input tiers (--in-dir)
+OUT_DIR = SIZE_DIR                                   # renders (--out-dir; default: the input folder)
+RENDER_TAG = "-v3"                                   # render folder suffix (--render-tag)
+IMAGES =["A", "B", "C"]                            # hare, owl, swan
 IMAGE_NAME = {"A": "hare", "B": "owl", "C": "swan"}
 TILES = "DMWLS"
 ORDER = "DSMWL"                                      # darker first: D < S < M < W < L (v2: S mid-dark)
@@ -1213,9 +1216,10 @@ def check_classes_for_specs(used: set[str]) -> None:
 
 
 def stage_render(border: str, cell: int, iters: int, seed: int) -> None:
-    for name, out_name in ((V9_INK, "run-ink-v3"), (V9_CLASSES, "run-full-v3")):
+    for name, base in ((V9_INK, "run-ink"), (V9_CLASSES, "run-full")):
         spec_path = HERE / name
-        out = SIZE_DIR / out_name
+        out_name = base + RENDER_TAG
+        out = OUT_DIR / out_name
         out.mkdir(parents=True, exist_ok=True)
         cmd = ["metapuzzle", "prototype", "--scenes", str(WORK / "scenes.txt"), "--classes", str(spec_path),
                "--out", str(out), "--rotation", "quarter", "--cell", str(cell), "--border", border,
@@ -1231,8 +1235,12 @@ def stage_render(border: str, cell: int, iters: int, seed: int) -> None:
 
 
 def main() -> None:
-    global EQ_LAM
+    global EQ_LAM, SIZE_DIR, OUT_DIR, WORK, RENDER_TAG
     ap = argparse.ArgumentParser()
+    ap.add_argument("--in-dir", default="27x38", help="folder under 011-subjects holding tiers-{A,B,C}.txt")
+    ap.add_argument("--out-dir", default=None,
+                    help="folder for renders and pipeline-out/ (default: the input folder, intermediates in pipeline/v3/)")
+    ap.add_argument("--render-tag", default="-v3", help="suffix of the render folders (run-ink<TAG>, run-full<TAG>)")
     ap.add_argument("--stages", default="equalize,classify,budgets,roles,scenes,metrics,render")
     ap.add_argument("--tiers", choices=["source", "eq"], default="eq",
                     help="tiles for the stages after equalize: source files or tiers-eq-*.txt")
@@ -1247,6 +1255,13 @@ def main() -> None:
     ap.add_argument("--cell", type=int, default=21)
     args = ap.parse_args()
     EQ_LAM = args.eq_lam
+    SIZE_DIR = EXP / args.in_dir
+    RENDER_TAG = args.render_tag
+    if args.out_dir:
+        OUT_DIR = EXP / args.out_dir
+        WORK = OUT_DIR / "pipeline-out"
+    else:
+        OUT_DIR = SIZE_DIR
     WORK.mkdir(parents=True, exist_ok=True)
     stages = args.stages.split(",")
     t_all = time.time()

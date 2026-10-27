@@ -1,0 +1,81 @@
+0. equalize (005 v5b logic; v2: five tiers, S-L moves only, S-D/S-M/S-W never created)
+   cells allowed to change per image: [766, 777, 821]
+   surplus before: A 73, B 58, C 62   total 193
+   seed 0: best score 737.00 (9 s)
+   seed 1: best score 722.00 (9 s)
+   seed 2: best score 671.00 (9 s)
+   chosen seed 2, score 671.00
+   surplus after:  A 50, B 36, C 41   total 127
+   changed cells per image: A 8, B 22, C 6 (tier totals unchanged, frame unchanged, changes inside the band)
+   wrote tiers-eq-A/B/C.txt and equalize-report.txt
+tiles used after equalize: eq (this run)
+1. tiers per image (input) and transition cells
+   A hare   tiles D 286 M 396 W  36 L 281 S  27   transitions 285 (own D/S/M/W/L 154/22/101/8/0)
+   B owl    tiles D 287 M 397 W  34 L 281 S  27   transitions 299 (own D/S/M/W/L 165/19/104/11/0)
+   C swan   tiles D 286 M 397 W  36 L 280 S  27   transitions 294 (own D/S/M/W/L 144/22/112/16/0)
+   classify 0.0 s
+   wrote /home/user/metapuzzle/experiments/011-subjects/27x38-v2/pipeline-out/quantized-codes.txt
+2. budgets (per class: max over images, own counts, surplus = max - own)
+   class   pair      A hare      B owl     C swan   max   sur_A   sur_B   sur_C
+   DMc       DM          12         12         11    12       0       0       1
+   DMs       DM          33         40         21    40       7       0      19
+   MDc       DM          10         11          6    11       1       0       5
+   MDd       DM           1          1          1     1       0       0       0
+   total     DM          56         64         39    64       8       0      25
+   DWc       DW           1          0          0     1       0       1       1
+   DWs       DW           1          6          6     6       5       0       0
+   WDc       DW           0          0          1     1       1       1       0
+   total     DW           2          6          7     8       6       2       1
+   DLc       DL          17         25         21    25       8       0       4
+   DLs       DL          49         48         49    49       0       1       0
+   LDc       DL          29         21         27    29       0       8       2
+   LDd       DL           1          1          1     1       0       0       0
+   total     DL          96         95         98   104       8       9       6
+   MWc       MW           3          0          2     3       0       3       1
+   MWs       MW          12         15         19    19       7       4       0
+   WMc       MW           5          5          5     5       0       0       0
+   total     MW          20         20         26    27       7       7       1
+   MLc       ML          23         22         18    23       0       1       5
+   MLs       ML          35         37         43    43       8       6       0
+   LMc       ML          23         25         25    25       2       0       0
+   total     ML          81         84         86    91      10       7       5
+   WLc       WL           4          3          2     4       0       1       2
+   WLs       WL           4          5         12    12       8       7       0
+   LWc       WL           0          3          2     3       3       0       1
+   total     WL           8         11         16    19      11       8       3
+   SLc       SL           7          7          7     7       0       0       0
+   SLs       SL          12         11         12    12       0       1       0
+   LSc       SL           3          1          3     3       0       2       0
+   total     SL          22         19         22    22       0       3       0
+   Transition cells per image: A 285, B 299, C 294; surplus (max minus own, all classes): A 50, B 36, C 41
+   approximations: A {'s+diag': 4}; B {'i+multi': 1}; C {'s+diag': 4, 'i+multi': 1}
+   cells with a three-tier junction (two lighter tiers among 8 neighbours): A 8, B 18, C 10
+   shared 4-neighbour edges (different tiers, frame included):
+     DL     A 101  B 102  C 103
+     DM     A  65  B  69  C  69
+     DW     A   7  B   7  C   8
+     ML     A  81  B  85  C  85
+     MW     A  18  B  24  C  24
+     SL     A  26  B  27  C  26
+     WL     A  12  B  11  C  16
+   W-M contacts (MW edges): A 18, B 24, C 24
+   S contacts: S-L edges (transitions) A 26, B 27, C 26; S-D/S-M/S-W 8-neighbour contacts (must be 0) A 0, B 0, C 0
+   verify_edges (shared edges whose halves disagree, from the rotated pieces' profiles):
+     A hare   shared edges 1987  approx 6  frame 33  junction 13
+     B owl    shared edges 1987  approx 2  frame 19  junction 23
+     C swan   shared edges 1987  approx 8  frame 55  junction 16
+     total: approx 16  frame 107  junction 52
+3. roles: total transitions 335, plain target total 691, tiers DSMWL
+   A F (plain-capable, frame incl.) 132/5/295/28/281; frame 62/0/0/9/55; far-slot estimate 6/0/43/0/20
+   B F (plain-capable, frame incl.) 122/8/293/23/281; frame 0/5/86/0/35; far-slot estimate 15/0/26/1/22
+   C F (plain-capable, frame incl.) 142/5/285/20/280; frame 70/0/56/0/0; far-slot estimate 1/0/34/0/29
+   plain targets 121/5/279/20/266; far-slot estimate short 0, near use 38
+   A hare   host tiers needed D/S/M/W/L 11/0/16/8/15; policy split cost 56
+   B owl    host tiers needed D/S/M/W/L 1/3/14/3/15; policy split cost 65
+   C swan   host tiers needed D/S/M/W/L 21/0/6/0/14; policy split cost 55
+hare: only 10 of 11 D hosts available
+
+real	0m30.898s
+user	0m30.757s
+sys	0m0.008s
+EXIT 1

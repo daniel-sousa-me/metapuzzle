@@ -37,3 +37,12 @@ disc, a branch and a tail, and the swan a "2" neck, a beak, an eye and a wing on
 are full tiers (`budget_v2.py`). Each picture has one D-on-L and one D-on-M dot. Everything
 matches within 5, except M–W edges (18/24/24) and 45° runs (eyes). 20x25-v2 is a rough downsample
 (W and dots lost) and is not matched.
+
+## Redrawn tiers run (27x38-v2)
+
+`pipeline/run_from_tiers_v3.py --in-dir 27x38-v2 --out-dir 27x38-v2 --render-tag ""` (cell 21; the
+options were added, the logic is unchanged). Equalize: surplus 73/58/62 (193) to 50/36/41 (127) for
+A/B/C, with 8/22/6 cells changed. The run stopped in roles (exit 1): the hare needs 11 D hosts but
+only 10 far D cells exist, and the swan needs 21 with 1. The host check counts D cells next to a
+transition (near), which `pick()` never uses for D, so no scenes, renders or solution JSON were
+written. Log: `27x38-v2/pipeline-out/run-main.log`.
