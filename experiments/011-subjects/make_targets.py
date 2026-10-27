@@ -1,35 +1,48 @@
 """Tier targets for experiment 011: "Field, Wood and Water" (hare at dawn, owl at dusk, swan at midnight).
 
-Usage: python3 make_targets.py [COLSxROWS ...]   default: 27x38 (primary) then 20x25.
-The first size is written next to this file (tiers-A/B/C.txt, budgets.txt, targets-preview.png,
-contours-preview.png); every size is also written to <COLS>x<ROWS>/. Sizes tried: 20x25, 25x30,
-27x38 (primary, about 1000 cells, owner decision 2026-10-27), 32x48.
+Version 2 (2026-10-27): the three pictures are drawn natively at 27 x 38 (no resampled 20 x 25 pixel
+art, so no 2-cell steps), after blind test 1 (blind-test-full-1.md, blind-test-ink-1.md). The
+previous version is make_targets_v1.py (its outputs: 27x38/, 20x25/ and the files next to this one).
 
-Each picture is a tier map: D dark, M mid, L light, S dark chips scattered on light (no transition
-against L), W mid with wave lenses (counts as M for budgets). Value inversion with field ownership
+Usage: python3 make_targets.py [COLSxROWS ...]   default: 27x38 (native) then 20x25.
+Every size is written to <COLS>x<ROWS>-v2/ (tiers-A/B/C.txt, budgets.txt, targets-preview.png,
+contours-preview.png; the previews have no text labels, for blind tests). About 25 min on 4 cores.
+
+Each picture is a tier map: D dark, M mid, L light, S dark chips scattered on light, W mid with
+wave lenses. v2: W and S are full tiers (budget_v2.py, as the pipeline's run_from_tiers_v2.py and
+classes-v9): every contact between two tiers is a transition, S touches L only. Value inversion with field ownership
 (docs/design/07, 08): every tier is the figure in one picture, the sky in another and the ground or
 water in the third.
 
         tier   A hare (dawn, vertical)   B owl (dusk, radial)    C swan (midnight, horizontal)
-        D      ploughed field, lone tree owl and branch           night sky
-        M      hare                      dusk sky                 lake
-        L      sky, light furrow lenses  moon halo and snow       swan, small moon, moon glints
+        D      ploughed field, lone tree owl, branch, crow dot   night sky, far bank, duck dot
+        M      hare                      dusk sky, bat dot        lake, clouds
+        L      sky, light furrow lenses  moon disc, eyes, snow    swan, moon, stars, glints
         S      starling flock            bramble in the snow      wing feathers
-        W      dawn cloud bank           cloud bars               swell
+        W      dawn cloud, mist at feet  clouds at owl and moon   water band, far swell
+
+v2 figures: A a hare sitting up in profile (two separated ears 4-5 cells wide, nape and throat
+notches, haunch, front leg and paw, tail, D-dot eye), body inside the dark field and head in the
+light sky; B an owl with round octagonal eyes (2 x 2 pupils), a beak, the moon disc behind the head,
+a branch and tail, clouds across the moon and at its sides; C a swan with a "2"-shaped neck, head, beak and D-dot eye, wing feathers, sitting
+on a W band. Dot pieces (one dark cell on four sides of one other tier) are matched: per picture one
+D-on-L dot (A crow, B crow on the snow, C swan eye) and one D-on-M dot (A hare eye, B bat, C duck).
 
 Transition pieces are a shared inventory (FINDINGS 12), so tier counts and, per tier pair, boundary
-edges and corners (budget.py) must match across the three pictures; tips (1-cell caps) and 45-degree
+edges and corners (budget_v2.py, seven pairs incl. W and S-L) must match across the three pictures; tips (1-cell caps) and 45-degree
 staircase runs are tracked too (future tip and diagonal tiles). Method:
-  1. SKETCHES: hand-drawn 20 x 25 pixel art. The figure (largest region of the figure tier plus the
-     holes it encloses: eyes, beak) is locked, as are S, W and features marked lower case.
+  1. SKETCHES: hand-drawn 27 x 38 pixel art. The figure (largest region of the figure tier plus the
+     holes it encloses: eyes, beak) is locked, as are S and features marked lower case (the
+     hare's tree, the swan's clouds, the dots and their neighbours). v2: W is background and may move.
   2. balance(): seeded simulated annealing that changes only unlocked cells within one cell of a
-     drawn boundary (horizon, snow line, moon rim, clouds, lenses), to a neighbouring background
+     drawn boundary (horizon, snow line, moon rim, clouds, mist, lenses), to a neighbouring background
      tier. Energy: spreads of counts / edges / corners / 45-degree runs beyond a tolerance, tips and
-     anomalies (caps, 1-wide strips, dots, pinches against any foreign tier), straight runs longer
+     anomalies (caps, 1-wide strips, dots, pinches against any other tier; weight 1000 in v2, so
+     none is added), straight runs longer
      than 5 edges per 20 columns, changes of the Euler number of any tier (no new islands or
-     holes), S touching anything but L, and every changed cell. SEEDS runs in parallel, then a
-     cooler polish pass from the best one.
-  3. Other sizes: the balanced 20 x 25 maps are resampled (blurred one-hot labels, bilinear,
+     holes), S touching anything but L (8-neighbourhood), and every changed cell. SEEDS runs in parallel, then a
+     cooler polish pass from the best one. v2: half of the moves flip a domino of two cells.
+  3. Other sizes: the balanced 27 x 38 maps are resampled (blurred one-hot labels, bilinear,
      argmax), cleaned of anomalies, S and W counts equalized, and balanced again at that size.
 """
 import os
@@ -42,15 +55,16 @@ from PIL import Image, ImageDraw
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from budget import PAIRS, FREE, budgets, table, anomaly_map, pair_key  # noqa: E402
+from budget_v2 import PAIRS, FORBIDDEN, budgets, table, anomaly_map, key as pair_key  # noqa: E402
 
-PRIMARY = "27x38"   # COLSxROWS of the primary deliverable (about 1000 cells, owner decision)
+PRIMARY = "27x38"   # COLSxROWS of the native drawings and primary deliverable (owner decision)
+OUT_SUFFIX = "-v2"  # outputs go to <COLS>x<ROWS>-v2/ (v1 outputs are kept)
 SMOOTH = 0.55       # Gaussian sigma (sketch cells) used when resampling the sketches
 NAMES = ["A", "B", "C"]
 TITLES = {"A": "A hare (dawn)", "B": "B owl (dusk)", "C": "C swan (midnight)"}
 FIGURE = {"A": "M", "B": "D", "C": "L"}
 # Tiers the balancer may paint in each picture (the figure tier only away from the figure).
-BACKGROUND = {"A": "DL", "B": "ML", "C": "DML"}
+BACKGROUND = {"A": "DLW", "B": "MLW", "C": "DMLW"}   # v2: W (mist, clouds, water) is background too
 SEED = 11         # base seed; SEEDS runs are made and the lowest energy kept
 SEEDS = 4
 ITERS_PER_CELL = 400
@@ -59,103 +73,144 @@ SOFT_RADIUS = 1   # 1 = only cells on a drawn boundary; 2 = also their neighbour
 
 SKETCHES = {}  # filled below
 
-# Hand-drawn sketches, rows top to bottom. D M S as themselves, '.' = L, 'w' = W.
+# Hand-drawn 27 x 38 sketches, rows top to bottom. D M S as themselves, '.' = L, 'w' = W.
 # Lower case 'd' / 'm' / ',' = D / M / L locked: a drawn feature the balancer must not touch
-# (the hare's tree, the swan's clouds). The figure, S and W are always locked.
+# (the hare's tree, the swan's clouds, the dots and their neighbours). The figure and S are always
+# locked.
 SKETCHES["A"] = """
-wwwwwww.......SSSSS.
-wwwwww.........SSSSS
-wwww...MM...MM..SSSS
-www....MM...MM.SSSSS
-......MM...MM...SSSS
-......MM...MM....SS.
-.....MM...MM........
-.....MM...MM........
-...MMMMMMMM,,,.dddd.
-...MMMMMMMM,,,dddddd
-..MMMMMMMMM,,,dddddd
-..MMMMMMMMMM,,,dddd.
-DDDDMMMMMMMM,,,.dd..
-DDDDMMMMMMMMM,,.dd..
-DDDDMMMMMMMMMMDDddDD
-DDDDMMMMMMMMMMMDDDDD
-DDDDMMMMMMMMMMMDDDDD
-DDDDDMMMMMMMMMMMDDDD
-DDDDDMMMMMMMMMMMDDDD
-DDDDDMMDDMMMMMMMDDDD
-DDDMMMMDDMMMMMMMDDDD
-DDDMMMMDDMMMMMDDDDDD
-DDDDDDDDDDDDDDD....D
-D....DDDDDDDDDD....D
-D....DDDDDDDDDDDDDDD
+...........................
+....................wwwwww.
+..SS...........MM...wwwwww.
+.SSS..MM......MMMM.........
+.SSS..MMM.....MMMM..,,,....
+.SSS..MMMM....MMMM..,d,....
+.SSS...MMMM...MMMMM.,,,....
+.SSS...MMMM...MMMMM.....dd.
+.SSSS..MMMMM..MMMMM....dddd
+..SSS..MMMMM..MMMMM....dddd
+..SSS...MMMMMMMMMMMM...dddd
+.........MMMMMMMMMMM....ddd
+.........MMMMMMMMdMMM...dd.
+DDD......MMMMMMMMMMMMM..dd.
+DDDD......MMMMMMMMMMMM..dd.
+DDDDD......MMMMMMMMMMM..dd.
+DDDDDD......MMMMMMMM....dd.
+DDDDDDD.....MMMMMM......dd.
+DDDDDDDD...MMMMMMM.....dddd
+DDDDDDDD..MMMMMMMMM....dddd
+DDDDDDDDDMMMMMMMMMMMDDDDDDD
+DDDDDDDDDMMMMMMMMMMMDDD..DD
+DDDDDDDMMMMMMMMMMMMMMDD..DD
+..DDDDMMMMMMMMMMMMMMMDDDDDD
+..DDDMMMMMMMMMMMMMMMMDDDDDD
+DDDDDMMMMMMMMMMMMMMMMDDD..D
+DDDDMMMMMMMMMMMMMMMMMDDD..D
+DDDDMMMMMMMMMMMMMMMMDDDDDDD
+DDDMMMMMMMMMMMMMMMMMDDDDDDD
+DMMMMMMMMMMMMMMMMMMMDD..DDD
+DMMMMMMMMMMMMMMDDMMMDD..DDD
+DDDMMMMMMMMMMMMDDMMMDDDDDDD
+DDDMMMMMMMMMMwwwwMMMDDDDDDD
+DDDDMMMMMMMMMwwwwMMMDDDD..D
+DDDDMMMMMMMMMMMwwMMMMDDD..D
+DDDDDDDDMMMMMMMwwMMMMDDDDDD
+..DDDDDDwwwwwwwwwwDDDDDDDDD
+...DDDDDwwwwwwwwwwDDDDDDDDD
 """
 
 SKETCHES["B"] = """
-wwwwwwwwMM.....MMMMM
-wwwwwwwM.........MMM
-wwwwwM............MM
-MMMMM.............MM
-MMMM....DD....DD...M
-MMMM....DDD..DDD...M
-MMMM....DDDDDDDD...M
-MMMM...DD..DD..DD...
-MMMM...DD..DD..DD...
-MMMM...DDDDDDDDDD...
-MMMMM..DDDDMMDDDD..M
-MMMMMMDDDDDMMDDDDMMM
-MMMMMDDDDDDDDDDDDDMM
-MMMMMDDDDDDDDDDDDDMM
-MMMMMDDDDDDDDDDDDDMM
-MMMMMDDDDDDDDDDDDMMM
-MMMMMMDDDDDDDDDDDMMM
-MMMMMMDDDDDDDDDDMMMM
-MMMMMDDDDDDDDMMMMMMM
-MMDDDDDDMMMMMMMMMMMM
-DDDDD.......MMMMMMMM
-DD..................
-....................
-.......SSSSSSSSSS...
-....SSSSSSSSSSSSSSS.
+MMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMwwwwwwwMMMMMMMMMM
+MMMMMMM...wwwwwww..MMMMMMMM
+MMMMM................MMMMMM
+MMMM..................MMMMM
+MMMM......DDDDDD......MMMMM
+MMM.....DDDDDDDDDD.....MMMM
+MM....DDDDDDDDDDDDDD....MMM
+MM...DDDDDDDDDDDDDDDD...MMM
+MM..DDDD..DDDDDD..DDDD..MMM
+MM..DDD....DDDD....DDD..MMM
+MM..DD..DD..DD..DD..DD..MMM
+MM..DD..DD..DD..DD..DD..MMM
+mmmMDDD....DDDD....DDDMMMMM
+mdmMDDDD..DDMMDD..DDDDMMMMM
+mmmMMDDDDDDDMMDDDDDDDMMMMMM
+MMMMMDDDDDDDMMDDDDDDDMMMMMM
+MMMwwDDDDDDDDDDDDDDDDwwMMMM
+MMMwwDDDDDDDDDDDDDDDDwwMMMM
+MMMwwDDDDDDDDDDDDDDDDwwMMMM
+MMMwwDDDDDDDDDDDDDDDDwwMMMM
+MMMMMMMDDDDDDDDDDDDMMMMMMMM
+MMMMMMMDDDDDDDDDDDDMMMMMMMM
+MMMMMMMMDDDDDDDDDDMMMMMMMMM
+MMMMMMMMDDDDDDDDDDMMMMMMMMM
+MMMMMMDDDDDDDDDDDDDDDMMMMMM
+MMMMMDDDDDDDDDDDDDDDDMMMMMM
+MMMMMDDDDMMMDDMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMM
+..MMMMMMMMMMMMMMMMMMMMMMMMM
+....MM....MMMMMM..MM.....MM
+...........................
+...........................
+........SS.............,,,.
+......SSSSS...SSSSS....,d,.
+......SSSSS...SSSSS....,,,.
+..............SSSSS........
 """
 
 SKETCHES["C"] = """
-DDmmmmmDDDDDDDDD,,DD
-DmmmmmmmDDDDDDD,,,,D
-DmmmmmmmDDDDDDD,,,,D
-DDDmmmDDDDDDDDDD,,DD
-DDDDDDD..DDDDDDDDDDD
-DDDDDD.....DDDDDDDDD
-DDDDD..DD..DDDDDmmmm
-DDDDD..DD..DDDDmmmmm
-DDDDDDDD..DDDDDmmmmm
-DDDDDDDD..DDDDDDDDDD
-DDDDDM...MMMDDDDDMM.
-DDDMMM...MMMDDDDD...
-MMMMM....MMMMM......
-MMMM...........SSS..
-MMMM........SSSSS...
-MMMM.......SSSSSSS..
-MMMMM......SSSSSSS..
-MMMMMM......SSS.....
-MMMMMMM............M
-MMMMMMMMMMM.....MMMM
-MMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMMMM
-MM....MMMMMMM...MMMM
-MM....MMMMMMM...MMMM
-wwwwwwwwwwwwwwwwwwww
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+DDmmmmmDDDDDDDDDDDDDD...DDD
+mmmmmmmDDDDDDDDDDDDD.....DD
+mmmmmmDDDDD...DDDDD.......D
+DDDDDDDDD......DDDD.......D
+DDDDDDDDD..d...DDDDD.....DD
+DDDDD...........DDDDD...DDD
+DDDDD...........DDDDDDDDDDD
+DDDDDDDDDDD.......DDDDDDDDD
+DDD..DDDDDDDDD....DDDDDDDDD
+DDD..DDDDDDDDDD...DDDDDDDDD
+DDDDDDDD..DDDDD...DDDDDDDDD
+DDDDDDDD..DDDD....DDDwwwwww
+DDDDDDDDDDDDDD...DDDDwwwwww
+MMMMMMDDDDDDD....DDDMMMMMMM
+MMMMMMMMMMMM....MMMMMMMMMMM
+MMMMMMMMMMMM...MMMMMMMMMMMM
+MMMMMMMMMM.....MMM...MM...M
+MMMMMMMMM......MM.........M
+MMMMMMM...................M
+MMMMMM.............SS.....M
+MMMMM.......SSSSSSSSS.....M
+MMMMM.......SSSSSSSSS....MM
+MMMMM........SSSSSSS.....MM
+MMMMM...................MMM
+MMMMMM.................MMMM
+MMMMMMMww.......wwwwwwwMMMM
+MMMMMMMwwwwwwwwwwwwwwwwMMMM
+MMMMMMMMMwwwwwwwMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMM...MM
+MMMMmmmMMMMMMMMMMMMMMM...MM
+MMMMmdmMMMMMMMMMM...MMMMMMM
+MMMMmmmMMMMMMMMMM...MMMMMMM
+MMMMMMMMMMMMMMMMMMMMM...MMM
+DDDMMMMMMMMMMMMMMMMMM...MMD
+DDDDDMMMMMMMMMMMMMMMMMMMMDD
+DDDDDDDDMMMMMMMDDDDMMMMMDDD
 """
 
 
 # ---- parsing, resampling, cleaning ------------------------------------------------------
 CODE = {"D": 0, "M": 1, "L": 2, "S": 3, "W": 4}
 CHARS = np.array(list("DMLSW"))
-BUDGET_TIER = np.array([0, 1, 2, 3, 1])           # W counts as M
-PAIR_ID = -np.ones((4, 4), int)
-for i, (a, b) in enumerate(PAIRS):
+BUDGET_TIER = np.array([0, 1, 2, 3, 4])           # v2: every token is a tier of its own (W too)
+PAIR_ID = -np.ones((5, 5), int)
+NB = len(PAIRS)                                   # budget pairs; then the forbidden S pairs
+for i, (a, b) in enumerate(PAIRS + FORBIDDEN):
     PAIR_ID[CODE[a], CODE[b]] = PAIR_ID[CODE[b], CODE[a]] = i
-NP = len(PAIRS)
-SKETCH_ROWS, SKETCH_COLS = 25, 20
+NP = len(PAIRS) + len(FORBIDDEN)
+SKETCH_ROWS, SKETCH_COLS = 38, 27   # native size of the sketches
 SKETCH_CHAR = {".": "L", ",": "L", "d": "D", "m": "M", "w": "W", "D": "D", "M": "M", "S": "S"}
 
 
@@ -286,7 +341,7 @@ def pad(b, v=-1):
 
 
 def is_boundary(x, y):
-    return (x != y) & ~(((x == 2) & (y == 3)) | ((x == 3) & (y == 2)))
+    return x != y
 
 
 class Stats:
@@ -310,7 +365,7 @@ class Stats:
         self.tips = 0
         self.anomalies = 0
         others = np.zeros(b.shape, int)
-        for y in range(4):
+        for y in range(5):
             pid = PAIR_ID[b, y]
             valid = pid >= 0
             s = [x == y for x in side]
@@ -334,17 +389,17 @@ class Stats:
                 self.diag += np.bincount(pid[inrun], minlength=NP)
             others += valid & ((ns > 0) | anyd)
         # anomalies against any foreign tier (a neighbour needing a transition)
-        fs = [(x >= 0) & (x != b) & ~(((x == 2) & (b == 3)) | ((x == 3) & (b == 2))) for x in side]
-        fd = [(x >= 0) & (x != b) & ~(((x == 2) & (b == 3)) | ((x == 3) & (b == 2))) for x in diag]
+        fs = [(x >= 0) & (x != b) for x in side]
+        fd = [(x >= 0) & (x != b) for x in diag]
         nf = sum(fs)
         fopp = (fs[0] & fs[2]) | (fs[1] & fs[3])
         self.tips = int((nf == 3).sum())
         self.anomalies = int(((nf == 4) | ((nf == 2) & fopp) | ((nf == 0) & ((fd[0] & fd[2]) | (fd[1] & fd[3])))).sum())
-        self.counts = np.bincount(b.ravel(), minlength=4)
+        self.counts = np.bincount(b.ravel(), minlength=5)
         self.raw_counts = np.bincount(t.ravel(), minlength=5)
         self.run = run_excess(b, run_limit)
         self.junction = int((others >= 2).sum())
-        self.regions = tuple(euler(b == k) for k in range(4))
+        self.regions = tuple(euler(b == k) for k in range(5))
 
 
 def euler(m):
@@ -368,21 +423,26 @@ def run_excess(b, limit):
     return ex
 
 
+ANOMALY_W = 1000.0   # v2: the drawings have no anomalies but the locked dots; the balancer adds none
+DIAG_TOL, DIAG_W = 4, 0.3   # 45-degree runs are tracked, matched more loosely than edges and corners
+RUN_W = 25.0      # v2: per edge of a straight run above the limit (6 in v1; W cells now move)
+
+
 def energy(st, changes, ref_regions):
     e = 0.0
     for s, ref in zip(st, ref_regions):
         e += 40.0 * sum(abs(a - b) for a, b in zip(s.regions, ref))
-    E = np.array([s.edges for s in st])
-    K = np.array([s.corners for s in st])
-    G = np.array([s.diag for s in st])
+    E = np.array([s.edges[:NB] for s in st])
+    K = np.array([s.corners[:NB] for s in st])
+    G = np.array([s.diag[:NB] for s in st])
     N = np.array([s.counts for s in st])
-    for arr, tol, w in ((E, 2, 3.0), (K, 2, 3.0), (G, 2, 2.0), (N[:, :3], 1, 4.0)):
+    for arr, tol, w in ((E, 2, 3.0), (K, 2, 3.0), (G, DIAG_TOL, DIAG_W), (N, 1, 4.0)):
         spread = arr.max(0) - arr.min(0)
         e += w * (np.maximum(0, spread - tol) ** 2).sum() + 0.3 * spread.sum()
     J = np.array([s.junction for s in st])
     e += 0.5 * max(0, J.max() - J.min() - 6) ** 2
-    e += sum(200.0 * (s.tips + s.anomalies) + 6.0 * s.run for s in st)
-    e += sum(30.0 * (s.edges[3:].sum() + s.corners[3:].sum()) for s in st)   # S touches only L
+    e += sum(ANOMALY_W * (s.tips + s.anomalies) + RUN_W * s.run for s in st)
+    e += sum(30.0 * (s.edges[NB:].sum() + s.corners[NB:].sum()) for s in st)   # S touches only L (8-nb)
     e += 0.08 * K.sum()                      # mild preference for smooth lines
     e += 1.0 * changes
     return e
@@ -406,6 +466,10 @@ def soft_band(t, radius=SOFT_RADIUS):
     return band
 
 
+DOMINO = 0.5      # v2: share of moves that flip two adjacent cells together
+SIDE4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+
+
 def balance(start, locked, run_limit, iters, seed, T0=6.0):
     """Seeded annealing of the unprotected boundary cells (see module docstring)."""
     rng = np.random.default_rng(seed)
@@ -417,7 +481,7 @@ def balance(start, locked, run_limit, iters, seed, T0=6.0):
         near_main = np.zeros_like(main)
         near_main[1:] |= main[:-1]; near_main[:-1] |= main[1:]
         near_main[:, 1:] |= main[:, :-1]; near_main[:, :-1] |= main[:, 1:]
-        fixed = fig | locked[n] | (maps[n] == CODE["S"]) | (maps[n] == CODE["W"])
+        fixed = fig | locked[n] | (maps[n] == CODE["S"])          # v2: W cells may move
         prot[n] = (fixed | ~soft_band(maps[n]), near_main)
     st = {n: Stats(maps[n], run_limit) for n in NAMES}
     ref = [st[n].regions for n in NAMES]
@@ -442,10 +506,19 @@ def balance(start, locked, run_limit, iters, seed, T0=6.0):
         if not nb:
             continue
         new = rng.choice(sorted(nb))
-        old = t[r, c]
-        t[r, c] = new
+        cells = [(r, c)]
+        if rng.random() < DOMINO:     # v2: flip a domino (two side neighbours of one tier) together,
+            dr, dc = SIDE4[rng.integers(4)]          # so a straight line can move by a 2-wide bump
+            r2, c2 = r + dr, c + dc
+            if not (0 <= r2 < R and 0 <= c2 < C) or fixed[r2, c2] or t[r2, c2] != t[r, c] \
+                    or (near_main[r2, c2] and new == CODE[FIGURE[n]]):
+                continue
+            cells.append((r2, c2))
+        olds = [t[y, x] for y, x in cells]
+        for y, x in cells:
+            t[y, x] = new
         s_new = Stats(t, run_limit)
-        d_change = int(new != start[n][r, c]) - int(old != start[n][r, c])
+        d_change = sum(int(new != start[n][y, x]) - int(o != start[n][y, x]) for (y, x), o in zip(cells, olds))
         cand = {**st, n: s_new}
         e = energy([cand[k] for k in NAMES], changes + d_change, ref)
         if e <= cur or rng.random() < np.exp((cur - e) / T):
@@ -454,7 +527,8 @@ def balance(start, locked, run_limit, iters, seed, T0=6.0):
             if e < best[0]:
                 best = (e, {k: maps[k].copy() for k in NAMES})
         else:
-            t[r, c] = old
+            for (y, x), o in zip(cells, olds):
+                t[y, x] = o
     return best[1], best[0]
 
 
@@ -475,26 +549,32 @@ def best_of_seeds(start, locked, rows, cols, run_limit, T0=6.0):
 _NATIVE = {}
 
 
+def run_limit_for(cols):
+    """Straight boundary runs above 5 edges per 20 columns are penalized (7 at 27 columns)."""
+    return max(5, round(5 * cols / 20))
+
+
 def make(rows, cols):
     """Returns (start, balanced, run limit) at a grid size. Stage 1 balances the hand sketches at
-    their own size (20 x 25). Other sizes resample the stage-1 maps (and the locks), clean the
+    their own size (27 x 38). Other sizes resample the stage-1 maps (and the locks), clean the
     anomalies resampling leaves, equalize the S and W counts, and balance again at that size."""
     parsed = {n: parse(SKETCHES[n]) for n in NAMES}
     locked = {n: parsed[n][1] for n in NAMES}
     if not _NATIVE:
         start = {n: parsed[n][0] for n in NAMES}
         _NATIVE["start"] = start
-        first = best_of_seeds(start, locked, SKETCH_ROWS, SKETCH_COLS, 5)
-        _NATIVE["maps"] = best_of_seeds(first, locked, SKETCH_ROWS, SKETCH_COLS, 5, T0=POLISH_T0)
+        lim = run_limit_for(SKETCH_COLS)
+        first = best_of_seeds(start, locked, SKETCH_ROWS, SKETCH_COLS, lim)
+        _NATIVE["maps"] = best_of_seeds(first, locked, SKETCH_ROWS, SKETCH_COLS, lim, T0=POLISH_T0)
     if (rows, cols) == (SKETCH_ROWS, SKETCH_COLS):
-        return _NATIVE["start"], _NATIVE["maps"], 5
+        return _NATIVE["start"], _NATIVE["maps"], run_limit_for(SKETCH_COLS)
     start, lk = {}, {}
     for n in NAMES:
         t, lk[n] = resample(_NATIVE["maps"][n], locked[n], rows, cols)
         start[n] = clean(t)
     equalize_label(start, CODE["S"], CODE["L"])
     equalize_label(start, CODE["W"], CODE["M"])
-    run_limit = max(5, round(5 * cols / SKETCH_COLS))
+    run_limit = run_limit_for(cols)
     first = best_of_seeds(start, lk, rows, cols, run_limit)
     return start, best_of_seeds(first, lk, rows, cols, run_limit, T0=POLISH_T0), run_limit
 
@@ -543,16 +623,14 @@ def contour_image(t, up=16, width=2):
     return img
 
 
-def sheet(rows_of_images, labels, path, gap=14, lab_h=16):
+def sheet(rows_of_images, path, gap=14):
+    """Panels side by side on white, with no text (the previews double as blind-test material)."""
     w, h = rows_of_images[0][0].size
     n = len(rows_of_images[0])
-    can = Image.new("RGB", (n * w + (n + 1) * gap, len(rows_of_images) * (h + lab_h + gap) + gap), (255, 255, 255))
-    d = ImageDraw.Draw(can)
+    can = Image.new("RGB", (n * w + (n + 1) * gap, len(rows_of_images) * (h + gap) + gap), (255, 255, 255))
     for i, row in enumerate(rows_of_images):
         for j, im in enumerate(row):
-            x, y = gap + j * (w + gap), gap + i * (h + lab_h + gap)
-            d.text((x, y), labels[i][j], fill=(0, 0, 0))
-            can.paste(im, (x, y + lab_h))
+            can.paste(im, (gap + j * (w + gap), gap + i * (h + gap)))
     can.save(path)
 
 
@@ -561,15 +639,10 @@ def write_tiers(t, path):
 
 
 def extra_rows(maps):
-    """Table rows for the tile items the coordinator asked to track: tips and 45-degree runs."""
+    """Table row for the tile item the coordinator asked to track beyond budget_v2: tips."""
     st = [Stats(maps[n], 10 ** 6) for n in NAMES]
-    lines = []
-    def row(label, vals):
-        lines.append(f"{label:22s}" + "".join(f"{v:9d}" for v in vals) + f"{max(vals) - min(vals):9d}")
-    row("tips (1-cell caps)", [s.tips for s in st])
-    for i, (a, b) in enumerate(PAIRS[:3]):
-        row(f"{pair_key(a, b)} 45deg-run cells", [int(s.diag[i]) for s in st])
-    return "\n".join(lines)
+    vals = [s.tips for s in st]
+    return f"{'tips (1-cell caps)':24s}" + "".join(f"{v:9d}" for v in vals) + f"{max(vals) - min(vals):9d}"
 
 
 def write_outputs(start, maps, out, rows, cols, run_limit):
@@ -582,11 +655,13 @@ def write_outputs(start, maps, out, rows, cols, run_limit):
         f"# Boundary budgets, experiment 011 (Field, Wood and Water), {cols} columns x {rows} rows.",
         "# Columns: A hare, B owl, C swan. edges = 4-neighbour cell edges between the two tiers;",
         "# corners = cells with the other tier on two adjacent sides (convex) or on a diagonal only",
-        "# (concave), both tiers counted. W counts as M; S-L needs no transition and is not a pair.",
-        "# Anomalies need rare tiles (target 0). Tips = 1-cell protrusions (caps). 45deg-run cells =",
+        "# (concave), both tiers counted. W and S are full tiers (budget_v2.py, as pipeline v2 and",
+        "# classes-v9): S-L is a budget pair, S-D, S-M and S-W contacts (8-neighbourhood) must be 0.",
+        "# Anomalies need rare tiles (target 0; the dots are designed: one D-on-L and one D-on-M dot per",
+        "# picture). Tips = 1-cell protrusions (caps). 45deg-run cells =",
         "# convex corners chained diagonally (staircases of single steps, 2+ cells), per pair.",
         f"# Straight runs are penalized above {run_limit} edges. Cells moved by the balancer from the",
-        "# resampled sketch: " + ", ".join(f"{n} {moved[n]}" for n in NAMES),
+        "# start map (sketch or resampled map): " + ", ".join(f"{n} {moved[n]}" for n in NAMES),
         "",
         table(named),
         extra_rows(maps),
@@ -594,24 +669,19 @@ def write_outputs(start, maps, out, rows, cols, run_limit):
     (out / "budgets.txt").write_text("\n".join(report) + "\n")
     print("\n".join(report))
     up = 16
-    labels = [[f"{TITLES[n]} start" for n in NAMES], [f"{TITLES[n]} balanced" for n in NAMES]]
-    sheet([[tier_image(start[n], up) for n in NAMES], [tier_image(maps[n], up) for n in NAMES]], labels,
-          out / "targets-preview.png")
-    sheet([[contour_image(maps[n], up) for n in NAMES]], [[f"{TITLES[n]} ink" for n in NAMES]],
-          out / "contours-preview.png")
+    sheet([[tier_image(maps[n], up) for n in NAMES]], out / "targets-preview.png")
+    sheet([[contour_image(maps[n], up) for n in NAMES]], out / "contours-preview.png")
 
 
 def main(argv):
-    """Usage: make_targets.py [COLSxROWS ...]   (default: 27x38 primary, then 20x25).
-    The first size is the primary: written next to this file; every size also goes to <COLS>x<ROWS>/."""
+    """Usage: make_targets.py [COLSxROWS ...]   (default: 27x38 native, then 20x25).
+    Every size is written to <COLS>x<ROWS>-v2/."""
     sizes = argv or [PRIMARY, "20x25"]
-    for i, size in enumerate(sizes):
+    for size in sizes:
         cols, rows = (int(v) for v in size.lower().split("x"))
         print(f"== {cols}x{rows}", flush=True)
         start, maps, run_limit = make(rows, cols)
-        write_outputs(start, maps, HERE / f"{cols}x{rows}", rows, cols, run_limit)
-        if i == 0:
-            write_outputs(start, maps, HERE, rows, cols, run_limit)
+        write_outputs(start, maps, HERE / f"{cols}x{rows}{OUT_SUFFIX}", rows, cols, run_limit)
 
 
 if __name__ == "__main__":

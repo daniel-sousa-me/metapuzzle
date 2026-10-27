@@ -26,3 +26,14 @@ Edges (and corners) D-M 63/58/62 (55/52/58), D-L 75/77/75 (82/80/83), M-L 94/88/
 
 `prev-attempt/` holds the earlier hare/owl/whale run (quantize, roles, render), kept for
 reference; it is not part of this pipeline.
+
+## Hare v2
+
+`make_targets.py` v2 (v1 kept as `make_targets_v1.py`) draws all three pictures natively at 27 × 38
+and writes `27x38-v2/` and `20x25-v2/`. Hare: sitting profile, two separate ears 4–5 cells wide,
+nape and throat notches, haunch, front leg, paw, tail and a dot eye; the body is in the dark field,
+the head in the light sky. Following blind test 1, the owl got octagonal eyes, a beak, a moon
+disc, a branch and a tail, and the swan a "2" neck, a beak, an eye and a wing on a W band. W and S
+are full tiers (`budget_v2.py`). Each picture has one D-on-L and one D-on-M dot. Everything
+matches within 5, except M–W edges (18/24/24) and 45° runs (eyes). 20x25-v2 is a rough downsample
+(W and dots lost) and is not matched.
