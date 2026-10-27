@@ -1,0 +1,27 @@
+maps (cols x rows): A 27x38, B 27x38, C 27x38
+class histograms:
+  A: D=110 Mb=68 Mc=68 Mr=68 M=67 Lb=55 Lo=55 Lr=55 Lx=55 L=53 DLs=49 MLs=43 DMs=40 LDc=29 LMc=25 DLc=23 MLc=23 MWs=19 W=16 DMc=12 SLs=12 WLs=12 MDc=11 SLc=7 DWs=6 S=5 WMc=5 WLc=4 LSc=3 LWc=3 MWc=3 H_G=2 H_I=2 H_O=2 DWc=1 D_s_a=1 H_E=1 H_N=1 H_Y=1 L_f_a=1 L_p_a=1 L_v_a=1 M_c_a=1 M_d_a=1 M_d_b=1 M_l_a=1 M_l_b=1 M_s_a=1 M_s_b=1 WDc=1
+  B: D=110 Mb=68 Mc=68 Mr=68 M=67 Lb=55 Lo=55 Lr=55 Lx=55 L=53 DLs=49 MLs=43 DMs=40 LDc=29 LMc=25 DLc=23 MLc=23 MWs=19 W=16 DMc=12 SLs=12 WLs=12 MDc=11 SLc=7 DWs=6 S=5 WMc=5 WLc=4 LSc=3 LWc=3 MWc=3 H_G=2 H_I=2 H_O=2 DWc=1 D_s_a=1 H_E=1 H_N=1 H_Y=1 L_f_a=1 L_p_a=1 L_v_a=1 M_c_a=1 M_d_a=1 M_d_b=1 M_l_a=1 M_l_b=1 M_s_a=1 M_s_b=1 WDc=1
+  C: D=110 Mb=68 Mc=68 Mr=68 M=67 Lb=55 Lo=55 Lr=55 Lx=55 L=53 DLs=49 MLs=43 DMs=40 LDc=29 LMc=25 DLc=23 MLc=23 MWs=19 W=16 DMc=12 SLs=12 WLs=12 MDc=11 SLc=7 DWs=6 S=5 WMc=5 WLc=4 LSc=3 LWc=3 MWc=3 H_G=2 H_I=2 H_O=2 DWc=1 D_s_a=1 H_E=1 H_N=1 H_Y=1 L_f_a=1 L_p_a=1 L_v_a=1 M_c_a=1 M_d_a=1 M_d_b=1 M_l_a=1 M_l_b=1 M_s_a=1 M_s_b=1 WDc=1
+largest same-class blob per class:
+  A: Mr=65 Mc=57 Lr=53 Mb=52 L=51 M=48 D=41 Lo=31 Lb=19 Lx=18 DLs=16 W=14 MWs=10 DMs=7 MLs=6 SLs=5 S=4 WLs=4 LDc=3 LMc=3 DLc=2 DMc=2 DWs=2 H_G=2 H_I=2 LSc=2 MLc=2 MWc=2 SLc=2 WLc=2 DWc=1 D_s_a=1 H_E=1 H_N=1 H_O=1 H_Y=1 LWc=1 L_f_a=1 L_p_a=1 L_v_a=1 MDc=1 M_c_a=1 M_d_a=1 M_d_b=1 M_l_a=1 M_l_b=1 M_s_a=1 M_s_b=1 WDc=1 WMc=1
+  B: D=93 Mr=60 L=50 Mb=34 M=32 Lo=28 Lr=28 Mc=26 Lx=23 Lb=15 DMs=8 MWs=8 DLs=6 W=6 MLs=5 S=5 SLs=5 DWs=4 WLs=4 DLc=3 LDc=3 DMc=2 LMc=2 LSc=2 MLc=2 SLc=2 DWc=1 D_s_a=1 H_E=1 H_G=1 H_I=1 H_N=1 H_O=1 H_Y=1 LWc=1 L_f_a=1 L_p_a=1 L_v_a=1 MDc=1 MWc=1 M_c_a=1 M_d_a=1 M_d_b=1 M_l_a=1 M_l_b=1 M_s_a=1 M_s_b=1 WDc=1 WLc=1 WMc=1
+  C: D=61 Mb=58 Mc=43 Mr=43 Lx=37 Lo=35 L=31 Lr=26 Lb=25 M=17 DLs=11 MLs=8 MWs=7 W=7 WLs=7 SLs=6 DMs=5 S=5 DWs=4 MLc=3 DLc=2 DMc=2 H_I=2 LDc=2 LMc=2 LSc=2 MDc=2 SLc=2 DWc=1 D_s_a=1 H_E=1 H_G=1 H_N=1 H_O=1 H_Y=1 LWc=1 L_f_a=1 L_p_a=1 L_v_a=1 MWc=1 M_c_a=1 M_d_a=1 M_d_b=1 M_l_a=1 M_l_b=1 M_s_a=1 M_s_b=1 WDc=1 WLc=1 WMc=1
+same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+pairs (window reuse shown as plain/rotated, window = rows x cols):
+  A-B: same position 6 (0.6%)
+    same position excl. dominant D (covers 10.7% of cells, not gated): 4 (0.5%)
+    weighted overlap: 0.5%
+    window reuse: 1x2 0.81/0.89  2x1 0.82/0.90  2x2 0.37/0.55  3x3 0.01/0.05
+    transferable blob: 26 cells (2.5% of A)
+  A-C: same position 26 (2.5%)
+    same position excl. dominant D (covers 10.7% of cells, not gated): 6 (0.7%)
+    weighted overlap: 0.7%
+    window reuse: 1x2 0.85/0.92  2x1 0.81/0.92  2x2 0.33/0.54  3x3 0.02/0.06
+    transferable blob: 30 cells (2.9% of A)
+  B-C: same position 15 (1.5%)
+    same position excl. dominant D (covers 10.7% of cells, not gated): 14 (1.7%)
+    weighted overlap: 0.8%
+    window reuse: 1x2 0.86/0.93  2x1 0.79/0.91  2x2 0.37/0.53  3x3 0.03/0.05
+    transferable blob: 31 cells (3.0% of B)
+scene gates: FAIL (A-B 2x2 window reuse 36.7% ≥ 30%; A-C 2x2 window reuse 32.6% ≥ 30%; B-C 2x2 window reuse 36.9% ≥ 30%)
