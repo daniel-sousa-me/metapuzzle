@@ -12,7 +12,7 @@
 - max_shared_fraction: None
 - seed: 0
 - iters: 300000
-- iters_used: 402
+- iters_used: 315
 - cell: 32
 - grid: none
 - labels: False
@@ -29,44 +29,44 @@ Adjacency = two pieces touching in a solution (flat seams included). Shared = to
 | AC | 0 | 0.00% | - | 0 | 0 | 0 | 0.000 |
 | BC | 0 | 0.00% | - | 0 | 0 | 0 | 0.000 |
 
-Total shared: 0; cluster penalty: 0; rotated pieces per solution: [356, 356, 358]
+Total shared: 0; cluster penalty: 0; rotated pieces per solution: [359, 350, 349]
 
 ## Scene-level metrics
 
 ```text
 maps (cols x rows): A 20x25, B 20x25, C 20x25
 class histograms:
-  A: L=223 DMs=79 M=48 MLs=36 DLs=32 MLc=29 MDc=20 DMc=9 LMc=9 DLc=7 D=2 DMp=2 LDc=1 MDd=1 MDp=1 MLp=1
-  B: L=223 DMs=79 M=48 MLs=36 DLs=32 MLc=29 MDc=20 DMc=9 LMc=9 DLc=7 D=2 DMp=2 LDc=1 MDd=1 MDp=1 MLp=1
-  C: L=223 DMs=79 M=48 MLs=36 DLs=32 MLc=29 MDc=20 DMc=9 LMc=9 DLc=7 D=2 DMp=2 LDc=1 MDd=1 MDp=1 MLp=1
+  A: L=287 M=76 DMs=41 MLs=24 MLc=17 DLs=16 MDc=11 D=10 DMc=8 LMc=6 DMp=2 MDd=1 MLp=1
+  B: L=287 M=76 DMs=41 MLs=24 MLc=17 DLs=16 MDc=11 D=10 DMc=8 LMc=6 DMp=2 MDd=1 MLp=1
+  C: L=287 M=76 DMs=41 MLs=24 MLc=17 DLs=16 MDc=11 D=10 DMc=8 LMc=6 DMp=2 MDd=1 MLp=1
 largest same-class blob per class:
-  A: L=223 M=47 DMs=37 MLs=14 DLs=10 MDc=3 MLc=2 D=1 DLc=1 DMc=1 DMp=1 LDc=1 LMc=1 MDd=1 MDp=1 MLp=1
-  B: L=223 M=39 DLs=32 DMs=26 MLs=6 MDc=5 DLc=3 DMc=3 MLc=2 D=1 DMp=1 LDc=1 LMc=1 MDd=1 MDp=1 MLp=1
-  C: L=223 DMs=31 M=25 DLs=19 MLs=14 MDc=3 MLc=2 D=1 DLc=1 DMc=1 DMp=1 LDc=1 LMc=1 MDd=1 MDp=1 MLp=1
+  A: L=284 M=75 DMs=7 MLs=7 DLs=5 D=4 MDc=4 DMc=2 MLc=2 DMp=1 LMc=1 MDd=1 MLp=1
+  B: L=287 M=56 DLs=16 DMs=14 D=6 MLs=6 DMc=2 DMp=2 MDc=2 MLc=2 LMc=1 MDd=1 MLp=1
+  C: L=287 M=38 DLs=10 DMs=8 MLs=8 D=6 MDc=2 MLc=2 DMc=1 DMp=1 LMc=1 MDd=1 MLp=1
 same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
 pairs (window reuse shown as plain/rotated, window = rows x cols):
-  A-B: same position 233 (46.6%)
-    same position excl. dominant L (covers 44.6% of cells, gated): 71 (32.9%)
-    weighted overlap: 16.6%
-    window reuse: 1x2 0.85/0.94  2x1 0.89/0.93  2x2 0.55/0.64  3x3 0.22/0.29
-    transferable blob: 161 cells (32.2% of A)
-  A-C: same position 256 (51.2%)
-    same position excl. dominant L (covers 44.6% of cells, gated): 85 (37.8%)
-    weighted overlap: 16.0%
-    window reuse: 1x2 0.93/0.97  2x1 0.93/0.97  2x2 0.73/0.77  3x3 0.31/0.37
-    transferable blob: 172 cells (34.4% of A)
-  B-C: same position 231 (46.2%)
-    same position excl. dominant L (covers 44.6% of cells, gated): 67 (30.7%)
-    weighted overlap: 13.4%
-    window reuse: 1x2 0.92/0.96  2x1 0.93/0.95  2x2 0.68/0.72  3x3 0.23/0.25
-    transferable blob: 160 cells (32.0% of B)
-scene gates: FAIL (A-B same-position excl. L 32.9% ≥ 25%; A-B 2x2 window reuse 55.0% ≥ 30%; A-B transferable blob 32.2% ≥ 10% of cells; A-C same-position excl. L 37.8% ≥ 25%; A-C 2x2 window reuse 72.6% ≥ 30%; A-C transferable blob 34.4% ≥ 10% of cells; B-C same-position excl. L 30.7% ≥ 25%; B-C 2x2 window reuse 68.2% ≥ 30%; B-C transferable blob 32.0% ≥ 10% of cells)
+  A-B: same position 297 (59.4%)
+    same position excl. dominant L (covers 57.4% of cells, gated): 64 (40.3%)
+    weighted overlap: 15.5%
+    window reuse: 1x2 0.89/0.95  2x1 0.93/0.96  2x2 0.66/0.73  3x3 0.37/0.39
+    transferable blob: 233 cells (46.6% of A)
+  A-C: same position 296 (59.2%)
+    same position excl. dominant L (covers 57.4% of cells, gated): 63 (39.6%)
+    weighted overlap: 14.3%
+    window reuse: 1x2 0.93/0.97  2x1 0.91/0.97  2x2 0.74/0.80  3x3 0.42/0.43
+    transferable blob: 230 cells (46.0% of A)
+  B-C: same position 293 (58.6%)
+    same position excl. dominant L (covers 57.4% of cells, gated): 59 (36.9%)
+    weighted overlap: 15.6%
+    window reuse: 1x2 0.92/0.94  2x1 0.91/0.95  2x2 0.69/0.80  3x3 0.43/0.45
+    transferable blob: 234 cells (46.8% of B)
+scene gates: FAIL (A-B same-position excl. L 40.3% ≥ 25%; A-B 2x2 window reuse 65.8% ≥ 30%; A-B transferable blob 46.6% ≥ 10% of cells; A-C same-position excl. L 39.6% ≥ 25%; A-C 2x2 window reuse 74.3% ≥ 30%; A-C transferable blob 46.0% ≥ 10% of cells; B-C same-position excl. L 36.9% ≥ 25%; B-C 2x2 window reuse 68.6% ≥ 30%; B-C transferable blob 46.8% ≥ 10% of cells)
 ```
 
 ## Gates
 
 - piece gates: PASS
-- scene gates: FAIL (A-B same-position excl. L 32.9% ≥ 25%; A-B 2x2 window reuse 55.0% ≥ 30%; A-B transferable blob 32.2% ≥ 10% of cells; A-C same-position excl. L 37.8% ≥ 25%; A-C 2x2 window reuse 72.6% ≥ 30%; A-C transferable blob 34.4% ≥ 10% of cells; B-C same-position excl. L 30.7% ≥ 25%; B-C 2x2 window reuse 68.2% ≥ 30%; B-C transferable blob 32.0% ≥ 10% of cells)
+- scene gates: FAIL (A-B same-position excl. L 40.3% ≥ 25%; A-B 2x2 window reuse 65.8% ≥ 30%; A-B transferable blob 46.6% ≥ 10% of cells; A-C same-position excl. L 39.6% ≥ 25%; A-C 2x2 window reuse 74.3% ≥ 30%; A-C transferable blob 46.0% ≥ 10% of cells; B-C same-position excl. L 36.9% ≥ 25%; B-C 2x2 window reuse 68.6% ≥ 30%; B-C transferable blob 46.8% ≥ 10% of cells)
 
 ## Connectors
 

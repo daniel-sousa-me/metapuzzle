@@ -113,3 +113,27 @@ Suffix `-v2` on `make_targets.py`, `quantize.py` (report to `quantize-report-v2.
 **Scenes** (`build_scenes_v5.py`). `roles-to-scenes` did not finish: `roles._hall` enumerates every subset of the roles in the interior (about 2^28), and the run was killed after 15 minutes. It fixes the histogram to `target_counts` and reuses the library's placement and annealing. Maps match the target and pass `validate_scenes`.
 
 **Metrics** (`scene-metrics-v5.txt`, gates fail). Same position excluding L: 32.9 / 37.8 / 30.7%; 2x2 reuse: 55 / 73 / 68%; transferable blob: 32 / 34 / 32%.
+
+## Step 6b: rotation and host fix (v5 renders)
+
+**Bug.** Step 6 had two faults, found by an edge check (section 5 of `quantize-report-v5.txt`). Symmetric ink strokes hid both.
+1. Lighter-own straights were not turned 180 degrees (`FLIP_LIGHT_STRAIGHTS = False`), so the lighter tier sat on the darker side of the boundary.
+2. Both cells of a tier edge hosted the transition. Each drew the other tier as a half strip, so the strips zigzagged (D|L|D|L) inside dark bodies.
+
+**Convention.** A merged straight `PQs` has the darker P as base at the bottom and Q as mass on top. `@deg` is the side that holds the neighbour's mass (v4). `render.py` rotates clockwise: a marker at the top left goes to the top right under `rotate(90)`. Corners and caps keep v4's canonical geometry, so their rotations carry over (the `i` mapping is a constant shift).
+
+**Host rule.** `HOST = "darker"`: a cell counts only lighter neighbours, so the darker cell of each tier edge hosts it and the lighter cell stays plain. `HOST = "both"` reproduces v4 cell by cell (checked).
+
+**Edge check** (`verify_edges`, 955 shared edges per image; a mismatch is a shared edge whose halves disagree)
+
+| config | other | junction | approx | cap | frame |
+|---|---|---|---|---|---|
+| v4 hosts, flip off (before) | 164 | 217 | 74 | 1 | 33 |
+| v4 hosts, flip on | 91 | 218 | 79 | 2 | 29 |
+| darker host, flip on (now) | **0** | 64 | 53 | 4 | 22 |
+
+Categories: other = unexplained (must be 0); junction = three-tier corner, where one tier is dropped; cap = a `p` piece's split side meets a plain neighbour; frame = tier cut on a frame cell (coded plain, as in step 2b); approx = the four v4 approximations.
+
+**Results.** Transition cells per image (cat / sailboat / tree): 86 / 94 / 83, was 158 / 178 / 156; surplus 41 / 33 / 44. `make_roles_v5.py` and `build_scenes_v5.py` (defaults) ran with no shortfall; `validate_scenes` passes. Scene gates still fail and are worse: same position excl. L 40 / 40 / 37% (was 33 / 38 / 31); 2x2 reuse (larger of plain and rotated) 73 / 80 / 80% (was 55 / 73 / 68); transferable blob 47 / 46 / 47% (was 32 / 34 / 32). Plain L is now 287 of 500 cells.
+
+**Renders** (`--rotation quarter --cell 32`, `run-full-v5` with `classes-v4.json`, `run-ink-v5` with `classes-ink.json`): piece gates pass with 0 shared adjacencies. Dark bodies are solid with ragged edges and an olive ring; the ground band has a ragged top.
