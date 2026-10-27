@@ -198,6 +198,8 @@ run_prototype(scenes_path, classes_path, out_dir, *, sizes=None, border="standar
 ```
 Loads the class maps, derives the inventory (with `extra_flat` added to the automatic seams), restricts rotations by the class spec (pinned to 0 in none mode), solves, and writes the outputs. Returns `valid`, `violations`, `shared`, `gates` (`{"piece", "scene", "failures"}`), `gate_lines`, `files` and `out_dir`. Invalid solutions still write their outputs.
 
+**Parameter ranges in class specs (`classes.py`).** A numeric layer parameter may be sampled per piece instead of fixed. `{"range": [lo, hi]}` works for any numeric parameter; a plain `[lo, hi]` pair works only where the primitive's default is a number (`scale`, `density`, `length`), so list-valued parameters such as `offset`, `kinds` and `radius` stay literal. The value is drawn uniformly (inclusive integers when both bounds are integers) from the piece seed mixed with the layer index and the parameter name, so it is fixed for a piece, identical on every call, and independent of the render size. `ClassSpec.validate()` requires numeric bounds with `lo < hi` and checks each layer at both ends. Mask parameters cannot be ranges. The pipeline's three scale variants per motif (`gen_classes_v12.py`) could be replaced by one `{"range": [0.8, 1.2]}` class, but the variants also scale offsets and margins, so that change is not made here.
+
 ## cli.py (`metapuzzle` entry point)
 
 ```
