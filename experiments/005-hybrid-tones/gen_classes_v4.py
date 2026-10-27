@@ -2,7 +2,7 @@
 
 Tiers D, M, L are copied from classes.json. New: S (navy chips on cream), W (M with
 cream lenses). Every ordered pair of D/M/L/W gets four march_mask transitions
-(s, c, i, p); the D/L pair gets two dots. Six motif classes sit on L.
+(s, c, i, p); the D/L pair gets two dots, and a D dot sits in M base (MDd, v5). Six motif classes sit on L.
 
 The transition convention matches gallery/march-demo.py: the own tier is the base
 (background included), the neighbour tier is the mass, clipped by a named march_mask.
@@ -99,8 +99,8 @@ def build(src: dict) -> dict:
                     copy.deepcopy(tiers[own]) + nbr_layers,
                     masks={"edge": _march(pattern)})
 
-    # <nbr><own>d: base nbr, with an isolated dot of own. Only for the D/L pair.
-    for own, nbr in (("L", "D"), ("D", "L")):
+    # <nbr><own>d: base nbr, with an isolated dot of own. D/L pair, plus D dot in M base (v5).
+    for own, nbr in (("L", "D"), ("D", "L"), ("D", "M")):
         dot_layers = copy.deepcopy(tiers[own])
         for layer in dot_layers:
             layer["mask"] = "dot"

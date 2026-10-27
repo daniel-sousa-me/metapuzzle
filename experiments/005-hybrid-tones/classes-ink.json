@@ -2261,6 +2261,49 @@
         270
       ]
     },
+    "MDd": {
+      "layers": [
+        {
+          "primitive": "stipple",
+          "palette": [
+            "white"
+          ],
+          "params": {
+            "density": 0
+          },
+          "background": true
+        },
+        {
+          "primitive": "march_line",
+          "palette": [
+            "white",
+            "black"
+          ],
+          "params": {
+            "stroke": 0.035
+          },
+          "outline_of": "dot",
+          "background": false
+        }
+      ],
+      "masks": {
+        "dot": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "dot",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      },
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
     "SUN": {
       "layers": [
         {

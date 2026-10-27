@@ -3650,6 +3650,68 @@
         }
       }
     },
+    "MDd": {
+      "layers": [
+        {
+          "primitive": "dabs",
+          "palette": [
+            "olive",
+            "sand",
+            "olive",
+            "slate",
+            "olive",
+            "ochre",
+            "sand",
+            "olive"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          }
+        },
+        {
+          "primitive": "dabs",
+          "palette": [
+            "indigo",
+            "slate",
+            "indigo",
+            "rust",
+            "indigo",
+            "slate",
+            "indigo",
+            "slate"
+          ],
+          "background": true,
+          "params": {
+            "count": 60,
+            "length": 0.2,
+            "width": 0.1,
+            "shape": "mixed"
+          },
+          "mask": "dot"
+        }
+      ],
+      "directional": false,
+      "allowed_rotations": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "masks": {
+        "dot": {
+          "primitive": "march_mask",
+          "params": {
+            "pattern": "dot",
+            "roughness": 0.5,
+            "wobble": 0.12
+          }
+        }
+      }
+    },
     "SUN": {
       "layers": [
         {

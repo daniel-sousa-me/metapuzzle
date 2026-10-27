@@ -1,0 +1,55 @@
+1. tiers (equalized, identical to quantized-v2). D / M / L totals per image:
+   cat       plain D/M/L  27/ 78/237   transition cells own D/M/L  49/ 45/ 64   tier totals D/M/L 76/123/301
+   sailboat  plain D/M/L  13/ 60/249   transition cells own D/M/L  63/ 63/ 52   tier totals D/M/L 76/123/301
+   tree      plain D/M/L  25/ 82/237   transition cells own D/M/L  51/ 41/ 64   tier totals D/M/L 76/123/301
+   target D/M/L 76 / 123 / 301; FLIP_LIGHT_STRAIGHTS = False
+2. merged class histogram per image (transition classes; rotation dropped):
+   class      DMc   DMp   DMs   DLc   DLs   MDc   MDd   MDp   MLc   MLp   MLs   LDc   LMc
+   cat          7     2    31     7    32    20     1     1    17     1    36     1     2
+   sailboat     7     0    79     3    32     7     0     0    18     0    23     0     9
+   tree         9     0    30     6    25    16     0     0    29     0    33     1     7
+   pairwise L1 (cat-sailboat, cat-tree, sailboat-tree): 92, 40, 94
+   per-class max over images: DMc=9  DMp=2  DMs=79  DLc=7  DLs=32  MDc=20  MDd=1  MDp=1  MLc=29  MLp=1  MLs=36  LDc=1  LMc=9
+3. approximations per image (pattern kept, detail dropped):
+   strip     cat=6  sailboat=1  tree=0
+   s+diag    cat=10  sailboat=5  tree=7
+   c+diag    cat=1  sailboat=1  tree=0
+   i+multi   cat=3  sailboat=0  tree=0
+4. Pair D-M
+   class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+   DMc  corner-P DMc          7        7        9     9        2        2        0
+   DMp  cap-P DMp             2        0        0     2        0        2        2
+   DMs  straight             31       79       30    79       48        0       49
+   MDc  corner-Q MDc         20        7       16    20        0       13        4
+   MDd  dot-P MDd             1        0        0     1        0        1        1
+   MDp  cap-Q MDp             1        0        0     1        0        1        1
+   total                     62       93       55   112       50       19       57
+   approx strip             3        1        0
+   approx s+diag            8        3        7
+   approx c+diag            1        0        0
+   approx i+multi           1        0        0
+
+4. Pair D-L
+   class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+   DLc  corner-P DLc          7        3        6     7        0        4        1
+   DLs  straight             32       32       25    32        0        0        7
+   LDc  corner-Q LDc          1        0        1     1        0        1        0
+   total                     40       35       32    40        0        5        8
+   approx strip             2        0        0
+   approx s+diag            1        0        0
+   approx i+multi           1        0        0
+
+4. Pair M-L
+   class                    cat sailboat     tree   max  sur_cat  sur_sai  sur_tre
+   MLc  corner-P MLc         17       18       29    29       12       11        0
+   MLp  cap-P MLp             1        0        0     1        0        1        1
+   MLs  straight             36       23       33    36        0       13        3
+   LMc  corner-Q LMc          2        9        7     9        7        0        2
+   total                     56       50       69    75       19       25        6
+   approx strip             1        0        0
+   approx s+diag            1        2        0
+   approx c+diag            0        1        0
+   approx i+multi           1        0        0
+
+Transition cells per image: cat 158, sailboat 178, tree 156; surplus to place (all pairs): cat 69, sailboat 49, tree 71
+wrote /home/user/metapuzzle/experiments/005-hybrid-tones/boundary-budgets-v5.txt and /home/user/metapuzzle/experiments/005-hybrid-tones/quantized-codes-v5.txt

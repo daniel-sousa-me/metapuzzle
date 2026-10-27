@@ -101,3 +101,15 @@ Suffix `-v2` on `make_targets.py`, `quantize.py` (report to `quantize-report-v2.
 **Infeasible.** Own-D codes need 79 cells; each map has 76 D cells (target -3), so `roles-to-scenes` rejects it. No `scenes-v4.txt` or metrics. Near capacity also fails (cat D: 30 surplus, 19 near cells). Rotation-0 transitions (36 / 39 / 35) are unconstrained.
 
 **Class codes:** D, M, L, DLs, DMc, DMi, DMp, DMs, MDd, LDc, LDi, LDs, LMc, LMi, LMs, MDc, MDi, MDp, MDs, MLc, MLi, MLp, MLs.
+
+## Step 6: merged classes and boundary budgets
+
+**Classes** (`quantize_v5.py`, log `quantize-report-v5.txt`). Straights `PQs` (darker P first, lighter Q half on the boundary side); corners `PQc` (quarter tier first; a `QPi` corner is the same piece rotated); caps `PQp`; dots keep v4 naming (`MDd`). Specs: `classes-v4.json` gains `MDd` (`gen_classes_v4.py`); `classes-ink.json` regenerated.
+
+**Budgets** (`boundary-budgets-v5.txt`). Surplus (max minus own) for cat / sailboat / tree: DM 50 / 19 / 57, DL 0 / 5 / 8, ML 19 / 25 / 6; total 69 / 49 / 71.
+
+**Roles** (`make_roles_v5.py`). Edges fixed. Surplus goes to 8-isolated far cells (2+ from any transition): 25 / 26 / 26. The rest goes to near cells, plain otherwise (42 / 23 / 41), then 2 / 0 / 4 residue to non-isolated far cells. Near-only placement would leave 6 pieces unplaced (cat D 2; tree D 2, M 2).
+
+**Scenes** (`build_scenes_v5.py`). `roles-to-scenes` did not finish: `roles._hall` enumerates every subset of the roles in the interior (about 2^28), and the run was killed after 15 minutes. It fixes the histogram to `target_counts` and reuses the library's placement and annealing. Maps match the target and pass `validate_scenes`.
+
+**Metrics** (`scene-metrics-v5.txt`, gates fail). Same position excluding L: 32.9 / 37.8 / 30.7%; 2x2 reuse: 55 / 73 / 68%; transferable blob: 32 / 34 / 32%.

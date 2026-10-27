@@ -1,0 +1,27 @@
+maps (cols x rows): A 20x25, B 20x25, C 20x25
+class histograms:
+  A: L=223 DMs=79 M=48 MLs=36 DLs=32 MLc=29 MDc=20 DMc=9 LMc=9 DLc=7 D=2 DMp=2 LDc=1 MDd=1 MDp=1 MLp=1
+  B: L=223 DMs=79 M=48 MLs=36 DLs=32 MLc=29 MDc=20 DMc=9 LMc=9 DLc=7 D=2 DMp=2 LDc=1 MDd=1 MDp=1 MLp=1
+  C: L=223 DMs=79 M=48 MLs=36 DLs=32 MLc=29 MDc=20 DMc=9 LMc=9 DLc=7 D=2 DMp=2 LDc=1 MDd=1 MDp=1 MLp=1
+largest same-class blob per class:
+  A: L=223 M=47 DMs=37 MLs=14 DLs=10 MDc=3 MLc=2 D=1 DLc=1 DMc=1 DMp=1 LDc=1 LMc=1 MDd=1 MDp=1 MLp=1
+  B: L=223 M=39 DLs=32 DMs=26 MLs=6 MDc=5 DLc=3 DMc=3 MLc=2 D=1 DMp=1 LDc=1 LMc=1 MDd=1 MDp=1 MLp=1
+  C: L=223 DMs=31 M=25 DLs=19 MLs=14 MDc=3 MLc=2 D=1 DLc=1 DMc=1 DMp=1 LDc=1 LMc=1 MDd=1 MDp=1 MLp=1
+same-position gate: where the pair's dominant class covers more than 40% of the cells, the gate reads same position excl. that class; otherwise the plain line
+pairs (window reuse shown as plain/rotated, window = rows x cols):
+  A-B: same position 233 (46.6%)
+    same position excl. dominant L (covers 44.6% of cells, gated): 71 (32.9%)
+    weighted overlap: 16.6%
+    window reuse: 1x2 0.85/0.94  2x1 0.89/0.93  2x2 0.55/0.64  3x3 0.22/0.29
+    transferable blob: 161 cells (32.2% of A)
+  A-C: same position 256 (51.2%)
+    same position excl. dominant L (covers 44.6% of cells, gated): 85 (37.8%)
+    weighted overlap: 16.0%
+    window reuse: 1x2 0.93/0.97  2x1 0.93/0.97  2x2 0.73/0.77  3x3 0.31/0.37
+    transferable blob: 172 cells (34.4% of A)
+  B-C: same position 231 (46.2%)
+    same position excl. dominant L (covers 44.6% of cells, gated): 67 (30.7%)
+    weighted overlap: 13.4%
+    window reuse: 1x2 0.92/0.96  2x1 0.93/0.95  2x2 0.68/0.72  3x3 0.23/0.25
+    transferable blob: 160 cells (32.0% of B)
+scene gates: FAIL (A-B same-position excl. L 32.9% ≥ 25%; A-B 2x2 window reuse 55.0% ≥ 30%; A-B transferable blob 32.2% ≥ 10% of cells; A-C same-position excl. L 37.8% ≥ 25%; A-C 2x2 window reuse 72.6% ≥ 30%; A-C transferable blob 34.4% ≥ 10% of cells; B-C same-position excl. L 30.7% ≥ 25%; B-C 2x2 window reuse 68.2% ≥ 30%; B-C transferable blob 32.0% ≥ 10% of cells)
