@@ -66,3 +66,7 @@ The scale study (experiment 013) ran the same three placeholders at 500, 750, 10
 ## 2026-10-27 — Mechanical uniqueness: rely on artwork, not on connector algebra
 
 Research (experiment 012, docs/design/09): exact minimal mating classes (every tab fits exactly its three intended blanks) exist only for boards with both dimensions ≡ 1 (mod 3) without rotation, and they force pictures B and C to be fixed shuffles of A; with three freely designed subjects only about 20–24% of pieces can follow such a construction, and deviating by a few percent already restores hundreds of false fits per intended one. Decision: keep quarter rotation and free subject design; conventional distinct cuts plus visually distinguishing artwork (chip-signature sub-classes, motifs, marks) carry uniqueness; evaluate it with the visual-ambiguity test (T9) rather than the false-fit ratio. Noted for later: a board such as 28×37 would permit an exact border; rotation-none would halve false fits at the cost of four times as many transition classes.
+
+## 2026-10-27 — Product form: tray (frameless) border for the subject set
+
+With value inversion, the three pictures' frames have different tone mixes (the owl's frame has no dark cells at all), so a conventional flat-edged border would need identical frame inventories that the design cannot provide without distorting the pictures. Decision: the puzzle sits in a tray; all pieces are interior-shaped (the "frame tray" idea from docs/IDEAS.md). Revisit only if cross-class interior seams are implemented in the engine.
