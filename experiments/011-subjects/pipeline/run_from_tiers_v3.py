@@ -696,96 +696,41 @@ def image_roles(tok, st, C: int, R: int) -> dict:
     return out
 
 
-def tier_caps(far, X, rnd, C, R):
-    caps = Counter()
-    for _ in range(N_RESTARTS):
-        order = far[:]
-        rnd.shuffle(order)
-        chosen, blocked = [], set()
-        for p in order:
-            if p in blocked:
-                continue
-            chosen.append(p)
-            blocked.add(p)
-            blocked.update(ring8(*p, C, R))
-        cnt = Counter(X(*p) for p in chosen)
-        for t in ORDER:
-            caps[t] = max(caps[t], cnt[t])
-    return caps
-
-
-def max_flow(cap: dict, s: str, t: str) -> int:
-    flow = 0
-    while True:
-        parent = {s: None}
-        q = deque([s])
-        while q and t not in parent:
-            u = q.popleft()
-            for v, c in cap.get(u, {}).items():
-                if c > 0 and v not in parent:
-                    parent[v] = u
-                    q.append(v)
-        if t not in parent:
-            return flow
-        f, v = float("inf"), t
-        while parent[v] is not None:
-            f = min(f, cap[parent[v]][v])
-            v = parent[v]
-        v = t
-        while parent[v] is not None:
-            u = parent[v]
-            cap[u][v] -= f
-            cap.setdefault(v, {}).setdefault(u, 0)
-            cap[v][u] += f
-            v = u
-        flow += f
-
-
-def pair_flow_ok(P: dict, s: dict) -> bool:
-    """Can every pair's surplus P[pair] be split between its two tiers so tier t gets s[t]?"""
-    if sum(P.values()) != sum(s.values()) or any(v < 0 for v in s.values()):
-        return False
-    cap: dict = {"src": {}}
-    for pair, v in P.items():
-        cap["src"][("p", pair)] = v
-        cap[("p", pair)] = {("t", t): 10**9 for t in pair}
-    for t, v in s.items():
-        cap[("t", t)] = {"snk": v}
-    flow = max_flow(cap, "src", "snk")
-    return flow == sum(P.values())
-
-
 def fmt(d: dict) -> str:
     return "/".join(str(d.get(t, 0)) for t in ORDER)
 
 
 # ------------------------------------------------------------------ stage: roles (v3 placement policy)
-# Histogram target: v2's, unchanged (transition counts T per class, max over images; plain targets Pt from
-# the same search, with the same tier-flow test; the search now also needs the host split below to exist).
-# v3 changes only where surplus transition pieces may sit, by class pair (FINDINGS 14, 20, 23):
-#   SL      S cells on the S side of an S-L boundary. A plain S cell with a transition on side k takes the
-#           piece whose L side is k (classify's rule for a boundary S cell: rot = k). Corners use the sides
-#           {k, k+1}; the convex LSc piece uses its diagonal L corner. The ragged edge thickens outward.
-#   DL, DM  D cells at Chebyshev distance >= FUR_MIN_DIST from every transition and FRAME_MIN from the edge
-#           ("fur" marks), free rotation
-#           (@*). Fallback: M cells at the same distance, then L.
-#   ML      M cells at the same distance, lower part of the picture preferred, free rotation. L only when the
-#           fixed target leaves no other host; then an L cell next to the M-L boundary (flagged in the log).
-#   MW, WL  W cells, far first, then ring. MW falls back to M when the fixed target keeps every W cell plain.
+# Histogram target: v2's (transition counts T per class, max over images; plain targets Pt common to the
+# three images). Surplus transition pieces are hosted by plain cells along a fallback chain per pair.
+# A chain stage is (host tile, zone):
+#   far     interior cell at Chebyshev distance >= FUR_MIN_DIST from every transition cell and >= FRAME_MIN
+#           from the picture edge; free rotation ("fur" mark)
+#   near    any other interior non-transition cell (next to a transition or to the edge ring)
+#   edge    S cell that touches an S-L boundary (8-neighbourhood) for some class; interior = the rest
+# Transition cells and frame cells are never hosts. The capacity check (min-cost allocation over the chain
+# stages) and the picker (place_image) both read the pools of host_zones, so a plan that passes the check
+# always finds cells. The tile counts of a plan are exact: host tile t of image n = F[n][t] - Pt[t].
 
+CHAIN = {                                             # stages per pair, in order; cost = position
+    "DL": [("D", "far"), ("D", "near"), ("M", "far"), ("M", "near"), ("L", "far")],
+    "DM": [("D", "far"), ("D", "near"), ("M", "far"), ("M", "near"), ("L", "far")],
+    "DW": [("D", "far"), ("D", "near"), ("M", "far"), ("M", "near"), ("L", "far")],   # pairs with D: D chain
+    "ML": [("M", "far"), ("M", "near"), ("L", "far")],
+    "MW": [("W", "far"), ("W", "near"), ("M", "far")],
+    "WL": [("W", "far"), ("W", "near"), ("M", "far")],
+    "SL": [("S", "edge"), ("S", "interior")],
+}
+STAGE_ORDER = [("D", "far"), ("D", "near"), ("M", "far"), ("M", "near"), ("L", "far"),
+               ("W", "far"), ("W", "near"), ("S", "edge"), ("S", "interior")]
 FUR_MIN_DIST = 2                       # Chebyshev distance from every transition cell for interior marks
 FRAME_MIN = 2                          # ... and from the picture edge (frame cells), in cells
-HOST_COST = {                          # tiers that may host a surplus pair, with a cost (0 = the policy)
-    "SL": {"S": 0, "L": 4},
-    "DL": {"D": 0, "M": 1, "L": 4},
-    "DM": {"D": 0, "M": 1, "L": 4},
-    "ML": {"M": 0, "L": 3},
-    "MW": {"W": 0, "M": 2},
-    "WL": {"W": 0, "L": 3},
-    "DW": {"D": 0, "W": 1},
-}
 SE_ROLE = {"SLs": "se_sls", "SLc": "se_slc", "LSc": "se_lsc"}   # S-edge roles, one class each
 SE_CLASS = {v: k for k, v in SE_ROLE.items()}
+
+
+def stage_name(stage: tuple) -> str:
+    return f"{stage[0]}-{stage[1]}"
 
 
 def transition_cells(st, R: int, C: int) -> set:
@@ -806,11 +751,18 @@ def cheb_dist(trans: set, C: int, R: int) -> dict:
     return dist
 
 
+def s_geometry(p, trans: set):
+    """Sides k (0 T, 1 R, 2 B, 3 L) and corners q (0 TL .. 3 BL) of cell p whose neighbour is a transition."""
+    B = {k for k, (dx, dy) in enumerate(SIDE_OFF) if (p[0] + dx, p[1] + dy) in trans}
+    Q = [q for q, (dx, dy) in enumerate(CORNER_OFF) if (p[0] + dx, p[1] + dy) in trans]
+    return B, Q
+
+
 def s_options(B: set, Q: list) -> dict:
     """Best (score, rotation in degrees) per SL class for a plain S cell.
 
-    B: sides k (0 T, 1 R, 2 B, 3 L) whose neighbour is a transition; Q: corners q (0 TL .. 3 BL) whose
-    diagonal neighbour is a transition. Score 2 = every L side meets a boundary, 0 = partly, < 0 = none.
+    B: sides k whose neighbour is a transition; Q: corners q whose diagonal neighbour is a transition.
+    Score 2 = every L side meets a boundary, 0 = partly, < 0 = none.
     """
     out = {}
     ks = sorted(B)
@@ -832,164 +784,184 @@ def s_options(B: set, Q: list) -> dict:
     return out
 
 
-def s_cat(score: int) -> str:
-    return "S-edge" if score >= 2 else ("S-edge partial" if score >= 0 else "S-off-edge")
+def is_far_cell(p, dist: dict, C: int, R: int) -> bool:
+    return (dist.get(p, 99) >= FUR_MIN_DIST and FRAME_MIN <= p[0] <= C - 1 - FRAME_MIN
+            and FRAME_MIN <= p[1] <= R - 1 - FRAME_MIN)
 
 
-def split_pairs(P: dict, s: dict):
-    """Split each pair's surplus over its allowed host tiers so that tier t receives exactly s[t] pieces,
-    at the least total HOST_COST. Returns (cost, {pair: {tier: n}}) or None."""
-    pairs = [p for p in PAIRS if P.get(p, 0)]
-    best = {"cost": None, "alloc": None}
-
-    def splits(n: int, k: int):
-        if k == 1:
-            yield (n,)
-            return
-        for i in range(n + 1):
-            for rest in splits(n - i, k - 1):
-                yield (i,) + rest
-
-    def rec(i: int, used: dict, cost: int, alloc: dict) -> None:
-        if best["cost"] is not None and cost >= best["cost"]:
-            return
-        if i == len(pairs):
-            if all(used.get(t, 0) == s.get(t, 0) for t in ORDER):
-                best["cost"], best["alloc"] = cost, {p: dict(v) for p, v in alloc.items()}
-            return
-        p = pairs[i]
-        hosts = list(HOST_COST[p])
-        for split in splits(P[p], len(hosts)):
-            u = dict(used)
-            ok = True
-            for t, k in zip(hosts, split):
-                u[t] = u.get(t, 0) + k
-                if u[t] > s.get(t, 0):
-                    ok = False
-                    break
-            if not ok:
-                continue
-            alloc[p] = dict(zip(hosts, split))
-            rec(i + 1, u, cost + sum(HOST_COST[p][t] * k for t, k in zip(hosts, split)), alloc)
-            del alloc[p]
-
-    rec(0, {}, 0, {})
-    return None if best["alloc"] is None else (best["cost"], best["alloc"])
-
-
-def place_image(n: str, tok: list, st: dict, sur_n: dict, alloc_n: dict, C: int, R: int, rnd: random.Random) -> dict:
-    """Host cells of one image: {(x, y): (role token, category, pair)}. Plain and edge cells are not listed."""
+def host_zones(tok, st, C: int, R: int) -> dict:
+    """Candidate host cells of one image by chain stage, with the S options. Capacity and picker both use this."""
     trans = transition_cells(st, R, C)
     dist = cheb_dist(trans, C, R)
-    out: dict = {}
-
-    def inside(p) -> bool:
-        return 0 <= p[0] < C and 0 <= p[1] < R
-
-    def tr(p) -> bool:
-        return inside(p) and p in trans
-
-    def far(p) -> bool:                                  # interior: away from transitions and from the edge
-        return (dist.get(p, 99) >= FUR_MIN_DIST and FRAME_MIN <= p[0] <= C - 1 - FRAME_MIN
-                and FRAME_MIN <= p[1] <= R - 1 - FRAME_MIN)
-
-    # S hosts (SL pair): every surplus SL piece, most constrained class first.
-    s_cells = [(x, y) for y in range(R) for x in range(C)
-               if not is_frame(y, x, R, C) and tok[y][x] == "S" and (x, y) not in trans]
-    opts = {}
-    for p in s_cells:
-        B = {k for k, (dx, dy) in enumerate(SIDE_OFF) if tr((p[0] + dx, p[1] + dy))}
-        Q = [q for q, (dx, dy) in enumerate(CORNER_OFF) if tr((p[0] + dx, p[1] + dy))]
-        opts[p] = s_options(B, Q)
-    tie = {p: rnd.random() for p in s_cells}
-    chosen_s: set = set()
-    rem = {c: sur_n.get(c, 0) for c in ("LSc", "SLc", "SLs")}
-    while sum(rem.values()):                       # best (cell, class) first: score, then fewest chosen neighbours
-        best_key, best_pick = None, None
-        for p in s_cells:
-            if p in out:
+    pools: dict = {(t, z): [] for t in "DMWL" for z in ("far", "near")}
+    pools[("S", "edge")], pools[("S", "interior")] = [], []
+    s_opts: dict = {}
+    for y in range(R):
+        for x in range(C):
+            p = (x, y)
+            if is_frame(y, x, R, C) or p in trans:
                 continue
-            pen = sum(1 for dx, dy in SIDE_OFF if (p[0] + dx, p[1] + dy) in chosen_s)
-            for cls, k in rem.items():
-                if k:
-                    key = (-opts[p][cls][0], pen, tie[p], cls)
-                    if best_key is None or key < best_key:
-                        best_key, best_pick = key, (p, cls)
-        if best_pick is None:
-            raise SystemExit(f"{IMAGE_NAME[n]}: no plain S cell left for the S-edge pieces")
-        p, cls = best_pick
-        score, deg = opts[p][cls]
-        out[p] = (f"{SE_ROLE[cls]}@{deg}", s_cat(score), "SL")
-        chosen_s.add(p)
-        rem[cls] -= 1
-    if len(chosen_s) != alloc_n.get("SL", {}).get("S", 0):
-        raise SystemExit(f"{IMAGE_NAME[n]}: S hosts {len(chosen_s)} != SL pieces hosted at S")
+            t = tok[y][x]
+            if t == "S":
+                s_opts[p] = s_options(*s_geometry(p, trans))
+                zone = "edge" if max(v[0] for v in s_opts[p].values()) >= 0 else "interior"
+                pools[("S", zone)].append(p)
+            else:
+                pools[(t, "far" if is_far_cell(p, dist, C, R) else "near")].append(p)
+    return {"pools": pools, "s_opts": s_opts, "trans": trans}
 
-    # Other hosts (D, M, W, L): interior marks with free rotation, spaced by one cell.
+
+def min_cost_flow(arcs: list, src, snk) -> tuple[int, int, list]:
+    """Successive shortest paths (Bellman-Ford). arcs: (u, v, cap, cost). Returns (flow, cost, flow per arc)."""
+    g: dict = {}
+    fwd: list = []
+
+    def add(u, v, cap: int, cost: int) -> None:
+        f = {"to": v, "cap": cap, "cost": cost, "rev": None}
+        b = {"to": u, "cap": 0, "cost": -cost, "rev": f}
+        f["rev"] = b
+        g.setdefault(u, []).append(f)
+        g.setdefault(v, []).append(b)
+        fwd.append((f, cap))
+
+    for u, v, cap, cost in arcs:
+        add(u, v, cap, cost)
+    flow = total = 0
+    while True:
+        dist = {src: 0}
+        prev: dict = {}
+        for _ in range(len(g)):
+            moved = False
+            for u in list(dist):
+                for e in g.get(u, []):
+                    if e["cap"] > 0 and (e["to"] not in dist or dist[u] + e["cost"] < dist[e["to"]]):
+                        dist[e["to"]] = dist[u] + e["cost"]
+                        prev[e["to"]] = e
+                        moved = True
+            if not moved:
+                break
+        if snk not in dist:
+            break
+        push, v = None, snk
+        while v != src:
+            e = prev[v]
+            push = e["cap"] if push is None else min(push, e["cap"])
+            v = e["rev"]["to"]
+        v = snk
+        while v != src:
+            e = prev[v]
+            e["cap"] -= push
+            e["rev"]["cap"] += push
+            v = e["rev"]["to"]
+        flow += push
+        total += push * dist[snk]
+    return flow, total, [cap - f["cap"] for f, cap in fwd]
+
+
+def alloc_hosts(P: dict, s: dict, size: dict):
+    """Split each pair's surplus over its chain stages so that host tile t gets exactly s[t] pieces, at the least
+    total chain cost. size: pool size per stage (the cells the picker draws from). Returns (cost, {pair: {stage: n}})
+    or None when no split exists."""
+    pieces = {p: P[p] for p in PAIRS if P.get(p, 0)}
+    if sum(pieces.values()) != sum(s.values()) or any(v < 0 for v in s.values()):
+        return None
+    arcs, idx = [], []
+    for p, n in pieces.items():
+        arcs.append(("src", ("p", p), n, 0))
+        for k, stage in enumerate(CHAIN[p]):
+            if size.get(stage, 0):
+                idx.append((len(arcs), p, stage))
+                arcs.append((("p", p), ("st", stage), n, k))
+    for stage, cap in size.items():
+        if cap:
+            arcs.append((("st", stage), ("t", stage[0]), cap, 0))
+    for t in ORDER:
+        arcs.append((("t", t), "snk", s.get(t, 0), 0))
+    flow, cost, got = min_cost_flow(arcs, "src", "snk")
+    if flow != sum(pieces.values()):
+        return None
+    out: dict = {}
+    for i, p, stage in idx:
+        if got[i]:
+            out.setdefault(p, {})[stage] = got[i]
+    return cost, out
+
+
+def place_image(n: str, tok: list, host: dict, sur_n: dict, alloc_n: dict, C: int, R: int,
+                rnd: random.Random) -> dict:
+    """Host cells of one image: {(x, y): (role token, stage, pair, chain rank)}. Plain cells are not listed."""
+    pools, s_opts, trans = host["pools"], host["s_opts"], host["trans"]
+    out: dict = {}
+    m_key = {p: rnd.random() ** (1.0 / (1.0 + 2.0 * p[1] / max(1, R - 1)))
+             for z in ("far", "near") for p in pools[("M", z)]}
+
+    # SL pieces: S-edge cells first, then S-interior; within a zone the best (cell, class) by score.
+    rem = {c: sur_n.get(c, 0) for c in ("LSc", "SLc", "SLs")}
+    tie = {p: rnd.random() for p in s_opts}
+    chosen_s: set = set()
+    for stage in (("S", "edge"), ("S", "interior")):
+        for _ in range(alloc_n.get("SL", {}).get(stage, 0)):
+            best = None
+            for p in pools[stage]:
+                if p in out:
+                    continue
+                pen = sum(1 for dx, dy in SIDE_OFF if (p[0] + dx, p[1] + dy) in chosen_s)
+                for cls, k in rem.items():
+                    if k:
+                        key = (-s_opts[p][cls][0], pen, tie[p], cls)
+                        if best is None or key < best[0]:
+                            best = (key, p, cls)
+            if best is None:
+                raise SystemExit(f"{IMAGE_NAME[n]}: no free {stage_name(stage)} cell for an SL piece (left {rem})")
+            _, p, cls = best
+            score, deg = s_opts[p][cls]
+            out[p] = (f"{SE_ROLE[cls]}@{deg}", stage_name(stage), "SL", CHAIN["SL"].index(stage))
+            chosen_s.add(p)
+            rem[cls] -= 1
+    if any(rem.values()):
+        raise SystemExit(f"{IMAGE_NAME[n]}: SL classes not placed: {rem}")
+
+    # Other hosts: interior marks with free rotation, one cell apart from other marks where the pool allows.
     blocked: set = set()
 
-    def pick(pool: list, k: int, tier: str) -> list:
-        """k cells in pool order; one-cell spacing from other marks first, relaxed only if the pool runs out."""
+    def pick(pool: list, k: int, stage: tuple) -> list:
         got: list = []
+        relaxed_picks = 0
         for relaxed in (False, True):
             for p in pool:
                 if len(got) == k:
                     break
                 if p in got or p in out or (not relaxed and p in blocked):
                     continue
+                if p in trans or is_frame(p[1], p[0], R, C):
+                    raise SystemExit(f"{IMAGE_NAME[n]}: {stage_name(stage)} pool holds a transition or frame cell {p}")
                 got.append(p)
                 blocked.add(p)
                 blocked.update(ring8(p[0], p[1], C, R))
+                if relaxed:
+                    relaxed_picks += 1
             if len(got) == k:
                 break
         if len(got) < k:
-            raise SystemExit(f"{IMAGE_NAME[n]}: only {len(got)} of {k} {tier} hosts available")
-        if relaxed:
-            log(f"   {n} {IMAGE_NAME[n]:6s} {tier}: spacing relaxed for {k} hosts (pool too small)")
+            raise SystemExit(f"{IMAGE_NAME[n]}: {stage_name(stage)} pool gives {len(got)} of {k} hosts")
+        if relaxed_picks:
+            log(f"   {n} {IMAGE_NAME[n]:6s} {stage_name(stage)}: spacing relaxed for {relaxed_picks} of {k} hosts")
         return got
 
-    by_tile: dict = {t: [] for t in TILES}
-    for y in range(R):
-        for x in range(C):
-            if not is_frame(y, x, R, C) and (x, y) not in trans:
-                by_tile[tok[y][x]].append((x, y))
-    m_key = {p: rnd.random() ** (1.0 / (1.0 + 2.0 * p[1] / max(1, R - 1))) for p in by_tile["M"]}
-    d_pool = [p for p in by_tile["D"] if far(p)]
-    rnd.shuffle(d_pool)
-    pools = {
-        "D": d_pool,
-        "M": sorted((p for p in by_tile["M"] if far(p)), key=lambda p: -m_key[p]),
-        "W": sorted(by_tile["W"], key=lambda p: (not far(p), rnd.random())),
-    }
-    def l_pool(pair: str) -> list:                 # L cells next to the pair's other tile, if any
-        other = next(t for t in pair if t != "L")
-        ot = {p for p in trans if tok[p[1]][p[0]] == other}
-        return sorted((p for p in by_tile["L"] if dist.get(p, 99) == 1),
-                      key=lambda p: (not any((p[0] + dx, p[1] + dy) in ot for dx, dy in SIDE_OFF), rnd.random()))
-
-    for tier in ("D", "M", "W", "L"):
-        labels = [pair for pair, split in alloc_n.items() for _ in range(split.get(tier, 0))]
+    for stage in STAGE_ORDER:
+        if stage[0] == "S":
+            continue
+        labels = [pair for pair, split in alloc_n.items() if pair != "SL" for _ in range(split.get(stage, 0))]
         if not labels:
             continue
         rnd.shuffle(labels)
-        if tier == "L":
-            picked = []
-            for pair in dict.fromkeys(labels):
-                k = labels.count(pair)
-                picked += [(p, pair) for p in pick(l_pool(pair), k, tier)]
-            pairs_of = dict(picked)
+        pool = list(pools[stage])
+        if stage[0] == "M":
+            pool.sort(key=lambda p: -m_key[p])            # lower part of the picture first
         else:
-            pairs_of = dict(zip(pick(pools[tier], len(labels), tier), labels))
-        for p, pair in pairs_of.items():
-            if tier == "D":
-                cat = "D-interior"
-            elif tier == "M":
-                cat = "M-interior" if pair == "ML" else "M-fallback"
-            elif tier == "W":
-                cat = "W-far" if far(p) else "W-ring"
-            else:
-                cat = "L-edge (forced)"
-            out[p] = (f"{tier.lower()}_fur_{pair.lower()}@*", cat, pair)
+            rnd.shuffle(pool)
+        for p, pair in zip(pick(pool, len(labels), stage), labels):
+            out[p] = (f"{stage[0].lower()}_fur_{pair.lower()}@*", stage_name(stage), pair, CHAIN[pair].index(stage))
     return out
 
 
@@ -1000,73 +972,75 @@ def stage_roles(tiles, st, bud) -> None:
     T, sur_k = bud["T"], bud["sur"]
     codes = bud["classes"]
     info = {n: image_roles(tiles[n], st[n], C, R) for n in IMAGES}
-    X = {n: (lambda n: (lambda x, y: tiles[n][y][x]))(n) for n in IMAGES}
+    host = {n: host_zones(tiles[n], st[n], C, R) for n in IMAGES}
+    size = {n: {k: len(v) for k, v in host[n]["pools"].items()} for n in IMAGES}
+    tile_pool = {n: {t: sum(v for (tt, _), v in size[n].items() if tt == t) for t in ORDER} for n in IMAGES}
     total_trans = sum(T.values())
     plain_total = CELLS - total_trans
     frame_k = {n: {t: info[n]["frame"][t] for t in ORDER} for n in IMAGES}
     F = {n: {t: info[n]["frame"][t] + info[n]["near_n"][t] + info[n]["far_n"][t] for t in ORDER} for n in IMAGES}
     P_pair = {n: {p: sum(sur_k[n][c] for c in codes if pair_of(c) == p) for p in PAIRS} for n in IMAGES}
-    caps = {n: tier_caps(info[n]["far"], X[n], rnd, C, R) for n in IMAGES}
     log(f"3. roles: total transitions {total_trans}, plain target total {plain_total}, tiers {ORDER}")
     for n in IMAGES:
-        log(f"   {n} F (plain-capable, frame incl.) {fmt(F[n])}; frame {fmt(frame_k[n])}; "
-            f"far-slot estimate {fmt(caps[n])}")
-    # Plain targets: v2's search (same bounds, same tier-flow test) plus the v3 host split, which must exist.
+        log(f"   {n} {IMAGE_NAME[n]:6s} F (plain-capable, frame incl.) {fmt(F[n])}; frame {fmt(frame_k[n])}; "
+            "surplus " + " ".join(f"{p} {P_pair[n][p]}" for p in PAIRS if P_pair[n][p]))
+        log(f"   {n} {IMAGE_NAME[n]:6s} host pools (cells per chain stage): "
+            + " ".join(f"{stage_name(s)} {size[n][s]}" for s in STAGE_ORDER))
+
+    # Plain targets: common to the images. Each image's host split must exist (exact tile counts, the chain
+    # pools as capacity); among the feasible targets take the least total chain cost.
     lo = {t: max(frame_k[n][t] for n in IMAGES) for t in ORDER}
     hi = {t: min(F[n][t] for n in IMAGES) for t in ORDER}
     last = ORDER[-1]
-    feas = []
+    best, n_cand = None, 0
     for vals in itertools.product(*(range(lo[t], hi[t] + 1) for t in ORDER[:-1])):
         Pt = dict(zip(ORDER[:-1], vals))
         Pt[last] = plain_total - sum(vals)
         if not (lo[last] <= Pt[last] <= hi[last]):
             continue
-        short = near_use = 0
-        ok = True
+        total, alloc = 0, {}
         for n in IMAGES:
             s = {t: F[n][t] - Pt[t] for t in ORDER}
-            if any(s[t] < 0 or s[t] > info[n]["near_n"][t] + info[n]["far_n"][t] for t in ORDER):
-                ok = False
+            if any(s[t] < 0 or s[t] > tile_pool[n][t] for t in ORDER):
                 break
-            if not pair_flow_ok(P_pair[n], s):
-                ok = False
+            res = alloc_hosts(P_pair[n], s, size[n])
+            if res is None:
                 break
-            short += sum(max(0, s[t] - caps[n][t] - info[n]["near_n"][t]) for t in ORDER)
-            near_use += sum(max(0, s[t] - caps[n][t]) for t in ORDER)
-        if ok:
-            feas.append(((short, near_use), Pt))
-    if not feas:
-        raise SystemExit("no plain-target split is flow-feasible")
-    feas.sort(key=lambda f: f[0])
-    Pt = short_est = near_est = None
-    for (short, near_use), cand in feas:
-        if all(split_pairs(P_pair[n], {t: F[n][t] - cand[t] for t in ORDER}) for n in IMAGES):
-            Pt, short_est, near_est = cand, short, near_use
-            break
-    if Pt is None:
-        raise SystemExit("no plain-target split matches the host policy")
-    log(f"   plain targets {fmt(Pt)}; far-slot estimate short {short_est}, near use {near_est}")
-
-    s_n = {n: {t: F[n][t] - Pt[t] for t in ORDER} for n in IMAGES}
-    alloc = {}
+            total += res[0]
+            alloc[n] = (s, res[0], res[1])
+        else:
+            n_cand += 1
+            if best is None or total < best[0]:
+                best = (total, Pt, alloc)
+    if best is None:
+        raise SystemExit("no plain-target split fits the chain pools")
+    total_cost, Pt, alloc = best
+    log(f"   plain targets {fmt(Pt)}; chain cost {total_cost} ({n_cand} feasible targets checked)")
     for n in IMAGES:
-        cost, alloc[n] = split_pairs(P_pair[n], s_n[n])
-        log(f"   {n} {IMAGE_NAME[n]:6s} host tiers needed D/S/M/W/L {fmt(s_n[n])}; policy split cost {cost}")
+        s, c, _ = alloc[n]
+        log(f"   {n} {IMAGE_NAME[n]:6s} host tiers needed D/S/M/W/L {fmt(s)}; chain cost {c}")
 
-    cell_info = {n: place_image(n, tiles[n], st[n], sur_k[n], alloc[n], C, R, rnd) for n in IMAGES}
-    log("   surplus placement (pair: host category, cells):")
+    cell_info = {n: place_image(n, tiles[n], host[n], sur_k[n], alloc[n][2], C, R, rnd) for n in IMAGES}
+    cols = [stage_name(s) for s in STAGE_ORDER]
+    log("   placement per pair (pieces by chain stage; fallback = placed after the pair's first stage):")
+    log("     " + f"{'image':10s}{'pair':>5s}{'surpl':>6s} " + "".join(f"{c:>12s}" for c in cols) + f"{'fallback':>10s}")
     place_lines = []
     for n in IMAGES:
-        tally = Counter((pair, cat) for _, cat, pair in cell_info[n].values())
+        tally = Counter((pair, cat) for _, cat, pair, _ in cell_info[n].values())
+        fb = Counter(pair for _, _, pair, rank in cell_info[n].values() if rank > 0)
         for pair in PAIRS:
-            parts = [f"{cat} {k}" for (pp, cat), k in sorted(tally.items()) if pp == pair]
-            if parts:
-                log(f"     {n} {IMAGE_NAME[n]:6s} {pair}: " + ", ".join(parts))
-        for (x, y), (role_tok, cat, pair) in sorted(cell_info[n].items(), key=lambda kv: (kv[0][1], kv[0][0])):
-            place_lines.append(f"{n} x={x} y={y} tile={tiles[n][y][x]} pair={pair} {cat} {role_tok}")
+            if not P_pair[n][pair]:
+                continue
+            placed = sum(tally[(pair, c)] for c in cols)
+            if placed != P_pair[n][pair]:
+                raise SystemExit(f"{IMAGE_NAME[n]} {pair}: placed {placed} of {P_pair[n][pair]}")
+            log(f"     {n + ' ' + IMAGE_NAME[n]:10s}{pair:>5s}{P_pair[n][pair]:6d} "
+                + "".join(f"{tally[(pair, c)]:12d}" for c in cols) + f"{fb[pair]:10d}")
+        for (x, y), (role_tok, cat, pair, rank) in sorted(cell_info[n].items(), key=lambda kv: (kv[0][1], kv[0][0])):
+            place_lines.append(f"{n} x={x} y={y} tile={tiles[n][y][x]} pair={pair} {cat} rank={rank} {role_tok}")
     (WORK / "placement.txt").write_text("\n".join(place_lines) + "\n", encoding="utf-8")
 
-    used = {r.partition("@")[0] for n in IMAGES for r, _, _ in cell_info[n].values()}
+    used = {r.partition("@")[0] for n in IMAGES for r, _, _, _ in cell_info[n].values()}
     roles = {}
     for t in ORDER:
         low = t.lower()
@@ -1084,9 +1058,10 @@ def stage_roles(tiles, st, bud) -> None:
     target = {c: T[c] for c in codes}
     target.update(Pt)
     assert sum(target.values()) == CELLS, (sum(target.values()), CELLS)
-    spec = {"_note": "Experiment 011 v3 roles: surplus transition pieces placed by class pair (S-edge oriented, "
-                     "D/M/W interior free rotation); target_counts = v2's (per-class max over images for "
-                     "transitions, common plain targets). Frame and edge roles fixed.",
+    spec = {"_note": "Experiment 011 v3 roles: surplus transition pieces placed along the per-pair fallback chain "
+                     "(D far, D near, M far, M near, L far; M far, M near, L far; W far, W near, M far; S edge, "
+                     "S interior). target_counts = v2's (per-class max over images for transitions, common plain "
+                     "targets). Frame and edge roles fixed.",
             "roles": roles, "target_counts": {k: target[k] for k in sorted(target)}}
     (WORK / "roles-spec.json").write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
 

@@ -1,0 +1,5 @@
+sizes=27x38, 27x38, 27x38 shared AB/AC/BC=0/0/1 valid=True wrote 16 files to /home/user/metapuzzle/experiments/011-subjects/27x38-v2/run-full
+piece gates: PASS
+scene gates: FAIL (A-B 2x2 window reuse 71.3% ≥ 30%; A-B transferable blob 10.3% ≥ 10% of cells; A-C 2x2 window reuse 64.3% ≥ 30%; A-C transferable blob 11.5% ≥ 10% of cells; B-C 2x2 window reuse 68.3% ≥ 30%)
+
+--- stderr ---
